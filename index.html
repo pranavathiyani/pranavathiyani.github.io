@@ -180,79 +180,52 @@
             font-size: 1.2rem;
         }
         
-        /* DNA Animation Easter Egg */
-        #dna-container {
-            position: fixed;
-            top: 50%;
-            left: -300px; /* Hidden initially */
-            transform: translateY(-50%);
-            width: 300px;
-            height: 400px;
-            z-index: 10;
-            transition: left 0.8s ease-out;
-            cursor: pointer;
+        /* Quote section styling */
+        .quote-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
         }
         
-        #dna-container.visible {
-            left: 0;
-        }
-        
-        .dna-strand {
+        .quote-section::before {
+            content: '"';
             position: absolute;
-            left: 150px;
-            height: 400px;
-            width: 4px;
-            background-color: rgba(255, 255, 255, 0.3);
+            top: -15px;
+            left: 10px;
+            font-size: 120px;
+            color: rgba(110, 87, 224, 0.1);
+            font-family: Georgia, serif;
         }
         
-        .dna-rung {
-            position: absolute;
-            width: 60px;
-            height: 4px;
-            left: 120px;
-            background-color: var(--primary-color);
-            transform-origin: right center;
+        .quote-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
         }
         
-        .dna-rung:nth-child(even) {
-            background-color: #4cd137;
+        .quote-author {
+            font-weight: bold;
+            color: var(--primary-color);
         }
         
-        .dna-toggle {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(110, 87, 224, 0.6);
-            z-index: 100;
-            transition: transform 0.3s;
-        }
-        
-        .dna-toggle:hover {
-            transform: scale(1.1);
+        .quote-emoji {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
         }
     </style>
 </head>
 <body>
     <!-- Stars Background -->
     <div id="stars-container"></div>
-    
-    <!-- DNA Easter Egg -->
-    <div class="dna-toggle" title="Click for a surprise">
-        <i class="bi bi-puzzle"></i>
-    </div>
-    <div id="dna-container">
-        <div class="dna-strand"></div>
-        <!-- DNA rungs will be added via JavaScript -->
-    </div>
     
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -366,6 +339,15 @@
             </div>
         </div>
     </section>
+    
+    <!-- Quote Section -->
+    <div class="container">
+        <div class="quote-section" id="quote-container">
+            <span class="quote-emoji" id="quote-emoji">💡</span>
+            <p class="quote-text" id="quote-text">Loading inspiration...</p>
+            <p class="quote-author" id="quote-author"></p>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-2">
@@ -375,7 +357,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom JavaScript for stars, comets, and DNA easter egg -->
+    <!-- Custom JavaScript for stars, comets, and quotes -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Stars and comets
@@ -441,47 +423,99 @@
             // Create initial comet
             createComet();
             
-            // DNA Easter Egg
-            const dnaContainer = document.getElementById('dna-container');
-            const dnaToggle = document.querySelector('.dna-toggle');
-            const dnaStrand = document.querySelector('.dna-strand');
-            const numRungs = 20;
+            // Quotes system
+            const quotes = [
+                {
+                    text: "In the vast sequence of life, every base pair matters.",
+                    author: "- Francis Collins",
+                    emoji: "🧬"
+                },
+                {
+                    text: "The code of life isn't just in DNA, but in how we decode its mysteries.",
+                    author: "- Jennifer Doudna",
+                    emoji: "🔬"
+                },
+                {
+                    text: "Science knows no country, because knowledge belongs to humanity.",
+                    author: "- Louis Pasteur",
+                    emoji: "🌍"
+                },
+                {
+                    text: "The beauty of data is not in the numbers, but in the patterns they reveal.",
+                    author: "- Rosalind Franklin",
+                    emoji: "📊"
+                },
+                {
+                    text: "The most exciting phrase in science is not 'Eureka!' but 'That's funny...'",
+                    author: "- Isaac Asimov",
+                    emoji: "💭"
+                },
+                {
+                    text: "The good thing about science is that it's true whether or not you believe in it.",
+                    author: "- Neil deGrasse Tyson",
+                    emoji: "⚗️"
+                },
+                {
+                    text: "Biology is the study of complicated things that have the appearance of having been designed with a purpose.",
+                    author: "- Richard Dawkins",
+                    emoji: "🦠"
+                },
+                {
+                    text: "The greatest enemy of knowledge is not ignorance, it is the illusion of knowledge.",
+                    author: "- Stephen Hawking",
+                    emoji: "🔭"
+                },
+                {
+                    text: "Somewhere, something incredible is waiting to be known.",
+                    author: "- Carl Sagan",
+                    emoji: "✨"
+                },
+                {
+                    text: "The first rule of intelligent tinkering is to save all the parts.",
+                    author: "- Paul Ehrlich",
+                    emoji: "🧩"
+                },
+                {
+                    text: "Data is the new science. Big Data holds the answers.",
+                    author: "- Pat Gelsinger",
+                    emoji: "💻"
+                },
+                {
+                    text: "The universe is not only stranger than we imagine, it's stranger than we can imagine.",
+                    author: "- J.B.S. Haldane",
+                    emoji: "🌌"
+                }
+            ];
             
-            // Create DNA rungs
-            for (let i = 0; i < numRungs; i++) {
-                const rung = document.createElement('div');
-                rung.classList.add('dna-rung');
+            // Display a random quote
+            function displayRandomQuote() {
+                const quoteContainer = document.getElementById('quote-container');
+                const quoteText = document.getElementById('quote-text');
+                const quoteAuthor = document.getElementById('quote-author');
+                const quoteEmoji = document.getElementById('quote-emoji');
                 
-                // Position along the strand
-                const position = i * (400 / numRungs);
-                rung.style.top = `${position}px`;
+                // Get random quote
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                const quote = quotes[randomIndex];
                 
-                // Animation
-                const baseDelay = i * 0.1;
-                rung.style.animation = `rotate-rung 3s infinite ease-in-out ${baseDelay}s`;
+                // Update DOM
+                quoteText.textContent = quote.text;
+                quoteAuthor.textContent = quote.author;
+                quoteEmoji.textContent = quote.emoji;
                 
-                dnaContainer.appendChild(rung);
+                // Add fade-in effect
+                quoteContainer.style.opacity = 0;
+                setTimeout(() => {
+                    quoteContainer.style.opacity = 1;
+                    quoteContainer.style.transition = 'opacity 1s ease';
+                }, 100);
             }
             
-            // Add animation keyframes dynamically
-            const styleSheet = document.createElement('style');
-            styleSheet.textContent = `
-                @keyframes rotate-rung {
-                    0%, 100% { transform: rotate(0deg); }
-                    50% { transform: rotate(90deg); }
-                }
-            `;
-            document.head.appendChild(styleSheet);
+            // Show initial quote
+            displayRandomQuote();
             
-            // Toggle DNA visibility
-            dnaToggle.addEventListener('click', () => {
-                dnaContainer.classList.toggle('visible');
-            });
-            
-            // Click to hide DNA
-            dnaContainer.addEventListener('click', () => {
-                dnaContainer.classList.remove('visible');
-            });
+            // Change quote every 30 seconds (optional)
+            setInterval(displayRandomQuote, 30000);
         });
     </script>
 </body>
