@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Course Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+        }
+        
+        .progress-fill {
+            background: #4caf50;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .quiz-content {
+            padding: 30px;
+        }
+        
+        .question-card {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .unit-badge {
+            background: #764ba2;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .option:hover {
+            background: #efefef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .option.correct {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .option.incorrect {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .option-letter {
+            background: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+        
+        .option.correct .option-letter {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .option.incorrect .option-letter {
+            background: #f44336;
+            color: white;
+        }
+        
+        .explanation {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .explanation.show {
+            display: block;
+        }
+        
+        .explanation-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-text {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .score-number {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .score-details {
+            margin: 30px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .score-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .score-item-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .score-item-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .results h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .results-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐍 Python Course Quiz</h1>
+            <p>Test your knowledge on Python fundamentals, OOP, and Biopython</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="quiz-content">
+            <div id="quizSection"></div>
+            
+            <div class="results" id="results">
+                <h2>Quiz Complete! 🎉</h2>
+                <div class="score-circle">
+                    <div class="score-number" id="scoreNumber">0%</div>
+                    <div class="score-label">Your Score</div>
+                </div>
+                <p class="results-message" id="resultsMessage"></p>
+                <div class="score-details">
+                    <div class="score-item">
+                        <div class="score-item-value" id="correctCount">0</div>
+                        <div class="score-item-label">Correct</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-item-value" id="incorrectCount">0</div>
+                        <div class="score-item-label">Incorrect</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-item-value" id="totalCount">0</div>
+                        <div class="score-item-label">Total Questions</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                unit: "Unit I",
+                question: "What is computational thinking?",
+                options: [
+                    "Writing code in any programming language",
+                    "Breaking down complex problems into manageable parts using logical reasoning",
+                    "Using a computer to solve all problems automatically",
+                    "Memorizing programming syntax"
+                ],
+                correct: 1,
+                explanation: "Computational thinking is a problem-solving approach that involves breaking down complex problems into smaller, manageable parts using logical reasoning, pattern recognition, abstraction, and algorithm design."
+            },
+            {
+                unit: "Unit I",
+                question: "Which of the following is NOT a mutable data type in Python?",
+                options: [
+                    "List",
+                    "Dictionary",
+                    "Tuple",
+                    "Set"
+                ],
+                correct: 2,
+                explanation: "Tuples are immutable in Python, meaning their contents cannot be changed after creation. Lists, dictionaries, and sets are all mutable data types."
+            },
+            {
+                unit: "Unit I",
+                question: "What is the output of: [x**2 for x in range(5) if x % 2 == 0]?",
+                options: [
+                    "[0, 1, 4, 9, 16]",
+                    "[0, 4, 16]",
+                    "[1, 9]",
+                    "[0, 2, 4]"
+                ],
+                correct: 1,
+                explanation: "This list comprehension squares only the even numbers from range(5), which are 0, 2, and 4. The result is [0, 4, 16]."
+            },
+            {
+                unit: "Unit I",
+                question: "Which method splits a string into a list in Python?",
+                options: [
+                    "divide()",
+                    "split()",
+                    "separate()",
+                    "break()"
+                ],
+                correct: 1,
+                explanation: "The split() method splits a string into a list based on a delimiter. For example, 'hello world'.split() returns ['hello', 'world']."
+            },
+            {
+                unit: "Unit I",
+                question: "What mode opens a CSV file for reading?",
+                options: [
+                    "'w'",
+                    "'r'",
+                    "'a'",
+                    "'x'"
+                ],
+                correct: 1,
+                explanation: "'r' mode opens a file for reading. 'w' is for writing, 'a' for appending, and 'x' creates a new file."
+            },
+            {
+                unit: "Unit I",
+                question: "What is the difference between a list and a tuple?",
+                options: [
+                    "Lists are faster than tuples",
+                    "Tuples can contain any data type, lists cannot",
+                    "Lists are mutable, tuples are immutable",
+                    "There is no difference"
+                ],
+                correct: 2,
+                explanation: "Lists are mutable (can be changed) while tuples are immutable (cannot be changed after creation)."
+            },
+            {
+                unit: "Unit I",
+                question: "Which operator is used for floor division?",
+                options: [
+                    "/",
+                    "//",
+                    "%",
+                    "**"
+                ],
+                correct: 1,
+                explanation: "The // operator performs floor division, returning the largest integer. For example, 7 // 2 returns 3."
+            },
+            {
+                unit: "Unit I",
+                question: "What does csv.DictReader do?",
+                options: [
+                    "Reads CSV files and creates a dictionary for each row",
+                    "Converts dictionaries to CSV format",
+                    "Encrypts CSV files",
+                    "Sorts CSV data alphabetically"
+                ],
+                correct: 0,
+                explanation: "DictReader reads CSV files and creates a dictionary for each row, using the first row as keys."
+            },
+            {
+                unit: "Unit II",
+                question: "What is the main purpose of a constructor?",
+                options: [
+                    "To destroy objects",
+                    "To initialize object attributes when an instance is created",
+                    "To copy objects",
+                    "To compare objects"
+                ],
+                correct: 1,
+                explanation: "The constructor (__init__ method) initializes object attributes when an instance is created."
+            },
+            {
+                unit: "Unit II",
+                question: "Which method is called when using the + operator between two objects?",
+                options: [
+                    "__add__()",
+                    "__plus__()",
+                    "__sum__()",
+                    "__combine__()"
+                ],
+                correct: 0,
+                explanation: "The __add__() method implements operator overloading for the + operator."
+            },
+            {
+                unit: "Unit II",
+                question: "What does polymorphism mean in OOP?",
+                options: [
+                    "Having multiple constructors",
+                    "The ability of different objects to respond to the same method call in their own way",
+                    "Creating multiple objects from one class",
+                    "Hiding data from users"
+                ],
+                correct: 1,
+                explanation: "Polymorphism allows objects of different classes to respond to the same method call in their own way."
+            },
+            {
+                unit: "Unit II",
+                question: "What is the purpose of the super() function?",
+                options: [
+                    "To create a new parent class",
+                    "To call methods from the parent class",
+                    "To delete the parent class",
+                    "To make a class independent"
+                ],
+                correct: 1,
+                explanation: "The super() function allows you to call methods from the parent class."
+            },
+            {
+                unit: "Unit II",
+                question: "What does the pattern '\\d+' match?",
+                options: [
+                    "One or more digits",
+                    "Exactly one digit",
+                    "Any character except digits",
+                    "Zero or more digits"
+                ],
+                correct: 0,
+                explanation: "\\d matches any digit (0-9), and + means 'one or more'. So \\d+ matches sequences of one or more digits."
+            },
+            {
+                unit: "Unit II",
+                question: "Which module is used for web scraping?",
+                options: [
+                    "urllib or requests with BeautifulSoup",
+                    "csv",
+                    "json only",
+                    "sys"
+                ],
+                correct: 0,
+                explanation: "Web scraping uses urllib or requests to fetch pages and BeautifulSoup to parse HTML."
+            },
+            {
+                unit: "Unit II",
+                question: "What is the purpose of the finally clause?",
+                options: [
+                    "To catch all exceptions",
+                    "To execute code regardless of whether an exception occurred",
+                    "To raise a new exception",
+                    "To ignore exceptions"
+                ],
+                correct: 1,
+                explanation: "The finally clause always executes, whether an exception occurred or not. It's used for cleanup actions."
+            },
+            {
+                unit: "Unit II",
+                question: "What does the __del__() method do?",
+                options: [
+                    "Deletes a class",
+                    "Acts as a destructor, called when an object is about to be destroyed",
+                    "Deletes all instances of a class",
+                    "Removes a method from a class"
+                ],
+                correct: 1,
+                explanation: "__del__() is the destructor method, called when an object is about to be garbage collected."
+            },
+            {
+                unit: "Unit II",
+                question: "How do you create a custom exception class?",
+                options: [
+                    "class MyError(Error):",
+                    "class MyError(Exception):",
+                    "class MyError extends Exception:",
+                    "def MyError(Exception):"
+                ],
+                correct: 1,
+                explanation: "Custom exceptions should inherit from the Exception class: class MyError(Exception): pass"
+            },
+            {
+                unit: "Unit III",
+                question: "What is a Seq object in Biopython?",
+                options: [
+                    "A database connection",
+                    "An object representing a biological sequence (DNA, RNA, or protein)",
+                    "A file format",
+                    "A visualization tool"
+                ],
+                correct: 1,
+                explanation: "The Seq object represents a biological sequence and provides methods for sequence manipulation."
+            },
+            {
+                unit: "Unit III",
+                question: "Which module is used for working with BLAST?",
+                options: [
+                    "Bio.Blast",
+                    "Bio.NCBIWWW or Bio.Blast.NCBIWWW",
+                    "Bio.Search",
+                    "Bio.Align"
+                ],
+                correct: 1,
+                explanation: "Bio.Blast.NCBIWWW provides the qblast() function for running BLAST searches over the internet."
+            },
+            {
+                unit: "Unit III",
+                question: "What is Entrez in Biopython?",
+                options: [
+                    "A sequence alignment algorithm",
+                    "A tool for accessing NCBI databases",
+                    "A protein structure viewer",
+                    "A restriction enzyme database"
+                ],
+                correct: 1,
+                explanation: "Entrez is a module for accessing NCBI's databases programmatically."
+            },
+            {
+                unit: "Unit III",
+                question: "What does PDB stand for?",
+                options: [
+                    "Python Database",
+                    "Protein Data Bank",
+                    "Primary DNA Base",
+                    "Protein Debug"
+                ],
+                correct: 1,
+                explanation: "PDB (Protein Data Bank) is a repository for 3D structural data of proteins and nucleic acids."
+            },
+            {
+                unit: "Unit III",
+                question: "Which method executes SQL queries in DB-API?",
+                options: [
+                    "run()",
+                    "query()",
+                    "execute()",
+                    "perform()"
+                ],
+                correct: 2,
+                explanation: "The execute() method of a cursor object is used to execute SQL queries."
+            },
+            {
+                unit: "Unit III",
+                question: "Which library is commonly used for plotting?",
+                options: [
+                    "plotlib",
+                    "matplotlib",
+                    "graphlib",
+                    "chartpy"
+                ],
+                correct: 1,
+                explanation: "Matplotlib is the most widely used plotting library in Python."
+            },
+            {
+                unit: "Unit III",
+                question: "What does NumPy primarily provide?",
+                options: [
+                    "Web scraping tools",
+                    "Multi-dimensional array objects and mathematical functions",
+                    "Database connectivity",
+                    "GUI development tools"
+                ],
+                correct: 1,
+                explanation: "NumPy provides the ndarray object for efficient multi-dimensional arrays and mathematical functions."
+            },
+            {
+                unit: "Unit III",
+                question: "What is the purpose of the random library?",
+                options: [
+                    "To create random file names",
+                    "To generate pseudo-random numbers and make random selections",
+                    "To randomize code execution",
+                    "To shuffle file contents"
+                ],
+                correct: 1,
+                explanation: "The random library generates pseudo-random numbers for various purposes like random.random(), random.randint(), and random.choice()."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function initQuiz() {
+            displayQuestion();
+            updateProgressBar();
+        }
+
+        function displayQuestion() {
+            const quizSection = document.getElementById('quizSection');
+            const question = quizData[currentQuestion];
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                optionsHTML += `
+                    <div class="option" onclick="selectOption(${index})">
+                        <div class="option-letter">${letter}</div>
+                        <div>${option}</div>
+                    </div>
+                `;
+            });
+
+            quizSection.innerHTML = `
+                <div class="question-card active">
+                    <div class="question-header">
+                        <span class="question-number">Question ${currentQuestion + 1}/${quizData.length}</span>
+                        <span class="unit-badge">${question.unit}</span>
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options" id="options">
+                        ${optionsHTML}
+                    </div>
+                    <div class="explanation" id="explanation">
+                        <div class="explanation-title">💡 Explanation:</div>
+                        <div class="explanation-text">${question.explanation}</div>
+                    </div>
+                    <div class="navigation">
+                        <button class="btn btn-secondary" onclick="previousQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
+                            ← Previous
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                            ${currentQuestion === quizData.length - 1 ? 'Finish' : 'Next →'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            answered = false;
+        }
+
+        function selectOption(selectedIndex) {
+            if (answered) return;
+            
+            answered = true;
+            const question = quizData[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const explanation = document.getElementById('explanation');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            options.forEach((option, index) => {
+                option.classList.add('disabled');
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                }
+                if (index === selectedIndex && selectedIndex !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === question.correct) {
+                score++;
+            }
+            
+            explanation.classList.add('show');
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            if (!answered) return;
+            
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                displayQuestion();
+                updateProgressBar();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion();
+                updateProgressBar();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            const percentage = Math.round((score / quizData.length) * 100);
+            const quizSection = document.getElementById('quizSection');
+            const results = document.getElementById('results');
+            
+            quizSection.style.display = 'none';
+            results.classList.add('show');
+            
+            document.getElementById('scoreNumber').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = quizData.length - score;
+            document.getElementById('totalCount').textContent = quizData.length;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Outstanding! You have excellent knowledge of Python! 🌟';
+            } else if (percentage >= 75) {
+                message = 'Great job! You have a solid understanding of Python! 🎯';
+            } else if (percentage >= 60) {
+                message = 'Good effort! Keep practicing to improve your skills! 📚';
+            } else {
+                message = 'Keep learning! Review the topics and try again! 💪';
+            }
+            
+            document.getElementById('resultsMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            document.getElementById('quizSection').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            initQuiz();
+        }
+
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
