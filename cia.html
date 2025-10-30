@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIA-III: Python Programming for Biologists</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        .header {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            font-weight: normal;
+            margin-bottom: 20px;
+            color: #6c757d;
+        }
+
+        .set-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .set-btn {
+            padding: 12px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #6c63ff;
+            background: transparent;
+            color: #6c63ff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .set-btn:hover {
+            background: #f0efff;
+            transform: translateY(-2px);
+        }
+
+        .set-btn.active {
+            background: #6c63ff;
+            color: #ffffff;
+        }
+
+        .exam-info {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+        }
+
+        .exam-info p {
+            margin: 5px 0;
+            color: #495057;
+        }
+
+        .exam-info strong {
+            color: #2c3e50;
+        }
+
+        .content {
+            padding: 0;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .question h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .sub-question {
+            margin: 15px 0;
+            padding-left: 20px;
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .sub-question strong {
+            color: #2c3e50;
+        }
+
+        .sub-question code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #6c63ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sub-question ul {
+            color: #495057;
+        }
+
+        .marks {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .file-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #6c63ff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .file-link:hover {
+            background: #5a54d6;
+            transform: translateY(-2px);
+        }
+
+        .file-link::before {
+            content: "📄 ";
+        }
+
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            color: #856404;
+        }
+
+        .instructions strong {
+            color: #856404;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .header h2 {
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 0;
+            }
+
+            .set-btn {
+                padding: 10px 30px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CIA - III</h1>
+            <h2>BIN304: PYTHON PROGRAMMING FOR BIOLOGISTS</h2>
+            <div class="set-selector">
+                <button class="set-btn active" onclick="showSet('A')">Set - A</button>
+                <button class="set-btn" onclick="showSet('B')">Set - B</button>
+            </div>
+        </div>
+
+        <div class="exam-info">
+            <p><strong>Total Marks:</strong> 50</p>
+            <p><strong>Duration:</strong> 90 mins</p>
+        </div>
+
+        <div class="content">
+            <!-- Set A -->
+            <div id="setA">
+                <div class="instructions">
+                    <strong>Instructions:</strong> Answer any three questions. Use proper function names and indentation. Import necessary libraries as required.
+                </div>
+
+                <div class="question">
+                    <h3>Question 1</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Write a function <code>count_nucleotides(sequence)</code> that accepts a DNA string and returns a dictionary containing the counts of A, T, G, and C. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Add a function to compute the GC percentage and return it as a formatted string Eg: "GC Content: 37.54%". <span class="marks">(2 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Read the DNA sequences from the given multi fasta file and print each sequence ID/accession, length, and GC%. <span class="marks">(3 marks)</span>
+                        <br>
+                        <a href="#" class="file-link" id="dnaFileLink1">dna.fasta</a>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(d)</strong> Using matplotlib, plot a bar chart showing nucleotide composition for one of the sequences. <span class="marks">(2 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 2</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Write a function <code>find_amino_acid_freq(protein_seq)</code> that calculates and returns a dictionary of amino acid frequencies from a protein sequence string (single-letter codes). <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Using the re module, identify all motifs matching the pattern "G or H-X-X-S-X-R", where "X" can be any amino acid. Print each match and its starting index. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Search for all hydrophobic motifs in the protein sequence defined as three or more consecutive hydrophobic residues (AILMVFYW). Print all matches and the total number of hydrophobic stretches detected. <span class="marks">(4 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 3</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Using <code>Bio.SeqIO.parse()</code>, read the multi FASTA file containing DNA sequences. For each sequence, display: ID, Length, and GC content using <code>gc_fraction()</code>. Display the transcribed RNA (first 30 bases only). <span class="marks">(5 marks)</span>
+                        <br>
+                        <a href="#" class="file-link" id="dnaFileLink2">dna.fasta</a>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Translate RNA → Protein, print unique amino acids and compute molecular weight using <code>molecular_weight()</code> for any one sequence. <span class="marks">(5 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 4</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Create a base class <code>Patient</code> with attributes patient_id, age, blood_group, and enrollment_date. Include <code>display_info()</code> to print all details. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Create a derived class <code>TrialPatient</code> inheriting from Patient with extra attributes trial_drug, dosage_mg, and response_score. Implement a method <code>treatment_response()</code> returning:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>"Excellent" if score ≥ 8</li>
+                            <li>"Good" if 6 ≤ score < 8</li>
+                            <li>"Poor" if score < 6</li>
+                        </ul>
+                        Raise a user-defined exception <code>InvalidScoreError</code> if response_score is not between 0 and 10. <span class="marks">(4 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Overload the > operator (<code>__gt__</code>) to compare patients by response_score. Create 4 objects, sort them, and display the best responder details. <span class="marks">(3 marks)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Set B -->
+            <div id="setB" class="hidden">
+                <div class="instructions">
+                    <strong>Instructions:</strong> Answer any three questions. Use proper function names and indentation. Import necessary libraries as required.
+                </div>
+
+                <div class="question">
+                    <h3>Question 1</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Write a function <code>calc_aa_composition(protein_seq)</code> that calculates the percentage composition of each amino acid in a protein sequence. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Using the re module, identify all motifs of the form "C-X-X-S or T-X-X-X-C", where "X" can be any amino acid. Print each motif and its position. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Find all charged residue stretches, defined as three or more consecutive charged residues (R, K, D, E). Print each stretch and the total number found. <span class="marks">(4 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 2</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Write a function <code>convert_to_rna(dna_seq)</code> that converts a given DNA sequence to RNA (replace T → U). Read a multi-FASTA file containing DNA sequences, convert each to RNA, and print. <span class="marks">(3 marks)</span>
+                        <br>
+                        <a href="#" class="file-link" id="dnaFileLink3">dna.fasta</a>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Write a function <code>count_rna_bases(sequence)</code> that accepts an RNA string and returns a dictionary containing counts of A, U, G, and C. <span class="marks">(2 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Using the converted RNA sequences, print for each sequence: ID, length, and AU content (percentage of A + U bases). <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(d)</strong> Using matplotlib, plot a pie chart showing nucleotide composition (A, U, G, C) for one of the RNA sequences. <span class="marks">(2 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 3</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Using <code>Bio.SeqIO.parse()</code>, read a multi-FASTA file containing RNA sequences. For each sequence, display: ID, length, and GC fraction using <code>gc_fraction()</code> from Bio.SeqUtils. Convert RNA → DNA using <code>.back_transcribe()</code> and print the first 30 bases. <span class="marks">(5 marks)</span>
+                        <br>
+                        <a href="#" class="file-link" id="rnaFileLink1">rna.fasta</a>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Translate all DNA sequences to proteins. Compute the molecular weight of each protein using <code>molecular_weight()</code> from Biopython and print only the highest molecular weight and the corresponding sequence ID. <span class="marks">(5 marks)</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Question 4</h3>
+                    <div class="sub-question">
+                        <strong>(a)</strong> Create a base class <code>PlantExperiment</code> with attributes: plant_id, species, soil_type, and date_planted. Include a <code>display_info()</code> method to print all details. <span class="marks">(3 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(b)</strong> Create a derived class <code>GrowthTrial</code> inheriting from PlantExperiment with extra attributes: fertilizer_type, growth_cm, and chlorophyll_index. Implement a method <code>growth_status()</code> returning:
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>"Excellent" if growth ≥ 25 and chlorophyll_index ≥ 8</li>
+                            <li>"Good" if growth 15–24 cm and chlorophyll_index 6–7.9</li>
+                            <li>"Poor" if growth < 15 or chlorophyll_index < 6</li>
+                        </ul>
+                        Raise a user-defined exception <code>InvalidGrowthDataError</code> if negative or unrealistic values are given. <span class="marks">(4 marks)</span>
+                    </div>
+                    <div class="sub-question">
+                        <strong>(c)</strong> Overload the == operator (<code>__eq__</code>) to compare two GrowthTrial objects for equal overall performance, defined as growth_rate = growth_cm × chlorophyll_index. If two plants have the same growth rate, print a message indicating they performed equally well. Create at least four plant objects and test equality between them. <span class="marks">(3 marks)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GitHub raw file URLs
+        const fileLinks = {
+            dna: 'https://raw.githubusercontent.com/pranavathiyani/pranavathiyani.github.io/refs/heads/main/dna.fasta',
+            rna: 'https://raw.githubusercontent.com/pranavathiyani/pranavathiyani.github.io/refs/heads/main/rna.fasta'
+        };
+
+        // Function to force download
+        function downloadFile(url, filename) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(link.href);
+                })
+                .catch(err => console.error('Download failed:', err));
+        }
+
+        // Set up download links after page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // DNA file links
+            const dnaLinks = [
+                document.getElementById('dnaFileLink1'),
+                document.getElementById('dnaFileLink2'),
+                document.getElementById('dnaFileLink3')
+            ];
+
+            dnaLinks.forEach(link => {
+                if (link) {
+                    link.href = '#';
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        downloadFile(fileLinks.dna, 'dna.fasta');
+                    });
+                }
+            });
+
+            // RNA file links
+            const rnaLinks = [
+                document.getElementById('rnaFileLink1')
+            ];
+
+            rnaLinks.forEach(link => {
+                if (link) {
+                    link.href = '#';
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        downloadFile(fileLinks.rna, 'rna.fasta');
+                    });
+                }
+            });
+        });
+
+        function showSet(set) {
+            const setA = document.getElementById('setA');
+            const setB = document.getElementById('setB');
+            const buttons = document.querySelectorAll('.set-btn');
+
+            if (set === 'A') {
+                setA.classList.remove('hidden');
+                setB.classList.add('hidden');
+                buttons[0].classList.add('active');
+                buttons[1].classList.remove('active');
+            } else {
+                setA.classList.add('hidden');
+                setB.classList.remove('hidden');
+                buttons[0].classList.remove('active');
+                buttons[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
