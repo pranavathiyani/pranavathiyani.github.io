@@ -1,0 +1,2569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Interactive Bioinformatics Tools with Streamlit - Workshop Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        h4 {
+            color: #555;
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .note {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .section {
+            margin-bottom: 50px;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+        }
+        .toc a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Building Interactive Bioinformatics Tools with Streamlit</h1>
+        <p><strong>One-Day Hands-on Workshop</strong></p>
+        <p>Bioinformatics Center, School of Chemical & Biotechnology<br>
+        SASTRA Deemed to be University, Thanjavur - 613401</p>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#setup">Setup and Installation (09:30 - 10:00 AM)</a></li>
+                <li><a href="#basics">Streamlit Basics (10:00 - 11:15 AM)</a></li>
+                <li><a href="#data">Data Handling & Visualization (11:30 AM - 01:00 PM)</a></li>
+                <li><a href="#fasta">Biopython + FASTA Analyzer (02:00 - 03:00 PM)</a></li>
+                <li><a href="#dashboards">Interactive Dashboards (03:00 - 04:00 PM)</a></li>
+                <li><a href="#protein1">Protein Explorer I (04:15 - 04:45 PM)</a></li>
+                <li><a href="#protein2">Protein Explorer II - Structure (04:45 - 05:15 PM)</a></li>
+                <li><a href="#wrapup">Wrap-up & Next Steps (05:15 - 05:30 PM)</a></li>
+                <li><a href="#bonus">Bonus Content</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="introduction">
+            <h2>Introduction</h2>
+            
+            <h3>What This Workshop IS NOT About</h3>
+            
+            <div class="error">
+                <h4>This Workshop is NOT:</h4>
+                <ul>
+                    <li><strong>Not a Python basics course</strong> - We assume you know variables, loops, functions</li>
+                    <li><strong>Not advanced bioinformatics algorithms</strong> - Focus is on visualization & interactivity</li>
+                    <li><strong>Not web development</strong> - No HTML/CSS/JavaScript required!</li>
+                    <li><strong>Not about deployment/hosting</strong> - We work locally only</li>
+                    <li><strong>Not ML/AI modeling</strong> - We use existing tools and libraries</li>
+                    <li><strong>Not production-grade software</strong> - Focus is on rapid prototyping</li>
+                </ul>
+            </div>
+
+            <div class="success">
+                <h4>This Workshop IS:</h4>
+                <ul>
+                    <li><strong>Rapid prototyping</strong> - Turn scripts into shareable apps in minutes</li>
+                    <li><strong>Interactive visualization</strong> - Make data exploration fun and intuitive</li>
+                    <li><strong>Practical bioinformatics tools</strong> - Real-world sequence analysis applications</li>
+                    <li><strong>Beginner-friendly</strong> - If you know Python basics, you're ready!</li>
+                    <li><strong>Local development</strong> - Everything runs on your machine</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="setup">
+            <h2>Setup and Installation (09:30 - 10:00 AM)</h2>
+            
+            <h3>Installation Requirements</h3>
+            
+            <p><strong>What We Need:</strong></p>
+            <pre><code># Check Python version (3.8 or higher)
+python --version
+
+# Install Streamlit
+pip install streamlit
+
+# Install Biopython
+pip install biopython
+
+# Install additional packages
+pip install pandas matplotlib seaborn plotly py3Dmol</code></pre>
+
+            <p><strong>Verify Installation:</strong></p>
+            <pre><code>streamlit --version
+python -c "import Bio; print(Bio.__version__)"</code></pre>
+
+            <p><strong>Create a workshop folder:</strong></p>
+            <pre><code>mkdir streamlit_workshop
+cd streamlit_workshop</code></pre>
+
+            <h3>Your First Streamlit App</h3>
+            
+            <p><strong>Create a file: hello_app.py</strong></p>
+            <pre><code>import streamlit as st
+
+# This is all you need!
+st.title("Hello Bioinformatics!")
+st.write("Welcome to Streamlit")
+
+# Add some interactive elements
+name = st.text_input("Enter your name:")
+if name:
+    st.write(f"Hello, {name}! Ready to build cool apps?")</code></pre>
+
+            <p><strong>Run it:</strong></p>
+            <pre><code>streamlit run hello_app.py</code></pre>
+
+            <div class="note">
+                <strong>Key Concept:</strong> Streamlit reruns your entire script from top to bottom whenever a widget changes!
+            </div>
+
+            <h3>Understanding the Streamlit Flow</h3>
+            
+            <p><strong>How Streamlit Works:</strong></p>
+            <pre><code>import streamlit as st
+
+st.write("This runs EVERY time")
+
+x = st.slider("Choose a number:", 0, 10)
+
+st.write(f"You chose: {x}")
+st.write("This also runs EVERY time")
+
+# The script runs from top to bottom on every interaction!</code></pre>
+
+            <p><strong>Important Concepts:</strong></p>
+            <ul>
+                <li>Script reruns on every widget interaction</li>
+                <li>No need for callbacks or event handlers</li>
+                <li>State persists between reruns (we'll see this later)</li>
+                <li>Fast and efficient rerun mechanism</li>
+            </ul>
+        </div>
+
+        <div class="section" id="basics">
+            <h2>Streamlit Basics (10:00 - 11:15 AM)</h2>
+            
+            <h3>Display Elements - Text & Titles</h3>
+            
+            <pre><code>import streamlit as st
+
+# Different text styles
+st.title("Main Title - Largest")
+st.header("Section Header")
+st.subheader("Subsection Header")
+st.text("Plain text - monospace font")
+st.write("Normal text - most versatile!")
+
+# Markdown support
+st.markdown("**Bold**, *italic*, and `code`")
+st.markdown("- Bullet point 1\n- Bullet point 2")
+
+# LaTeX for formulas
+st.latex(r"GC\% = \frac{G + C}{A + T + G + C} \times 100")
+
+# Colored boxes
+st.success("Success message!")
+st.info("Information message")
+st.warning("Warning message")
+st.error("Error message")
+
+# Code display
+st.code("def hello():\n    print('Hello')", language="python")</code></pre>
+
+            <h3>Interactive Widgets - Text Inputs</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Text Input Widgets")
+
+# Single line text input
+gene_name = st.text_input("Enter gene name:", "TP53")
+st.write(f"You entered: {gene_name}")
+
+# Multi-line text area
+sequence = st.text_area("Paste DNA sequence:", 
+                        value="ATGCGATCGATCG",
+                        height=150)
+st.write(f"Sequence length: {len(sequence)}")
+
+# Password input (hidden text)
+api_key = st.text_input("API Key:", type="password")
+
+# Display results
+if gene_name and sequence:
+    st.success(f"Analyzing {gene_name} with {len(sequence)} bp")</code></pre>
+
+            <h3>Interactive Widgets - Numbers & Selections</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Number and Selection Widgets")
+
+# Number input
+threshold = st.number_input("Set threshold:", 
+                            min_value=0.0, 
+                            max_value=1.0, 
+                            value=0.5, 
+                            step=0.1)
+
+# Slider
+window_size = st.slider("Window size:", 1, 100, 20)
+
+# Range slider
+gc_range = st.slider("GC% range:", 0, 100, (40, 60))
+st.write(f"Selected range: {gc_range[0]}% - {gc_range[1]}%")
+
+# Select box (dropdown)
+organism = st.selectbox("Select organism:", 
+                        ["Human", "Mouse", "Rat", "Zebrafish"])
+
+# Multi-select
+features = st.multiselect("Select features:", 
+                          ["Length", "GC%", "Molecular Weight"],
+                          default=["Length"])
+
+# Radio buttons
+analysis_type = st.radio("Analysis type:", 
+                         ["DNA", "RNA", "Protein"])
+
+# Checkbox
+show_plot = st.checkbox("Show visualization", value=True)</code></pre>
+
+            <h3>Interactive Widgets - Buttons & Actions</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Buttons and Actions")
+
+# Simple button
+if st.button("Analyze"):
+    st.write("Analysis started!")
+    st.balloons()  # Fun animation!
+
+# Button with state tracking
+if st.button("Click me"):
+    st.write("Button was clicked!")
+    # Note: This message disappears when anything else changes
+
+# Download button
+data = "Gene,Expression\nTP53,100\nBRCA1,200"
+st.download_button(
+    label="Download CSV",
+    data=data,
+    file_name="gene_expression.csv",
+    mime="text/csv"
+)
+
+# Form (groups multiple inputs)
+with st.form("my_form"):
+    name = st.text_input("Name:")
+    age = st.number_input("Age:", min_value=0)
+    submitted = st.form_submit_button("Submit")
+    
+    if submitted:
+        st.write(f"Name: {name}, Age: {age}")</code></pre>
+
+            <h3>Layout Elements - Columns</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Layout with Columns")
+
+# Create 3 equal columns
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.header("DNA")
+    st.write("Adenine")
+    st.write("Thymine")
+
+with col2:
+    st.header("RNA")
+    st.write("Adenine")
+    st.write("Uracil")
+
+with col3:
+    st.header("Protein")
+    st.write("Amino acids")
+
+# Different width columns
+left, right = st.columns([2, 1])  # 2:1 ratio
+
+with left:
+    st.write("Wider column - main content")
+    
+with right:
+    st.write("Narrower - sidebar style")</code></pre>
+
+            <h3>Layout Elements - Expanders & Containers</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Expanders and Containers")
+
+# Expander (collapsible section)
+with st.expander("See methodology"):
+    st.write("""
+    1. Extract DNA sequence
+    2. Calculate GC content
+    3. Plot nucleotide distribution
+    """)
+
+with st.expander("Advanced settings"):
+    min_length = st.slider("Min length:", 1, 100, 10)
+    normalize = st.checkbox("Normalize data")
+
+# Container (reusable section)
+container = st.container()
+container.write("This is inside a container")
+
+# Empty placeholder (can be updated later)
+placeholder = st.empty()
+placeholder.text("Loading...")
+# Later: placeholder.text("Done!")
+
+# Sidebar
+st.sidebar.title("Settings")
+st.sidebar.selectbox("Mode:", ["Basic", "Advanced"])</code></pre>
+
+            <h3>Layout Elements - Tabs</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Tabbed Interface")
+
+tab1, tab2, tab3 = st.tabs(["Analysis", "Visualization", "Export"])
+
+with tab1:
+    st.header("Analysis Results")
+    st.write("Perform your analysis here")
+    gc_content = st.slider("GC%:", 0, 100, 50)
+    
+with tab2:
+    st.header("Visualization")
+    st.write("Show your plots here")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    ax.bar(["A", "T", "G", "C"], [25, 25, 25, 25])
+    st.pyplot(fig)
+    
+with tab3:
+    st.header("Export Data")
+    st.write("Download options here")
+    st.download_button("Download", "data", "file.txt")</code></pre>
+
+            <h3>File Upload</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+
+st.title("File Upload Demo")
+
+# File uploader
+uploaded_file = st.file_uploader(
+    "Choose a file", 
+    type=['csv', 'txt', 'fasta', 'xlsx']
+)
+
+if uploaded_file is not None:
+    # Get file info
+    st.write(f"**Filename:** {uploaded_file.name}")
+    st.write(f"**Size:** {uploaded_file.size} bytes")
+    
+    # Read based on file type
+    if uploaded_file.name.endswith('.csv'):
+        df = pd.read_csv(uploaded_file)
+        st.dataframe(df)
+        
+    elif uploaded_file.name.endswith('.txt') or uploaded_file.name.endswith('.fasta'):
+        content = uploaded_file.read().decode('utf-8')
+        st.text_area("File content:", content, height=200)
+        
+else:
+    st.info("Please upload a file to get started")</code></pre>
+
+            <h3>Mini Exercise - "Hello App"</h3>
+            
+            <div class="note">
+                <h4>Exercise (10 minutes):</h4>
+                <p>Create my_bio_app.py with:</p>
+                <ol>
+                    <li>Title "My First Bio App"</li>
+                    <li>Text input for your name</li>
+                    <li>Select box with your favorite organism</li>
+                    <li>Number slider for years of experience (0-10)</li>
+                    <li>Checkbox "Show fun fact"</li>
+                    <li>Button to submit</li>
+                    <li>Display personalized message</li>
+                </ol>
+                <p><strong>Try it yourself first!</strong></p>
+            </div>
+
+            <h4>Solution:</h4>
+            <pre><code>import streamlit as st
+
+st.title("My First Bio App")
+
+# Input widgets
+name = st.text_input("Enter your name:")
+organism = st.selectbox(
+    "Favorite organism:", 
+    ["E. coli", "Yeast", "Human", "Drosophila", "C. elegans"]
+)
+experience = st.slider("Years in biology:", 0, 10, 2)
+
+show_fact = st.checkbox("Show fun fact")
+
+if st.button("Submit"):
+    if name:
+        st.success(f"Hello {name}! Great choice with {organism}!")
+        st.write(f"With {experience} years, you're well on your way!")
+        
+        if show_fact:
+            facts = {
+                "E. coli": "Can divide every 20 minutes under optimal conditions!",
+                "Yeast": "Shares about 23% of its DNA with humans",
+                "Human": "Has ~20,000-25,000 protein-coding genes",
+                "Drosophila": "50% of fly genes are similar to human disease genes",
+                "C. elegans": "Was the first multicellular organism with a fully sequenced genome"
+            }
+            st.info(f"Fun fact: {facts[organism]}")
+    else:
+        st.warning("Please enter your name!")</code></pre>
+        </div>
+
+        <div class="section" id="data">
+            <h2>Data Handling & Visualization (11:30 AM - 01:00 PM)</h2>
+            
+            <h3>Working with DataFrames</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+
+st.title("DataFrame Display")
+
+# Create sample data
+data = {
+    'Gene': ['TP53', 'BRCA1', 'EGFR', 'MYC'],
+    'Expression': [120, 85, 200, 150],
+    'Fold_Change': [2.5, 1.8, 3.2, 2.1],
+    'P_value': [0.001, 0.005, 0.0001, 0.002]
+}
+df = pd.DataFrame(data)
+
+# Display methods
+st.write("**Using st.write:**")
+st.write(df)
+
+st.write("**Using st.dataframe (interactive):**")
+st.dataframe(df, use_container_width=True)
+
+st.write("**Using st.table (static):**")
+st.table(df)
+
+# DataFrame with highlighting
+st.write("**With conditional formatting:**")
+st.dataframe(df.style.highlight_max(axis=0))</code></pre>
+
+            <h3>DataFrame Filtering & Interaction</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+
+st.title("Interactive Data Filtering")
+
+# Sample gene expression data
+df = pd.DataFrame({
+    'Gene': ['TP53', 'BRCA1', 'EGFR', 'MYC', 'KRAS', 'APC'],
+    'Expression': [120, 85, 200, 150, 95, 110],
+    'Fold_Change': [2.5, 1.8, 3.2, 2.1, 1.5, 2.0],
+    'Tissue': ['Liver', 'Breast', 'Lung', 'Liver', 'Colon', 'Colon']
+})
+
+# Filter controls
+st.sidebar.header("Filters")
+min_expression = st.sidebar.slider("Min Expression:", 0, 250, 100)
+tissues = st.sidebar.multiselect(
+    "Select tissues:",
+    options=df['Tissue'].unique(),
+    default=df['Tissue'].unique()
+)
+
+# Apply filters
+filtered_df = df[
+    (df['Expression'] >= min_expression) & 
+    (df['Tissue'].isin(tissues))
+]
+
+# Display
+st.write(f"**Showing {len(filtered_df)} of {len(df)} genes**")
+st.dataframe(filtered_df, use_container_width=True)
+
+# Summary statistics
+col1, col2, col3 = st.columns(3)
+col1.metric("Mean Expression", f"{filtered_df['Expression'].mean():.1f}")
+col2.metric("Max Fold Change", f"{filtered_df['Fold_Change'].max():.2f}")
+col3.metric("Genes", len(filtered_df))</code></pre>
+
+            <h3>Plotting with Matplotlib</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("Matplotlib Plots")
+
+# Sample data
+genes = ['TP53', 'BRCA1', 'EGFR', 'MYC', 'KRAS']
+expression = [120, 85, 200, 150, 95]
+
+# Create plot
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(genes, expression, color='steelblue')
+ax.set_xlabel('Gene', fontsize=12)
+ax.set_ylabel('Expression Level', fontsize=12)
+ax.set_title('Gene Expression Levels', fontsize=14, fontweight='bold')
+ax.grid(axis='y', alpha=0.3)
+
+# Display in Streamlit
+st.pyplot(fig)
+
+# Note: Always create fig, ax for better control
+# Avoid plt.show() - use st.pyplot() instead</code></pre>
+
+            <h3>Interactive Plots with Plotly</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+st.title("Interactive Plotly Charts")
+
+# Sample data
+df = pd.DataFrame({
+    'Gene': ['TP53', 'BRCA1', 'EGFR', 'MYC', 'KRAS', 'APC'] * 3,
+    'Expression': [120, 85, 200, 150, 95, 110, 
+                   130, 90, 210, 160, 100, 115,
+                   125, 88, 205, 155, 98, 112],
+    'Timepoint': ['0h']*6 + ['24h']*6 + ['48h']*6
+})
+
+# Interactive bar chart
+fig = px.bar(df, x='Gene', y='Expression', color='Timepoint',
+             title='Gene Expression Over Time',
+             barmode='group')
+
+st.plotly_chart(fig, use_container_width=True)
+
+# Scatter plot
+fig2 = px.scatter(df, x='Gene', y='Expression', 
+                  color='Timepoint', size='Expression',
+                  title='Expression Bubble Chart')
+
+st.plotly_chart(fig2, use_container_width=True)
+
+# Plotly plots are interactive: hover, zoom, pan!</code></pre>
+
+            <h3>Multiple Plot Types</h3>
+            
+            <pre><code>import streamlit as st
+import matplotlib.pyplot as plt
+import numpy as np
+
+st.title("Different Plot Types")
+
+# Sample data
+np.random.seed(42)
+data = np.random.randn(1000)
+
+# User selects plot type
+plot_type = st.selectbox("Select plot type:", 
+                         ["Histogram", "Box Plot", "Line Plot"])
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+if plot_type == "Histogram":
+    bins = st.slider("Number of bins:", 10, 100, 30)
+    ax.hist(data, bins=bins, edgecolor='black', alpha=0.7)
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Frequency")
+    
+elif plot_type == "Box Plot":
+    ax.boxplot(data, vert=True)
+    ax.set_ylabel("Value")
+    
+elif plot_type == "Line Plot":
+    ax.plot(data[:100])  # First 100 points
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Value")
+
+ax.set_title(f"{plot_type} Visualization")
+st.pyplot(fig)</code></pre>
+
+            <h3>Exercise - Gene Expression Analyzer</h3>
+            
+            <div class="note">
+                <h4>Exercise (20 minutes): Create gene_expression.py</h4>
+                <p><strong>Requirements:</strong></p>
+                <ol>
+                    <li>Upload CSV file with columns: Gene, Expression, P_value</li>
+                    <li>Filter by minimum expression threshold (slider)</li>
+                    <li>Show filtered data in a table</li>
+                    <li>Display bar chart of top 10 genes by expression</li>
+                    <li>Show summary statistics (mean, median, count)</li>
+                </ol>
+                <p><strong>Sample CSV to test (save as sample_genes.csv):</strong></p>
+                <pre>Gene,Expression,P_value
+TP53,120,0.001
+BRCA1,85,0.005
+EGFR,200,0.0001
+MYC,150,0.002
+KRAS,95,0.01</pre>
+            </div>
+
+            <h4>Solution - Part 1:</h4>
+            <pre><code>import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("Gene Expression Analyzer")
+
+# File upload
+uploaded_file = st.file_uploader("Upload gene expression CSV", type=['csv'])
+
+if uploaded_file:
+    # Read data
+    df = pd.read_csv(uploaded_file)
+    
+    st.success(f"Loaded {len(df)} genes")
+    
+    # Show raw data
+    with st.expander("View raw data"):
+        st.dataframe(df)
+    
+    # Filter controls
+    st.sidebar.header("Filters")
+    min_expression = st.sidebar.slider(
+        "Minimum Expression:", 
+        float(df['Expression'].min()), 
+        float(df['Expression'].max()), 
+        float(df['Expression'].mean())
+    )
+    
+    max_pvalue = st.sidebar.slider(
+        "Maximum P-value:", 
+        0.0, 0.05, 0.01, 0.001
+    )</code></pre>
+
+            <h4>Solution - Part 2:</h4>
+            <pre><code>    # Apply filters
+    filtered_df = df[
+        (df['Expression'] >= min_expression) & 
+        (df['P_value'] <= max_pvalue)
+    ]
+    
+    # Display filtered data
+    st.subheader(f"Filtered Results ({len(filtered_df)} genes)")
+    st.dataframe(filtered_df, use_container_width=True)
+    
+    if len(filtered_df) > 0:
+        # Summary statistics
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Mean Expression", 
+                    f"{filtered_df['Expression'].mean():.1f}")
+        col2.metric("Median Expression", 
+                    f"{filtered_df['Expression'].median():.1f}")
+        col3.metric("Gene Count", len(filtered_df))
+        
+        # Plot top 10 genes
+        st.subheader("Top 10 Genes by Expression")
+        top10 = filtered_df.nlargest(10, 'Expression')
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(top10['Gene'], top10['Expression'], color='steelblue')
+        ax.set_xlabel('Expression Level')
+        ax.set_title('Top 10 Highly Expressed Genes')
+        ax.invert_yaxis()
+        st.pyplot(fig)
+    else:
+        st.warning("No genes match the filter criteria")
+else:
+    st.info("Please upload a CSV file to begin")</code></pre>
+        </div>
+
+        <div class="section" id="fasta">
+            <h2>Biopython + FASTA Analyzer (02:00 - 03:00 PM)</h2>
+            
+            <h3>Introduction to Biopython</h3>
+            
+            <p><strong>What is Biopython?</strong></p>
+            <ul>
+                <li>Python library for biological computation</li>
+                <li>Parse sequences (FASTA, GenBank, etc.)</li>
+                <li>Sequence analysis and manipulation</li>
+                <li>Works seamlessly with Streamlit!</li>
+            </ul>
+
+            <p><strong>Basic Biopython Operations:</strong></p>
+            <pre><code>from Bio.Seq import Seq
+
+# Create a sequence
+dna_seq = Seq("ATGCGATCGATCG")
+
+# Basic operations
+print(f"Length: {len(dna_seq)}")
+print(f"Complement: {dna_seq.complement()}")
+print(f"Reverse complement: {dna_seq.reverse_complement()}")
+print(f"Transcribe: {dna_seq.transcribe()}")
+print(f"Translate: {dna_seq.translate()}")
+
+# GC content
+gc_count = dna_seq.count('G') + dna_seq.count('C')
+gc_percent = (gc_count / len(dna_seq)) * 100
+print(f"GC%: {gc_percent:.2f}")</code></pre>
+
+            <h3>Parsing FASTA Files</h3>
+            
+            <pre><code>from Bio import SeqIO
+
+# Parse a FASTA file
+for record in SeqIO.parse("sequences.fasta", "fasta"):
+    print(f"ID: {record.id}")
+    print(f"Description: {record.description}")
+    print(f"Sequence: {record.seq}")
+    print(f"Length: {len(record.seq)}")
+    print("---")
+
+# Parse from string
+fasta_string = """>gene1
+ATGCGATCGATCG
+>gene2
+CGATCGATCGTAGC"""
+
+from io import StringIO
+for record in SeqIO.parse(StringIO(fasta_string), "fasta"):
+    print(record.id, len(record.seq))</code></pre>
+
+            <p><strong>Sample FASTA format:</strong></p>
+            <pre>>seq1 Description of sequence 1
+ATGCGATCGATCGATCGATCGATCG
+ATCGATCGATCGATCG
+>seq2 Description of sequence 2
+CGATCGATCGTAGCTAGCTAGCT</pre>
+
+            <h3>FASTA Analyzer - Part 1 (Setup)</h3>
+            
+            <pre><code>import streamlit as st
+from Bio import SeqIO
+from Bio.Seq import Seq
+from io import StringIO
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("FASTA Sequence Analyzer")
+
+st.markdown("""
+Analyze DNA sequences from FASTA files:
+- Sequence length
+- GC content
+- Nucleotide composition
+- Visualization
+""")
+
+# Input methods
+input_method = st.radio("Choose input method:", 
+                        ["Upload FASTA file", "Paste sequence"])
+
+sequences = []
+
+if input_method == "Upload FASTA file":
+    uploaded_file = st.file_uploader("Upload FASTA", type=['fasta', 'fa', 'txt'])
+    if uploaded_file:
+        fasta_string = uploaded_file.read().decode('utf-8')
+        sequences = list(SeqIO.parse(StringIO(fasta_string), "fasta"))
+        
+else:
+    fasta_text = st.text_area("Paste FASTA sequence:", height=200)
+    if fasta_text:
+        sequences = list(SeqIO.parse(StringIO(fasta_text), "fasta"))</code></pre>
+
+            <h3>FASTA Analyzer - Part 2 (Analysis)</h3>
+            
+            <pre><code>if sequences:
+    st.success(f"Loaded {len(sequences)} sequence(s)")
+    
+    # Analyze each sequence
+    results = []
+    for record in sequences:
+        seq = str(record.seq)
+        
+        # Calculate metrics
+        length = len(seq)
+        gc_count = seq.count('G') + seq.count('C')
+        gc_percent = (gc_count / length * 100) if length > 0 else 0
+        
+        a_count = seq.count('A')
+        t_count = seq.count('T')
+        g_count = seq.count('G')
+        c_count = seq.count('C')
+        
+        results.append({
+            'ID': record.id,
+            'Length': length,
+            'GC%': round(gc_percent, 2),
+            'A': a_count,
+            'T': t_count,
+            'G': g_count,
+            'C': c_count
+        })
+    
+    # Display results table
+    df = pd.DataFrame(results)
+    st.subheader("Analysis Results")
+    st.dataframe(df, use_container_width=True)</code></pre>
+
+            <h3>FASTA Analyzer - Part 3 (Visualization)</h3>
+            
+            <pre><code>    # Visualization section
+    st.subheader("Visualization")
+    
+    # Select sequence to visualize
+    seq_ids = [r['ID'] for r in results]
+    selected_id = st.selectbox("Select sequence to visualize:", seq_ids)
+    
+    selected_result = next(r for r in results if r['ID'] == selected_id)
+    
+    # Create two columns for plots
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write("**Nucleotide Composition**")
+        fig, ax = plt.subplots(figsize=(6, 6))
+        nucleotides = ['A', 'T', 'G', 'C']
+        counts = [selected_result[n] for n in nucleotides]
+        colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#95E1D3']
+        ax.pie(counts, labels=nucleotides, autopct='%1.1f%%',
+               colors=colors, startangle=90)
+        ax.set_title(f"{selected_id} - Nucleotide Distribution")
+        st.pyplot(fig)
+    
+    with col2:
+        st.write("**Nucleotide Counts**")
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.bar(nucleotides, counts, color=colors)
+        ax.set_ylabel('Count')
+        ax.set_title(f"{selected_id} - Nucleotide Counts")
+        ax.grid(axis='y', alpha=0.3)
+        st.pyplot(fig)</code></pre>
+
+            <h3>Adding More Features</h3>
+            
+            <pre><code>    # Additional analyses
+    st.subheader("Advanced Analysis")
+    
+    # Get the selected sequence
+    selected_seq = next(rec for rec in sequences if rec.id == selected_id)
+    seq_str = str(selected_seq.seq)
+    
+    tab1, tab2, tab3 = st.tabs(["Sequence Info", "Transformations", "Motif Search"])
+    
+    with tab1:
+        st.write(f"**Sequence ID:** {selected_seq.id}")
+        st.write(f"**Length:** {len(seq_str)} bp")
+        st.write(f"**GC Content:** {selected_result['GC%']}%")
+        
+        with st.expander("View sequence"):
+            st.code(seq_str, language=None)
+    
+    with tab2:
+        seq_obj = Seq(seq_str)
+        st.write("**Complement:**")
+        st.code(str(seq_obj.complement()), language=None)
+        
+        st.write("**Reverse Complement:**")
+        st.code(str(seq_obj.reverse_complement()), language=None)
+        
+        st.write("**Transcription (DNA to RNA):**")
+        st.code(str(seq_obj.transcribe()), language=None)
+    
+    with tab3:
+        motif = st.text_input("Enter motif to search:", "ATG")
+        if motif:
+            positions = [i for i in range(len(seq_str)) 
+                        if seq_str.startswith(motif, i)]
+            st.write(f"Found **{len(positions)}** occurrences")
+            if positions:
+                st.write(f"Positions: {positions[:10]}")  # Show first 10
+else:
+    st.info("Please provide a FASTA sequence to analyze")</code></pre>
+
+            <h3>Sample FASTA for Testing</h3>
+            
+            <p><strong>Create a test file: sample.fasta</strong></p>
+            <pre>>seq1 Human TP53 gene fragment
+ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACTACTTCCTGAA
+AACAACGTTCTGTCCCCCTTGCCGTCCCAAGCAATGGATGATTTGATGCTGTCCCCGGACGATATTGAACAATGGTTCACTGAA
+
+>seq2 Mouse BRCA1 gene fragment
+CGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA
+GCTAGC</pre>
+
+            <h3>Exercise - Enhanced FASTA Analyzer</h3>
+            
+            <div class="note">
+                <h4>Exercise (15 minutes): Enhance the FASTA analyzer</h4>
+                <p><strong>Add these features:</strong></p>
+                <ol>
+                    <li>Calculate AT/GC ratio</li>
+                    <li>Find the longest homopolymer run (e.g., AAAAA)</li>
+                    <li>Add a download button for results CSV</li>
+                    <li>Color-code GC% in the results table (red &lt;40%, green 40-60%, yellow &gt;60%)</li>
+                </ol>
+                <p><strong>Hints:</strong></p>
+                <pre><code># AT/GC ratio
+at_ratio = (a_count + t_count) / (g_count + c_count)
+
+# Homopolymer run
+import re
+homopolymers = re.findall(r'(A+|T+|G+|C+)', seq)
+longest = max(homopolymers, key=len)
+
+# Download button
+csv = df.to_csv(index=False)
+st.download_button("Download CSV", csv, "results.csv", "text/csv")</code></pre>
+            </div>
+        </div>
+
+        <div class="section" id="dashboards">
+            <h2>Interactive Dashboards (03:00 - 04:00 PM)</h2>
+            
+            <h3>Session State - Managing Data Across Reruns</h3>
+            
+            <p><strong>The Problem:</strong></p>
+            <pre><code># This DOESN'T work as expected
+counter = 0
+
+if st.button("Increment"):
+    counter += 1  # Resets to 0 on every rerun!
+    
+st.write(f"Counter: {counter}")  # Always shows 0</code></pre>
+
+            <p><strong>The Solution - Session State:</strong></p>
+            <pre><code>import streamlit as st
+
+# Initialize session state
+if 'counter' not in st.session_state:
+    st.session_state.counter = 0
+
+# Button to increment
+if st.button("Increment"):
+    st.session_state.counter += 1
+
+st.write(f"Counter: {st.session_state.counter}")
+
+# Reset button
+if st.button("Reset"):
+    st.session_state.counter = 0</code></pre>
+
+            <div class="success">
+                <strong>Session state persists across reruns!</strong>
+            </div>
+
+            <h3>Session State - Practical Examples</h3>
+            
+            <pre><code>import streamlit as st
+
+st.title("Session State Examples")
+
+# Example 1: Store analysis results
+if 'results' not in st.session_state:
+    st.session_state.results = []
+
+sequence = st.text_input("Enter DNA sequence:")
+
+if st.button("Analyze"):
+    if sequence:
+        result = {
+            'sequence': sequence,
+            'length': len(sequence),
+            'gc': (sequence.count('G') + sequence.count('C')) / len(sequence) * 100
+        }
+        st.session_state.results.append(result)
+
+# Display all previous results
+if st.session_state.results:
+    st.subheader("Previous Analyses")
+    for i, res in enumerate(st.session_state.results):
+        st.write(f"{i+1}. Length: {res['length']}, GC%: {res['gc']:.1f}%")
+
+# Example 2: Multi-step workflow
+if 'step' not in st.session_state:
+    st.session_state.step = 1
+
+st.write(f"Current Step: {st.session_state.step}")
+
+if st.session_state.step == 1:
+    if st.button("Next Step"):
+        st.session_state.step = 2
+elif st.session_state.step == 2:
+    st.write("You're on step 2!")
+    if st.button("Go Back"):
+        st.session_state.step = 1</code></pre>
+
+            <h3>Caching - Speed Up Your App</h3>
+            
+            <p><strong>Why Cache?</strong></p>
+            <ul>
+                <li>Avoid recomputing expensive operations</li>
+                <li>Load large files only once</li>
+                <li>Faster user experience</li>
+            </ul>
+
+            <pre><code>import streamlit as st
+import time
+import pandas as pd
+
+# Without caching (SLOW)
+def load_data_slow():
+    time.sleep(3)  # Simulate slow loading
+    return pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+# With caching (FAST after first load)
+@st.cache_data
+def load_data_cached():
+    time.sleep(3)  # Only slow on first run!
+    return pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+st.title("Caching Demo")
+
+if st.button("Load without cache"):
+    with st.spinner("Loading..."):
+        df = load_data_slow()
+        st.write(df)
+        st.success("Loaded! (will be slow every time)")
+
+if st.button("Load with cache"):
+    with st.spinner("Loading..."):
+        df = load_data_cached()
+        st.write(df)
+        st.success("Loaded! (fast after first time)")</code></pre>
+
+            <h3>Caching - Best Practices</h3>
+            
+            <pre><code>import streamlit as st
+from Bio import SeqIO
+from io import StringIO
+
+# Cache data loading
+@st.cache_data
+def parse_fasta(fasta_string):
+    """Parse FASTA and return list of records"""
+    sequences = list(SeqIO.parse(StringIO(fasta_string), "fasta"))
+    return sequences
+
+# Cache expensive computations
+@st.cache_data
+def analyze_sequences(sequences):
+    """Analyze sequences - only computed once per unique input"""
+    results = []
+    for record in sequences:
+        seq = str(record.seq)
+        results.append({
+            'id': record.id,
+            'length': len(seq),
+            'gc': (seq.count('G') + seq.count('C')) / len(seq) * 100
+        })
+    return results
+
+# Use cached functions
+st.title("Cached Sequence Analysis")
+
+uploaded = st.file_uploader("Upload FASTA", type=['fasta'])
+
+if uploaded:
+    fasta_string = uploaded.read().decode('utf-8')
+    
+    # These are cached - fast on subsequent runs!
+    sequences = parse_fasta(fasta_string)
+    results = analyze_sequences(sequences)
+    
+    st.write(results)</code></pre>
+
+            <div class="note">
+                <p><strong>Key Points:</strong></p>
+                <ul>
+                    <li>Use <code>@st.cache_data</code> for data transformations</li>
+                    <li>Cache is invalidated when input changes</li>
+                    <li>Don't cache frequently changing data</li>
+                </ul>
+            </div>
+
+            <h3>Building a Sequence Dashboard - Part 1</h3>
+            
+            <pre><code>import streamlit as st
+from Bio import SeqIO
+from Bio.Seq import Seq
+from io import StringIO
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.set_page_config(page_title="Sequence Dashboard", layout="wide")
+
+st.title("Comprehensive Sequence Dashboard")
+
+# Initialize session state
+if 'sequences' not in st.session_state:
+    st.session_state.sequences = None
+if 'analysis_done' not in st.session_state:
+    st.session_state.analysis_done = False
+
+# Sidebar for controls
+st.sidebar.title("Controls")
+
+# File upload
+uploaded_file = st.sidebar.file_uploader("Upload FASTA", type=['fasta', 'fa'])
+
+if uploaded_file:
+    fasta_string = uploaded_file.read().decode('utf-8')
+    st.session_state.sequences = list(SeqIO.parse(StringIO(fasta_string), "fasta"))
+    st.sidebar.success(f"Loaded {len(st.session_state.sequences)} sequences")
+
+# Analysis button
+if st.sidebar.button("Run Analysis", type="primary"):
+    if st.session_state.sequences:
+        st.session_state.analysis_done = True
+    else:
+        st.sidebar.error("Please upload a file first!")</code></pre>
+
+            <h3>Building a Sequence Dashboard - Part 2</h3>
+            
+            <pre><code># Main content
+if st.session_state.analysis_done and st.session_state.sequences:
+    sequences = st.session_state.sequences
+    
+    # Summary metrics
+    st.header("Summary Statistics")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    total_sequences = len(sequences)
+    total_length = sum(len(rec.seq) for rec in sequences)
+    avg_length = total_length / total_sequences
+    
+    all_gc = []
+    for rec in sequences:
+        seq = str(rec.seq)
+        gc = (seq.count('G') + seq.count('C')) / len(seq) * 100
+        all_gc.append(gc)
+    
+    avg_gc = sum(all_gc) / len(all_gc)
+    
+    col1.metric("Total Sequences", total_sequences)
+    col2.metric("Total Length", f"{total_length:,} bp")
+    col3.metric("Average Length", f"{avg_length:.0f} bp")
+    col4.metric("Average GC%", f"{avg_gc:.1f}%")
+    
+    # Detailed results
+    st.header("Detailed Analysis")
+    
+    results = []
+    for i, record in enumerate(sequences):
+        seq = str(record.seq)
+        length = len(seq)
+        gc = (seq.count('G') + seq.count('C')) / length * 100
+        
+        results.append({
+            'Index': i + 1,
+            'ID': record.id,
+            'Description': record.description,
+            'Length': length,
+            'GC%': round(gc, 2),
+            'A': seq.count('A'),
+            'T': seq.count('T'),
+            'G': seq.count('G'),
+            'C': seq.count('C')
+        })
+    
+    df = pd.DataFrame(results)</code></pre>
+
+            <h3>Building a Sequence Dashboard - Part 3</h3>
+            
+            <pre><code>    # Filters
+    with st.expander("Filter Options", expanded=True):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            min_length = st.slider(
+                "Minimum Length:",
+                int(df['Length'].min()),
+                int(df['Length'].max()),
+                int(df['Length'].min())
+            )
+        
+        with col2:
+            gc_range = st.slider(
+                "GC% Range:",
+                0, 100, (0, 100)
+            )
+    
+    # Apply filters
+    filtered_df = df[
+        (df['Length'] >= min_length) &
+        (df['GC%'] >= gc_range[0]) &
+        (df['GC%'] <= gc_range[1])
+    ]
+    
+    st.write(f"**Showing {len(filtered_df)} of {len(df)} sequences**")
+    st.dataframe(filtered_df, use_container_width=True)
+    
+    # Visualizations
+    st.header("Visualizations")
+    
+    tab1, tab2, tab3 = st.tabs(["Length Distribution", "GC Content", "Nucleotide Composition"])
+    
+    with tab1:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.hist(filtered_df['Length'], bins=20, edgecolor='black', color='steelblue')
+        ax.set_xlabel('Sequence Length (bp)', fontsize=12)
+        ax.set_ylabel('Frequency', fontsize=12)
+        ax.set_title('Sequence Length Distribution', fontsize=14, fontweight='bold')
+        ax.grid(axis='y', alpha=0.3)
+        st.pyplot(fig)</code></pre>
+
+            <h3>Building a Sequence Dashboard - Part 4</h3>
+            
+            <pre><code>    with tab2:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.scatter(filtered_df['Length'], filtered_df['GC%'], 
+                   alpha=0.6, s=100, color='coral')
+        ax.set_xlabel('Sequence Length (bp)', fontsize=12)
+        ax.set_ylabel('GC Content (%)', fontsize=12)
+        ax.set_title('Length vs GC Content', fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        st.pyplot(fig)
+    
+    with tab3:
+        # Aggregate nucleotide counts
+        total_a = filtered_df['A'].sum()
+        total_t = filtered_df['T'].sum()
+        total_g = filtered_df['G'].sum()
+        total_c = filtered_df['C'].sum()
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+        
+        # Pie chart
+        sizes = [total_a, total_t, total_g, total_c]
+        labels = ['A', 'T', 'G', 'C']
+        colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#95E1D3']
+        
+        ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+                colors=colors, startangle=90)
+        ax1.set_title('Overall Nucleotide Distribution')
+        
+        # Bar chart
+        ax2.bar(labels, sizes, color=colors)
+        ax2.set_ylabel('Count')
+        ax2.set_title('Total Nucleotide Counts')
+        ax2.grid(axis='y', alpha=0.3)
+        
+        st.pyplot(fig)
+    
+    # Export option
+    st.header("Export Data")
+    csv = filtered_df.to_csv(index=False)
+    st.download_button(
+        label="Download Results as CSV",
+        data=csv,
+        file_name="sequence_analysis.csv",
+        mime="text/csv"
+    )
+
+else:
+    st.info("Upload a FASTA file and click 'Run Analysis' to begin")</code></pre>
+
+            <h3>Progress Indicators & Spinners</h3>
+            
+            <pre><code>import streamlit as st
+import time
+
+st.title("Progress Indicators")
+
+# Spinner
+if st.button("Show Spinner"):
+    with st.spinner("Processing..."):
+        time.sleep(2)
+    st.success("Done!")
+
+# Progress bar
+if st.button("Show Progress Bar"):
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    for i in range(100):
+        progress_bar.progress(i + 1)
+        status_text.text(f"Processing: {i+1}%")
+        time.sleep(0.02)
+    
+    status_text.text("Complete!")
+    st.balloons()
+
+# Practical example: analyzing multiple sequences
+if st.button("Analyze Sequences"):
+    sequences = ['SEQ1', 'SEQ2', 'SEQ3', 'SEQ4', 'SEQ5']
+    
+    progress = st.progress(0)
+    status = st.empty()
+    
+    results = []
+    for i, seq in enumerate(sequences):
+        status.text(f"Analyzing {seq}...")
+        time.sleep(0.5)  # Simulate analysis
+        results.append(f"{seq}: Complete")
+        progress.progress((i + 1) / len(sequences))
+    
+    status.text("All sequences analyzed!")
+    st.write(results)</code></pre>
+        </div>
+
+        <div class="section" id="protein1">
+            <h2>Protein Explorer I (04:15 - 04:45 PM)</h2>
+            
+            <h3>Protein Analysis - Introduction</h3>
+            
+            <p><strong>What We'll Build:</strong></p>
+            <ul>
+                <li>Protein sequence analyzer</li>
+                <li>Amino acid composition</li>
+                <li>Molecular weight calculator</li>
+                <li>Pattern/motif search</li>
+                <li>Interactive visualizations</li>
+            </ul>
+
+            <p><strong>Biopython Protein Tools:</strong></p>
+            <pre><code>from Bio.Seq import Seq
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
+
+# Create protein sequence
+protein_seq = Seq("MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEK")
+
+# Analyze with ProteinAnalysis
+analyzed_seq = ProteinAnalysis(str(protein_seq))
+
+# Get properties
+print(f"Length: {len(protein_seq)}")
+print(f"Molecular Weight: {analyzed_seq.molecular_weight():.2f} Da")
+print(f"Isoelectric Point: {analyzed_seq.isoelectric_point():.2f}")
+print(f"Aromaticity: {analyzed_seq.aromaticity():.3f}")
+print(f"Instability Index: {analyzed_seq.instability_index():.2f}")
+print(f"GRAVY: {analyzed_seq.gravy():.3f}")</code></pre>
+
+            <h3>Protein Analyzer - Setup</h3>
+            
+            <pre><code>import streamlit as st
+from Bio.Seq import Seq
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
+from Bio import SeqIO
+from io import StringIO
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.title("Protein Sequence Analyzer")
+
+st.markdown("""
+Analyze protein sequences to determine:
+- Amino acid composition
+- Molecular weight
+- Isoelectric point (pI)
+- Hydrophobicity (GRAVY)
+- Secondary structure prediction
+""")
+
+# Input methods
+input_method = st.radio("Choose input method:",
+                        ["Enter sequence", "Upload FASTA"])
+
+protein_seq = None
+
+if input_method == "Enter sequence":
+    seq_input = st.text_area("Enter protein sequence (one-letter code):",
+                             value="MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEK",
+                             height=150)
+    if seq_input:
+        # Remove whitespace and newlines
+        protein_seq = seq_input.replace("\n", "").replace(" ", "").upper()
+
+else:
+    uploaded_file = st.file_uploader("Upload FASTA file", type=['fasta', 'fa'])
+    if uploaded_file:
+        fasta_string = uploaded_file.read().decode('utf-8')
+        records = list(SeqIO.parse(StringIO(fasta_string), "fasta"))
+        if records:
+            protein_seq = str(records[0].seq).upper()
+            st.info(f"Loaded sequence: {records[0].id}")</code></pre>
+
+            <h3>Protein Analyzer - Basic Analysis</h3>
+            
+            <pre><code>if protein_seq:
+    # Validate sequence
+    valid_aa = set("ACDEFGHIKLMNPQRSTVWY")
+    invalid_chars = set(protein_seq) - valid_aa
+    
+    if invalid_chars:
+        st.error(f"Invalid characters found: {invalid_chars}")
+        st.stop()
+    
+    # Analyze
+    analyzed = ProteinAnalysis(protein_seq)
+    
+    # Basic properties
+    st.header("Basic Properties")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    col1.metric("Length", f"{len(protein_seq)} aa")
+    col2.metric("Molecular Weight", f"{analyzed.molecular_weight():.1f} Da")
+    col3.metric("Isoelectric Point", f"{analyzed.isoelectric_point():.2f}")
+    col4.metric("Aromaticity", f"{analyzed.aromaticity():.3f}")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    col1.metric("Instability Index", f"{analyzed.instability_index():.2f}")
+    stability = "Stable" if analyzed.instability_index() < 40 else "Unstable"
+    col1.caption(f"({stability})")
+    
+    col2.metric("GRAVY", f"{analyzed.gravy():.3f}")
+    hydro = "Hydrophobic" if analyzed.gravy() > 0 else "Hydrophilic"
+    col2.caption(f"({hydro})")
+    
+    col3.metric("Aliphatic Index", f"{analyzed.aliphatic_index():.2f}")
+    
+    # Show sequence
+    with st.expander("View Sequence"):
+        st.code(protein_seq, language=None)</code></pre>
+
+            <h3>Protein Analyzer - Amino Acid Composition</h3>
+            
+            <pre><code>    # Amino acid composition
+    st.header("Amino Acid Composition")
+    
+    aa_composition = analyzed.get_amino_acids_percent()
+    
+    # Convert to DataFrame
+    aa_df = pd.DataFrame([
+        {'Amino Acid': aa, 'Percentage': percent * 100}
+        for aa, percent in sorted(aa_composition.items(), 
+                                 key=lambda x: x[1], reverse=True)
+        if percent > 0
+    ])
+    
+    # Display table and chart side by side
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.dataframe(aa_df, use_container_width=True, hide_index=True)
+        
+        # Summary
+        charged = sum(aa_composition.get(aa, 0) for aa in ['K', 'R', 'H', 'D', 'E']) * 100
+        polar = sum(aa_composition.get(aa, 0) for aa in ['S', 'T', 'N', 'Q']) * 100
+        hydrophobic = sum(aa_composition.get(aa, 0) for aa in ['A', 'V', 'I', 'L', 'M', 'F', 'W', 'P']) * 100
+        
+        st.write("**Categories:**")
+        st.write(f"- Charged: {charged:.1f}%")
+        st.write(f"- Polar: {polar:.1f}%")
+        st.write(f"- Hydrophobic: {hydrophobic:.1f}%")
+    
+    with col2:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(aa_df['Amino Acid'], aa_df['Percentage'], color='steelblue')
+        ax.set_xlabel('Percentage (%)', fontsize=12)
+        ax.set_ylabel('Amino Acid', fontsize=12)
+        ax.set_title('Amino Acid Distribution', fontsize=14, fontweight='bold')
+        ax.grid(axis='x', alpha=0.3)
+        st.pyplot(fig)</code></pre>
+
+            <h3>Protein Analyzer - Secondary Structure</h3>
+            
+            <pre><code>    # Secondary structure
+    st.header("Secondary Structure Prediction")
+    
+    sec_struc = analyzed.secondary_structure_fraction()
+    helix, turn, sheet = sec_struc
+    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Alpha-Helix", f"{helix * 100:.1f}%")
+    col2.metric("Beta-Turn", f"{turn * 100:.1f}%")
+    col3.metric("Beta-Sheet", f"{sheet * 100:.1f}%")
+    
+    # Pie chart
+    fig, ax = plt.subplots(figsize=(8, 8))
+    sizes = [helix * 100, turn * 100, sheet * 100]
+    labels = ['Alpha-Helix', 'Beta-Turn', 'Beta-Sheet']
+    colors = ['#FF6B6B', '#4ECDC4', '#95E1D3']
+    explode = (0.1, 0, 0)
+    
+    ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
+           colors=colors, startangle=90, shadow=True)
+    ax.set_title('Secondary Structure Distribution', fontsize=14, fontweight='bold')
+    st.pyplot(fig)</code></pre>
+
+            <h3>Protein Analyzer - Pattern Search</h3>
+            
+            <pre><code>    # Pattern search
+    st.header("Pattern Search")
+    
+    pattern = st.text_input("Enter pattern to search (e.g., KR, RGD):", "KR")
+    
+    if pattern:
+        pattern = pattern.upper()
+        positions = []
+        for i in range(len(protein_seq) - len(pattern) + 1):
+            if protein_seq[i:i+len(pattern)] == pattern:
+                positions.append(i + 1)  # 1-indexed
+        
+        if positions:
+            st.success(f"Found {len(positions)} occurrence(s) of '{pattern}'")
+            st.write(f"**Positions:** {', '.join(map(str, positions))}")
+            
+            # Highlight in sequence
+            with st.expander("View highlighted sequence"):
+                highlighted = protein_seq
+                for pos in reversed(positions):  # Reverse to maintain positions
+                    idx = pos - 1
+                    highlighted = (highlighted[:idx] + 
+                                 f"**{highlighted[idx:idx+len(pattern)]}**" + 
+                                 highlighted[idx+len(pattern):])
+                st.markdown(highlighted)
+        else:
+            st.warning(f"Pattern '{pattern}' not found in sequence")
+    
+    # Common motifs
+    st.subheader("Common Motifs")
+    motifs = {
+        'N-glycosylation': 'N[^P][ST]',
+        'RGD adhesion': 'RGD',
+        'KDEL ER retention': 'KDEL',
+        'Nuclear localization': 'KRK'
+    }
+    
+    for motif_name, motif_pattern in motifs.items():
+        # Simple search (not regex for simplicity)
+        if motif_pattern in protein_seq:
+            st.write(f"- {motif_name}: Found")
+        else:
+            st.write(f"- {motif_name}: Not found")</code></pre>
+
+            <h3>Protein Analyzer - Export</h3>
+            
+            <pre><code>    # Export data
+    st.header("Export Results")
+    
+    # Compile results
+    report = f"""Protein Sequence Analysis Report
+================================
+
+Basic Properties:
+- Length: {len(protein_seq)} amino acids
+- Molecular Weight: {analyzed.molecular_weight():.2f} Da
+- Isoelectric Point (pI): {analyzed.isoelectric_point():.2f}
+- Aromaticity: {analyzed.aromaticity():.3f}
+- Instability Index: {analyzed.instability_index():.2f} ({stability})
+- GRAVY: {analyzed.gravy():.3f} ({hydro})
+- Aliphatic Index: {analyzed.aliphatic_index():.2f}
+
+Secondary Structure:
+- Alpha-Helix: {helix * 100:.1f}%
+- Beta-Turn: {turn * 100:.1f}%
+- Beta-Sheet: {sheet * 100:.1f}%
+
+Sequence:
+{protein_seq}
+"""
+    
+    st.download_button(
+        label="Download Report",
+        data=report,
+        file_name="protein_analysis.txt",
+        mime="text/plain"
+    )
+    
+    # CSV of amino acid composition
+    csv = aa_df.to_csv(index=False)
+    st.download_button(
+        label="Download AA Composition CSV",
+        data=csv,
+        file_name="aa_composition.csv",
+        mime="text/csv"
+    )
+
+else:
+    st.info("Please enter or upload a protein sequence to begin")</code></pre>
+        </div>
+
+        <div class="section" id="protein2">
+            <h2>Protein Explorer II - Structure (04:45 - 05:15 PM)</h2>
+            
+            <h3>3D Protein Structure Visualization</h3>
+            
+            <p><strong>What We'll Build:</strong></p>
+            <ul>
+                <li>Upload PDB files</li>
+                <li>Fetch from PDB database</li>
+                <li>3D interactive visualization with Py3Dmol</li>
+                <li>Different representation styles</li>
+            </ul>
+
+            <p><strong>About Py3Dmol:</strong></p>
+            <pre><code>import streamlit as st
+import py3Dmol
+import streamlit.components.v1 as components
+
+# Basic example
+pdb_string = """ATOM      1  N   ALA A   1       0.000   0.000   0.000"""
+
+xyzview = py3Dmol.view(width=800, height=600)
+xyzview.addModel(pdb_string, 'pdb')
+xyzview.setStyle({'cartoon': {'color': 'spectrum'}})
+xyzview.zoomTo()
+
+# Display in Streamlit
+components.html(xyzview._make_html(), height=600)</code></pre>
+
+            <h3>Protein Structure Viewer - Setup</h3>
+            
+            <pre><code>import streamlit as st
+import py3Dmol
+import streamlit.components.v1 as components
+import requests
+
+st.title("Protein Structure Viewer")
+
+st.markdown("""
+Visualize 3D protein structures:
+- Upload your own PDB file
+- Fetch from RCSB PDB database
+- Interactive 3D visualization
+- Multiple representation styles
+""")
+
+# Input methods
+input_method = st.radio("Choose input method:",
+                        ["Fetch from PDB", "Upload PDB file"])
+
+pdb_string = None
+pdb_id = None
+
+if input_method == "Fetch from PDB":
+    pdb_id = st.text_input("Enter PDB ID (e.g., 1UBQ, 3HFM):", "1UBQ")
+    
+    if st.button("Fetch Structure"):
+        with st.spinner(f"Fetching {pdb_id} from RCSB PDB..."):
+            try:
+                url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+                response = requests.get(url)
+                
+                if response.status_code == 200:
+                    pdb_string = response.text
+                    st.success(f"Loaded structure: {pdb_id}")
+                else:
+                    st.error(f"Failed to fetch {pdb_id}. Please check the PDB ID.")
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
+
+else:
+    uploaded_file = st.file_uploader("Upload PDB file", type=['pdb'])
+    
+    if uploaded_file:
+        pdb_string = uploaded_file.read().decode('utf-8')
+        st.success(f"Loaded file: {uploaded_file.name}")</code></pre>
+
+            <h3>Protein Structure Viewer - Visualization</h3>
+            
+            <pre><code>if pdb_string:
+    # Sidebar controls
+    st.sidebar.header("Visualization Settings")
+    
+    # Style options
+    style = st.sidebar.selectbox(
+        "Representation Style:",
+        ["cartoon", "stick", "sphere", "line", "cross"]
+    )
+    
+    # Color schemes
+    color_scheme = st.sidebar.selectbox(
+        "Color Scheme:",
+        ["spectrum", "chain", "ssSS", "residue", "white", "lightgray"]
+    )
+    
+    # Background color
+    bg_color = st.sidebar.color_picker("Background Color:", "#FFFFFF")
+    
+    # Spin animation
+    spin = st.sidebar.checkbox("Spin Animation", value=False)
+    
+    # Size
+    viewer_height = st.sidebar.slider("Viewer Height:", 400, 800, 600)
+    
+    # Create viewer
+    xyzview = py3Dmol.view(width=800, height=viewer_height)
+    xyzview.addModel(pdb_string, 'pdb')
+    
+    # Apply style
+    if style == "cartoon":
+        xyzview.setStyle({style: {'color': color_scheme}})
+    else:
+        xyzview.setStyle({style: {}})
+    
+    xyzview.setBackgroundColor(bg_color)
+    xyzview.zoomTo()
+    
+    if spin:
+        xyzview.spin(True)
+    
+    # Display
+    st.header("3D Structure")
+    components.html(xyzview._make_html(), height=viewer_height + 50)</code></pre>
+
+            <h3>Protein Structure Viewer - Structure Info</h3>
+            
+            <pre><code>    # Parse structure information
+    st.header("Structure Information")
+    
+    lines = pdb_string.split('\n')
+    
+    # Extract header info
+    header_info = {}
+    atom_count = 0
+    residues = set()
+    chains = set()
+    
+    for line in lines:
+        if line.startswith('HEADER'):
+            header_info['Classification'] = line[10:50].strip()
+            header_info['Date'] = line[50:59].strip()
+            header_info['ID'] = line[62:66].strip()
+        elif line.startswith('TITLE'):
+            header_info['Title'] = line[10:].strip()
+        elif line.startswith('ATOM') or line.startswith('HETATM'):
+            atom_count += 1
+            if len(line) > 26:
+                residues.add(line[17:20].strip())
+                chains.add(line[21])
+    
+    # Display info
+    col1, col2, col3, col4 = st.columns(4)
+    
+    col1.metric("Atoms", f"{atom_count:,}")
+    col2.metric("Residues", len(residues))
+    col3.metric("Chains", len(chains))
+    col4.metric("PDB ID", header_info.get('ID', 'N/A'))
+    
+    # Additional info
+    with st.expander("Detailed Information"):
+        for key, value in header_info.items():
+            st.write(f"**{key}:** {value}")
+        
+        st.write(f"**Chains:** {', '.join(sorted(chains))}")
+        st.write(f"**Unique Residues:** {', '.join(sorted(residues))}")</code></pre>
+
+            <h3>Protein Structure Viewer - Advanced Features</h3>
+            
+            <pre><code>    # Advanced visualization options
+    st.header("Advanced Visualization")
+    
+    tabs = st.tabs(["Multiple Styles", "Surface View", "Ligands"])
+    
+    with tabs[0]:
+        st.write("**Combine Multiple Representations**")
+        
+        show_cartoon = st.checkbox("Show Cartoon", value=True)
+        show_sticks = st.checkbox("Show Sticks for Sidechains", value=False)
+        
+        xyzview_multi = py3Dmol.view(width=800, height=500)
+        xyzview_multi.addModel(pdb_string, 'pdb')
+        
+        if show_cartoon:
+            xyzview_multi.setStyle({'cartoon': {'color': 'spectrum'}})
+        
+        if show_sticks:
+            xyzview_multi.addStyle({'and': [{'resn': ['PHE', 'TYR', 'TRP']}]},
+                                   {'stick': {'colorscheme': 'greenCarbon'}})
+        
+        xyzview_multi.setBackgroundColor('#FFFFFF')
+        xyzview_multi.zoomTo()
+        
+        components.html(xyzview_multi._make_html(), height=550)
+    
+    with tabs[1]:
+        st.write("**Surface Representation**")
+        
+        surface_type = st.radio("Surface Type:", 
+                               ["VDW (Van der Waals)", "SAS (Solvent Accessible)", "MS (Molecular)"])
+        
+        xyzview_surf = py3Dmol.view(width=800, height=500)
+        xyzview_surf.addModel(pdb_string, 'pdb')
+        xyzview_surf.setStyle({'cartoon': {'color': 'spectrum'}})
+        
+        if surface_type == "VDW (Van der Waals)":
+            xyzview_surf.addSurface(py3Dmol.VDW, {'opacity': 0.7, 'color': 'white'})
+        elif surface_type == "SAS (Solvent Accessible)":
+            xyzview_surf.addSurface(py3Dmol.SAS, {'opacity': 0.7, 'color': 'lightblue'})
+        else:
+            xyzview_surf.addSurface(py3Dmol.MS, {'opacity': 0.7, 'color': 'lightgray'})
+        
+        xyzview_surf.zoomTo()
+        components.html(xyzview_surf._make_html(), height=550)
+    
+    with tabs[2]:
+        st.write("**Highlight Specific Residues or Ligands**")
+        
+        residue_to_highlight = st.text_input("Enter residue name to highlight (e.g., HEM, ATP):", "")
+        
+        xyzview_lig = py3Dmol.view(width=800, height=500)
+        xyzview_lig.addModel(pdb_string, 'pdb')
+        xyzview_lig.setStyle({'cartoon': {'color': 'lightgray'}})
+        
+        if residue_to_highlight:
+            xyzview_lig.addStyle({'resn': residue_to_highlight},
+                                {'stick': {'colorscheme': 'orangeCarbon', 'radius': 0.3}})
+            xyzview_lig.addStyle({'resn': residue_to_highlight},
+                                {'sphere': {'scale': 0.3, 'colorscheme': 'orangeCarbon'}})
+        
+        xyzview_lig.zoomTo()
+        components.html(xyzview_lig._make_html(), height=550)</code></pre>
+
+            <h3>Protein Structure Viewer - Export</h3>
+            
+            <pre><code>    # Export options
+    st.header("Export")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.download_button(
+            label="Download PDB File",
+            data=pdb_string,
+            file_name=f"{pdb_id if pdb_id else 'structure'}.pdb",
+            mime="chemical/x-pdb"
+        )
+    
+    with col2:
+        if st.button("Copy PDB ID to Clipboard"):
+            if pdb_id:
+                st.code(pdb_id)
+                st.info(f"PDB ID: {pdb_id}")
+    
+    # Information box
+    st.info("""
+    **Tips:**
+    - Use mouse to rotate, zoom, and pan the structure
+    - Try different color schemes for better visualization
+    - Cartoon style is best for overall structure
+    - Stick/Sphere styles show atomic details
+    - Popular PDB IDs to try: 1UBQ (Ubiquitin), 1BNA (DNA), 3HFM (Hemoglobin)
+    """)
+
+else:
+    st.info("Please fetch or upload a PDB structure to begin")
+    
+    # Example structures
+    st.subheader("Popular Structures to Try")
+    
+    examples = {
+        "1UBQ": "Ubiquitin - Small regulatory protein",
+        "3HFM": "Hemoglobin - Oxygen transport protein",
+        "1BNA": "B-DNA Dodecamer - DNA double helix",
+        "2LYZ": "Lysozyme - Antibacterial enzyme",
+        "1AKI": "Aspartate Kinase - Metabolic enzyme"
+    }
+    
+    cols = st.columns(3)
+    for i, (pdb, desc) in enumerate(examples.items()):
+        with cols[i % 3]:
+            st.write(f"**{pdb}**")
+            st.caption(desc)</code></pre>
+        </div>
+
+        <div class="section" id="wrapup">
+            <h2>Wrap-up & Next Steps (05:15 - 05:30 PM)</h2>
+            
+            <h3>Best Practices & Tips</h3>
+            
+            <h4>Streamlit Best Practices:</h4>
+
+            <p><strong>1. Performance:</strong></p>
+            <pre><code># Cache expensive operations
+@st.cache_data
+def load_data():
+    return pd.read_csv('large_file.csv')
+
+# Use session state for persistence
+if 'data' not in st.session_state:
+    st.session_state.data = None</code></pre>
+
+            <p><strong>2. User Experience:</strong></p>
+            <pre><code># Show progress for long operations
+with st.spinner('Loading...'):
+    process_data()
+
+# Provide helpful messages
+st.info("Tip: Upload a FASTA file to begin")
+
+# Use expanders for optional content
+with st.expander("Advanced Options"):
+    show_advanced_settings()</code></pre>
+
+            <p><strong>3. Layout:</strong></p>
+            <pre><code># Use columns for compact layouts
+col1, col2 = st.columns(2)
+
+# Use sidebar for controls
+st.sidebar.header("Settings")
+
+# Use tabs for organization
+tab1, tab2 = st.tabs(["Analysis", "Results"])</code></pre>
+
+            <h3>Common Pitfalls & Solutions</h3>
+            
+            <h4>Common Mistakes:</h4>
+
+            <p><strong>1. Not handling empty inputs:</strong></p>
+            <pre><code># BAD
+df = pd.read_csv(uploaded_file)  # Crashes if None
+
+# GOOD
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+else:
+    st.warning("Please upload a file")</code></pre>
+
+            <p><strong>2. Forgetting sequence validation:</strong></p>
+            <pre><code># BAD
+gc = seq.count('G') + seq.count('C')  # Fails on invalid chars
+
+# GOOD
+valid_chars = set('ATGC')
+if set(seq.upper()) <= valid_chars:
+    gc = seq.count('G') + seq.count('C')
+else:
+    st.error("Invalid DNA sequence")</code></pre>
+
+            <p><strong>3. Not using session state for state persistence:</strong></p>
+            <pre><code># BAD - Resets every time
+counter = 0
+
+# GOOD
+if 'counter' not in st.session_state:
+    st.session_state.counter = 0</code></pre>
+
+            <p><strong>4. Creating plots without figure objects:</strong></p>
+            <pre><code># BAD
+plt.plot(data)  # Can cause issues
+
+# GOOD
+fig, ax = plt.subplots()
+ax.plot(data)
+st.pyplot(fig)</code></pre>
+
+            <h3>Project Ideas for Practice</h3>
+            
+            <h4>Projects to Build on Your Own:</h4>
+
+            <p><strong>Beginner Level:</strong></p>
+            <ol>
+                <li><strong>Codon Usage Analyzer</strong> - Calculate codon frequency from DNA sequences</li>
+                <li><strong>Primer Designer</strong> - Find optimal PCR primer pairs</li>
+                <li><strong>Restriction Site Finder</strong> - Identify restriction enzyme sites</li>
+                <li><strong>Sequence Format Converter</strong> - Convert between FASTA, GenBank, etc.</li>
+            </ol>
+
+            <p><strong>Intermediate Level:</strong></p>
+            <ol start="5">
+                <li><strong>Multiple Sequence Alignment Viewer</strong> - Upload and visualize MSA</li>
+                <li><strong>Gene Expression Heatmap</strong> - Interactive heatmap from CSV data</li>
+                <li><strong>Phylogenetic Tree Viewer</strong> - Display and interact with trees</li>
+                <li><strong>Protein Domain Predictor</strong> - Identify domains using simple rules</li>
+            </ol>
+
+            <p><strong>Advanced Level:</strong></p>
+            <ol start="9">
+                <li><strong>BLAST Results Parser</strong> - Upload and visualize BLAST XML/JSON</li>
+                <li><strong>RNA Secondary Structure</strong> - Predict and visualize RNA folding</li>
+                <li><strong>Variant Effect Predictor</strong> - Analyze SNP/variant impacts</li>
+                <li><strong>Pathway Visualization</strong> - Interactive biological pathway maps</li>
+            </ol>
+
+            <h3>Resources & Learning More</h3>
+            
+            <h4>Essential Resources:</h4>
+
+            <p><strong>Streamlit Documentation:</strong></p>
+            <ul>
+                <li>Official Docs: https://docs.streamlit.io</li>
+                <li>API Reference: https://docs.streamlit.io/library/api-reference</li>
+                <li>Community Forum: https://discuss.streamlit.io</li>
+                <li>Gallery: https://streamlit.io/gallery</li>
+            </ul>
+
+            <p><strong>Biopython Resources:</strong></p>
+            <ul>
+                <li>Tutorial: http://biopython.org/DIST/docs/tutorial/Tutorial.html</li>
+                <li>Cookbook: http://biopython.org/wiki/Category:Cookbook</li>
+                <li>API Documentation: https://biopython.org/docs/</li>
+            </ul>
+
+            <p><strong>Python Libraries:</strong></p>
+            <ul>
+                <li>Pandas: https://pandas.pydata.org</li>
+                <li>Matplotlib: https://matplotlib.org</li>
+                <li>Plotly: https://plotly.com/python</li>
+                <li>Py3Dmol: https://pypi.org/project/py3Dmol/</li>
+            </ul>
+
+            <p><strong>Bioinformatics Databases:</strong></p>
+            <ul>
+                <li>NCBI: https://www.ncbi.nlm.nih.gov</li>
+                <li>UniProt: https://www.uniprot.org</li>
+                <li>RCSB PDB: https://www.rcsb.org</li>
+            </ul>
+
+            <h3>Sharing Your Apps (Local)</h3>
+            
+            <h4>Ways to Share Your Work:</h4>
+
+            <p><strong>1. Local Network Sharing:</strong></p>
+            <pre><code># Run on specific IP for local network access
+streamlit run app.py --server.address=0.0.0.0
+
+# Others on same network can access via:
+# http://YOUR_IP_ADDRESS:8501</code></pre>
+
+            <p><strong>2. GitHub Repository:</strong></p>
+            <ul>
+                <li>Upload your code to GitHub</li>
+                <li>Include requirements.txt:</li>
+            </ul>
+            <pre><code>streamlit==1.28.0
+biopython==1.81
+pandas==2.0.0
+matplotlib==3.7.0
+plotly==5.14.0
+py3Dmol==2.0.3</code></pre>
+            <ul>
+                <li>Add README with instructions</li>
+                <li>Others can clone and run locally</li>
+            </ul>
+
+            <p><strong>3. Create a Demo Video:</strong></p>
+            <ul>
+                <li>Record screen while using your app</li>
+                <li>Great for presentations and portfolios</li>
+                <li>Use tools like OBS Studio or QuickTime</li>
+            </ul>
+
+            <p><strong>4. Export Standalone HTML (limited):</strong></p>
+            <ul>
+                <li>Some visualizations can be exported</li>
+                <li>Works for static plots</li>
+                <li>Not for interactive apps</li>
+            </ul>
+
+            <h3>Final Exercise - Build Your Own Tool</h3>
+            
+            <div class="note">
+                <h4>Capstone Exercise (Take home):</h4>
+                <p><strong>Build a "Multi-Tool Bioinformatics Suite"</strong></p>
+                
+                <p><strong>Requirements:</strong></p>
+                <ol>
+                    <li><strong>Multiple pages/tabs</strong> for different tools:
+                        <ul>
+                            <li>DNA Sequence Analyzer</li>
+                            <li>Protein Analyzer</li>
+                            <li>Structure Viewer</li>
+                        </ul>
+                    </li>
+                    <li><strong>Sidebar navigation</strong> between tools</li>
+                    <li><strong>Session state</strong> to remember previous analyses</li>
+                    <li><strong>Export functionality</strong> for all results</li>
+                    <li><strong>Professional styling</strong> with proper headers and documentation</li>
+                </ol>
+                
+                <p><strong>Bonus Features:</strong></p>
+                <ul>
+                    <li>Batch processing (multiple sequences at once)</li>
+                    <li>Comparison mode (compare two sequences)</li>
+                    <li>Custom color schemes</li>
+                    <li>Save/load analysis sessions</li>
+                </ul>
+                
+                <p><strong>Estimated Time:</strong> 2-3 hours</p>
+            </div>
+
+            <h3>Code Template for Multi-Tool App</h3>
+            
+            <pre><code>import streamlit as st
+
+st.set_page_config(
+    page_title="Bioinformatics Suite",
+    page_icon="🧬",
+    layout="wide"
+)
+
+# Sidebar navigation
+st.sidebar.title("Bioinformatics Suite")
+st.sidebar.markdown("---")
+
+page = st.sidebar.radio(
+    "Select Tool:",
+    ["Home", "DNA Analyzer", "Protein Analyzer", "Structure Viewer"]
+)
+
+st.sidebar.markdown("---")
+st.sidebar.info("""
+**About**  
+Comprehensive bioinformatics analysis tools  
+Built with Streamlit & Biopython
+
+**Workshop:** SASTRA University 2025
+""")
+
+# Main content
+if page == "Home":
+    st.title("Welcome to Bioinformatics Suite")
+    st.markdown("""
+    ### Available Tools:
+    
+    **DNA Analyzer**
+    - FASTA parsing
+    - GC content calculation
+    - Nucleotide composition
+    - Sequence transformations
+    
+    **Protein Analyzer**
+    - Amino acid composition
+    - Molecular weight
+    - Isoelectric point
+    - Secondary structure prediction
+    
+    **Structure Viewer**
+    - 3D protein visualization
+    - PDB file support
+    - Multiple representations
+    - Interactive manipulation
+    
+    Select a tool from the sidebar to begin!
+    """)
+
+elif page == "DNA Analyzer":
+    st.title("DNA Sequence Analyzer")
+    # Add your DNA analyzer code here
+    st.write("Build DNA analysis functionality...")
+
+elif page == "Protein Analyzer":
+    st.title("Protein Sequence Analyzer")
+    # Add your protein analyzer code here
+    st.write("Build protein analysis functionality...")
+
+elif page == "Structure Viewer":
+    st.title("Protein Structure Viewer")
+    # Add your structure viewer code here
+    st.write("Build structure visualization...")</code></pre>
+
+            <h3>Workshop Recap</h3>
+            
+            <h4>What We Covered Today:</h4>
+
+            <p><strong>Morning Sessions:</strong></p>
+            <ul>
+                <li>Streamlit basics & setup</li>
+                <li>Interactive widgets & layouts</li>
+                <li>File handling & data display</li>
+                <li>DataFrames & filtering</li>
+                <li>Matplotlib & Plotly visualization</li>
+            </ul>
+
+            <p><strong>Afternoon Sessions:</strong></p>
+            <ul>
+                <li>Biopython integration</li>
+                <li>FASTA parsing & analysis</li>
+                <li>Session state & caching</li>
+                <li>Interactive dashboards</li>
+                <li>Protein sequence analysis</li>
+                <li>3D structure visualization</li>
+            </ul>
+
+            <p><strong>Key Skills Acquired:</strong></p>
+            <ul>
+                <li>Rapid prototyping of bioinformatics tools</li>
+                <li>Creating interactive data visualizations</li>
+                <li>Building user-friendly interfaces</li>
+                <li>Combining Python libraries effectively</li>
+            </ul>
+
+            <h3>Next Steps & Career Impact</h3>
+            
+            <h4>How These Skills Help You:</h4>
+
+            <p><strong>Research:</strong></p>
+            <ul>
+                <li>Quickly prototype analysis pipelines</li>
+                <li>Share interactive results with collaborators</li>
+                <li>Visualize complex biological data</li>
+                <li>Make reproducible research tools</li>
+            </ul>
+
+            <p><strong>Career Development:</strong></p>
+            <ul>
+                <li>Stand out in job applications</li>
+                <li>Demonstrate practical coding skills</li>
+                <li>Build a portfolio of tools</li>
+                <li>Contribute to open-source projects</li>
+            </ul>
+
+            <p><strong>Further Learning:</strong></p>
+            <ul>
+                <li>Advanced Streamlit features (authentication, custom components)</li>
+                <li>Machine learning integration (scikit-learn, TensorFlow)</li>
+                <li>Database connectivity (SQL, MongoDB)</li>
+                <li>Advanced bioinformatics algorithms</li>
+            </ul>
+
+            <p><strong>Community Engagement:</strong></p>
+            <ul>
+                <li>Share your apps on Streamlit Community Cloud (optional)</li>
+                <li>Contribute to bioinformatics open-source projects</li>
+                <li>Join Streamlit and Biopython forums</li>
+                <li>Attend workshops and webinars</li>
+            </ul>
+
+            <h3>Troubleshooting Guide</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Problem</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>App won't start</td>
+                        <td>Check <code>streamlit --version</code> and Python version</td>
+                    </tr>
+                    <tr>
+                        <td>Import errors</td>
+                        <td>Verify all packages installed: <code>pip list</code></td>
+                    </tr>
+                    <tr>
+                        <td>Cache not working</td>
+                        <td>Use <code>@st.cache_data</code> (not old <code>@st.cache</code>)</td>
+                    </tr>
+                    <tr>
+                        <td>Widgets not updating</td>
+                        <td>Check if inside functions or proper indentation</td>
+                    </tr>
+                    <tr>
+                        <td>Plot not showing</td>
+                        <td>Always use <code>fig, ax = plt.subplots()</code></td>
+                    </tr>
+                    <tr>
+                        <td>File upload fails</td>
+                        <td>Check file size and type restrictions</td>
+                    </tr>
+                    <tr>
+                        <td>Slow performance</td>
+                        <td>Add <code>@st.cache_data</code> to expensive functions</td>
+                    </tr>
+                    <tr>
+                        <td>Session state issues</td>
+                        <td>Initialize before use: <code>if 'x' not in st.session_state</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Getting Help:</strong></p>
+            <ul>
+                <li>Check error message carefully</li>
+                <li>Search Streamlit documentation</li>
+                <li>Ask on Streamlit forum</li>
+                <li>Check workshop GitHub (if created)</li>
+                <li>Email workshop organizers</li>
+            </ul>
+
+            <h3>Quick Reference Cheat Sheet</h3>
+            
+            <h4>Essential Commands:</h4>
+            <pre><code># Display
+st.title(), st.header(), st.write()
+st.dataframe(df), st.table(df)
+
+# Widgets
+st.text_input(), st.text_area()
+st.number_input(), st.slider()
+st.selectbox(), st.multiselect()
+st.checkbox(), st.radio(), st.button()
+
+# Layout
+st.columns(), st.tabs(), st.expander()
+st.sidebar.X(), st.container()
+
+# File handling
+st.file_uploader()
+st.download_button()
+
+# Visualization
+st.pyplot(fig)
+st.plotly_chart(fig)
+
+# State management
+st.session_state.X
+@st.cache_data
+
+# Messages
+st.success(), st.error()
+st.warning(), st.info()
+st.spinner(), st.progress()</code></pre>
+        </div>
+
+        <div class="section" id="bonus">
+            <h2>Bonus Content</h2>
+            
+            <h3>Sample Data Files</h3>
+            
+            <p><strong>Create these files for practice:</strong></p>
+
+            <h4>1. sample_genes.csv</h4>
+            <pre>Gene,Expression,P_value,Tissue
+TP53,120,0.001,Liver
+BRCA1,85,0.005,Breast
+EGFR,200,0.0001,Lung
+MYC,150,0.002,Liver
+KRAS,95,0.01,Colon
+APC,110,0.003,Colon
+PTEN,130,0.002,Brain
+RB1,90,0.008,Eye
+VHL,105,0.004,Kidney
+NF1,115,0.006,Nerve</pre>
+
+            <h4>2. sample.fasta</h4>
+            <pre>>seq1 Human TP53 tumor suppressor gene fragment
+ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCA
+GACCTATGGAAACTACTTCCTGAAAACAACGTTCTGTCCCCCTTGCCGTCCCAAGCAATG
+>seq2 Mouse BRCA1 gene fragment  
+CGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGTAGCTAGCTA
+>seq3 Short test sequence
+ATGCGATCGATCG</pre>
+
+            <h4>3. sample_protein.fasta</h4>
+            <pre>>sp|P04637|P53_HUMAN Cellular tumor antigen p53
+MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP</pre>
+
+            <h3>Custom Styling with CSS</h3>
+            
+            <pre><code>import streamlit as st
+
+# Custom CSS
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 50px;
+        color: #4CAF50;
+        text-align: center;
+        font-weight: bold;
+    }
+    .info-box {
+        background-color: #E3F2FD;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #2196F3;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Use custom styles
+st.markdown('<p class="main-header">Styled Title</p>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="info-box">
+    <h3>Custom Info Box</h3>
+    <p>This is a styled information box!</p>
+</div>
+""", unsafe_allow_html=True)</code></pre>
+
+            <h3>Error Handling Best Practices</h3>
+            
+            <pre><code>import streamlit as st
+from Bio import SeqIO
+from io import StringIO
+
+def safe_parse_fasta(fasta_string):
+    """Safely parse FASTA with error handling"""
+    try:
+        sequences = list(SeqIO.parse(StringIO(fasta_string), "fasta"))
+        
+        if not sequences:
+            st.warning("No sequences found in file")
+            return None
+            
+        st.success(f"Successfully loaded {len(sequences)} sequence(s)")
+        return sequences
+        
+    except Exception as e:
+        st.error(f"Error parsing FASTA: {str(e)}")
+        st.info("Please ensure your file is in valid FASTA format")
+        return None
+
+# Usage
+uploaded = st.file_uploader("Upload FASTA")
+if uploaded:
+    content = uploaded.read().decode('utf-8')
+    sequences = safe_parse_fasta(content)
+    
+    if sequences:
+        # Process sequences
+        pass</code></pre>
+
+            <h3>Performance Optimization Tips</h3>
+            
+            <pre><code>import streamlit as st
+import pandas as pd
+
+# 1. Cache data loading
+@st.cache_data
+def load_large_dataset(file_path):
+    return pd.read_csv(file_path)
+
+# 2. Cache resource-intensive computations
+@st.cache_data
+def compute_expensive_analysis(data):
+    # Complex analysis here
+    return results
+
+# 3. Use st.empty() for dynamic updates
+placeholder = st.empty()
+
+for i in range(100):
+    placeholder.text(f"Processing: {i}%")
+    # Do work
+
+placeholder.text("Complete!")
+
+# 4. Limit dataframe display size
+if len(df) > 1000:
+    st.dataframe(df.head(1000))
+    st.info(f"Showing first 1000 of {len(df)} rows")
+else:
+    st.dataframe(df)
+
+# 5. Use forms for multiple inputs
+with st.form("my_form"):
+    name = st.text_input("Name")
+    age = st.number_input("Age")
+    submitted = st.form_submit_button("Submit")
+    # Only runs when submitted, not on every keystroke!</code></pre>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #666;">
+            <p><strong>Building Interactive Bioinformatics Tools with Streamlit</strong></p>
+            <p>Bioinformatics Center, School of Chemical & Biotechnology</p>
+            <p>SASTRA Deemed to be University, Thanjavur - 613401</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">Workshop Documentation - 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
