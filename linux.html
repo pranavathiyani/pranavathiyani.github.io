@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Fundamentals for Big Data - MTech Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .slide {
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            page-break-after: always;
+        }
+        
+        .slide-header {
+            border-bottom: 3px solid #4a9eff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .slide-number {
+            display: inline-block;
+            background: #4a9eff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #4a9eff;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 2em;
+            color: #64b5f6;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            font-size: 1.5em;
+            color: #81c784;
+            margin: 20px 0 10px 0;
+        }
+        
+        h4 {
+            font-size: 1.2em;
+            color: #ffb74d;
+            margin: 15px 0 10px 0;
+        }
+        
+        .subtitle {
+            font-size: 1.3em;
+            color: #b0bec5;
+            margin-bottom: 20px;
+        }
+        
+        pre {
+            background: #1a1a1a;
+            border-left: 4px solid #4a9eff;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #4a9eff;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .box {
+            background: rgba(50, 50, 70, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(74, 158, 255, 0.3);
+        }
+        
+        .box-green {
+            background: rgba(40, 80, 40, 0.6);
+            border: 1px solid rgba(129, 199, 132, 0.5);
+        }
+        
+        .box-blue {
+            background: rgba(40, 60, 100, 0.6);
+            border: 1px solid rgba(100, 181, 246, 0.5);
+        }
+        
+        .box-red {
+            background: rgba(80, 40, 40, 0.6);
+            border: 1px solid rgba(255, 87, 87, 0.5);
+        }
+        
+        .box-yellow {
+            background: rgba(80, 60, 20, 0.6);
+            border: 1px solid rgba(255, 183, 77, 0.5);
+        }
+        
+        .warning {
+            background: rgba(100, 60, 0, 0.4);
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .info {
+            background: rgba(0, 60, 100, 0.4);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background: rgba(0, 80, 40, 0.4);
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .notes {
+            background: rgba(100, 80, 30, 0.3);
+            border-left: 4px solid #ffd54f;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .notes-title {
+            color: #ffd54f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        strong {
+            color: #81c784;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .slide {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            h1, h2 { color: #003366; }
+            h3 { color: #006633; }
+            h4 { color: #cc6600; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Slide 1 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 1 of 16</span>
+                <h1>Linux Fundamentals</h1>
+                <p class="subtitle">For MTech Big Data Students</p>
+            </div>
+            <div class="center">
+                <div class="icon">💻</div>
+                <h2>Module Coverage</h2>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>Linux File System Architecture</li>
+                    <li>File Permissions & Ownership</li>
+                    <li>Essential Linux Commands</li>
+                    <li>Process Management & Filters</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Welcome to Linux Fundamentals. This course is designed for biotech background students entering Big Data. We'll cover essential Linux concepts needed for handling genomic data, bioinformatics pipelines, and large-scale data processing.
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 2 of 16</span>
+                <h2>Linux File System Overview</h2>
+            </div>
+            <pre>/                    (Root - Top of hierarchy)
+├── home/            (User home directories)
+│   └── biouser/     (Your personal space)
+├── bin/             (Essential binaries/commands)
+├── etc/             (Configuration files)
+├── var/             (Variable data - logs, databases)
+│   └── log/         (System and application logs)
+├── tmp/             (Temporary files)
+├── usr/             (User programs and data)
+│   ├── bin/         (User binaries)
+│   └── local/       (Locally installed software)
+└── opt/             (Optional software packages)</pre>
+            <div class="info">
+                <strong>Biotech Context:</strong> Bioinformatics tools often install in /usr/local or /opt. Your sequence data might be in /home/biouser/data or /var/data
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                The Linux file system follows a hierarchical tree structure starting from root (/). Unlike Windows (C:, D:), everything is under one root. For biotech work: /home stores your projects, /var/log contains error logs from failed analysis runs, /tmp is for intermediate pipeline files.
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 3 of 16</span>
+                <h2>Absolute vs Relative Paths</h2>
+            </div>
+            <div class="grid-2">
+                <div class="box-green">
+                    <h4>Absolute Path</h4>
+                    <p>Starts from root (/)</p>
+                    <pre>/home/biouser/projects/genome_analysis/data.fasta</pre>
+                    <p>✓ Works from anywhere</p>
+                </div>
+                <div class="box-blue">
+                    <h4>Relative Path</h4>
+                    <p>From current location</p>
+                    <pre>./data.fasta
+../results/output.txt
+../../shared/reference.fa</pre>
+                    <p>. = current, .. = parent</p>
+                </div>
+            </div>
+            <div class="info">
+                <strong>Example:</strong> If you are in /home/biouser/projects/
+                <ul>
+                    <li><code>cd genome_analysis</code> (relative)</li>
+                    <li><code>cd /home/biouser/projects/genome_analysis</code> (absolute)</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Absolute paths are complete addresses from root - like full postal addresses. Relative paths are directions from where you currently are. In bioinformatics scripts, use absolute paths for reliability; use relative for portability across different systems.
+            </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 4 of 16</span>
+                <h2>The Shell and Its Types</h2>
+            </div>
+            <p>The shell is a command-line interface to interact with the OS</p>
+            <div class="grid-2">
+                <div class="box">
+                    <h4 style="color: #81c784;">bash (Bourne Again Shell)</h4>
+                    <ul>
+                        <li>Most popular, default on many systems</li>
+                        <li>Great for scripting pipelines</li>
+                        <li>Command: <code>#!/bin/bash</code></li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h4 style="color: #64b5f6;">sh (Bourne Shell)</h4>
+                    <ul>
+                        <li>Original Unix shell</li>
+                        <li>More portable, fewer features</li>
+                        <li>Used in minimal environments</li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h4 style="color: #ba68c8;">zsh (Z Shell)</h4>
+                    <ul>
+                        <li>Modern, feature-rich</li>
+                        <li>Better auto-completion</li>
+                        <li>Default on macOS</li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h4 style="color: #ffd54f;">csh/tcsh (C Shell)</h4>
+                    <ul>
+                        <li>C-like syntax</li>
+                        <li>Less common for scripting</li>
+                        <li>Some legacy bioinformatics tools</li>
+                    </ul>
+                </div>
+            </div>
+            <pre>$ echo $SHELL    # Check your current shell</pre>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                The shell interprets your commands. Bash is standard for bioinformatics - most pipelines are bash scripts. The shell processes your commands, expands wildcards (*.fasta), handles variables ($HOME), and manages input/output redirection.
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 5 of 16</span>
+                <h2>Creating & Deleting Files/Directories</h2>
+            </div>
+            <div class="box-green">
+                <h3>Creating</h3>
+                <pre># Create empty file
+touch experiment_results.txt
+
+# Create multiple files
+touch sample1.fasta sample2.fasta sample3.fasta
+
+# Create directory
+mkdir genome_data
+
+# Create nested directories
+mkdir -p projects/2024/january/week1
+
+# Create file with content
+echo "Sequence data" > seq.txt</pre>
+            </div>
+            <div class="box-red">
+                <h3>Deleting</h3>
+                <pre># Remove file
+rm old_data.txt
+
+# Remove directory (must be empty)
+rmdir empty_folder
+
+# Remove directory with contents
+rm -r genome_data/
+
+# Remove with confirmation
+rm -i important_file.txt
+
+# Force remove (DANGEROUS!)
+rm -rf folder/    # Use with caution!</pre>
+            </div>
+            <div class="warning">
+                ⚠️ <strong>Warning:</strong> rm is permanent - no recycle bin!
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                touch creates empty files or updates timestamps. mkdir makes directories; -p flag creates parent directories too. rm removes files permanently - there's no undo! Always double-check before using rm -rf.
+            </div>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 6 of 16</span>
+                <h2>File Permissions Structure</h2>
+            </div>
+            <pre>-rwxrw-r-- 1 biouser staff 4096 Jan 15 10:30 script.sh</pre>
+            <pre>-         rwx      rw-      r--
+│          │        │        │
+│          │        │        └─ Others (all other users)
+│          │        └────────── Group (users in file group)
+│          └───────────────────── Owner (user who owns file)
+└──────────────────────────────── File type (- = file, d = dir, l = link)
+
+r = read (4)     w = write (2)     x = execute (1)</pre>
+            <div class="info">
+                <strong>Example:</strong>
+                <ul>
+                    <li>rwx = 4+2+1 = 7 (read, write, execute)</li>
+                    <li>rw- = 4+2+0 = 6 (read, write)</li>
+                    <li>r-- = 4+0+0 = 4 (read only)</li>
+                    <li>rwxrw-r-- = 764</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Every file has 3 permission sets: owner, group, others. Each set has 3 permissions: read (view contents), write (modify), execute (run as program). For files: r=read content, w=modify, x=run. For directories: r=list contents, w=add/delete files, x=enter directory.
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 7 of 16</span>
+                <h2>Changing Permissions - Symbolic</h2>
+            </div>
+            <h3>Symbolic Notation (chmod)</h3>
+            <pre># Who: u=user(owner), g=group, o=others, a=all
+# Operation: + (add), - (remove), = (set exactly)
+# Permission: r, w, x
+
+# Give owner execute permission
+chmod u+x script.sh
+
+# Remove write from group and others
+chmod go-w data.txt
+
+# Set exact: owner=rwx, group=rx, others=r
+chmod u=rwx,g=rx,o=r analysis.py
+
+# Add read for everyone
+chmod a+r readme.txt</pre>
+            <div class="success">
+                <strong>Biotech Example:</strong>
+                <ul>
+                    <li><code>chmod u+x run_pipeline.sh</code> - Make pipeline executable</li>
+                    <li><code>chmod go-rwx patient_data.txt</code> - Restrict sensitive data</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Symbolic method is human-readable. u/g/o specify who, +/-/= specify operation, r/w/x specify permission. Use when making specific changes. For bioinformatics: make scripts executable (u+x), protect sensitive data (go-rwx), share results (a+r).
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 8 of 16</span>
+                <h2>Changing Permissions - Numeric</h2>
+            </div>
+            <h3>Numeric Notation</h3>
+            <pre># Each digit: owner, group, others
+# Calculate: r=4, w=2, x=1, add them
+
+chmod 755 script.sh       # rwxr-xr-x
+chmod 644 data.txt        # rw-r--r--
+chmod 600 private.key     # rw-------
+chmod 700 my_folder/      # rwx------
+chmod 775 shared_dir/     # rwxrwxr-x</pre>
+            <h3>Common Patterns</h3>
+            <div class="box">
+                <ul>
+                    <li><code>777</code> - rwxrwxrwx - Everyone everything (dangerous!)</li>
+                    <li><code>755</code> - rwxr-xr-x - Standard executable scripts</li>
+                    <li><code>700</code> - rwx------ - Private executable</li>
+                    <li><code>644</code> - rw-r--r-- - Standard data files</li>
+                    <li><code>600</code> - rw------- - Private data/keys</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Numeric method is faster. Three digits: owner-group-others. Calculate: r(4) + w(2) + x(1). 755 means owner full control, group and others read/execute. 644 is standard for files. 600 for private files. 755 for scripts.
+            </div>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 9 of 16</span>
+                <h2>Processes in Linux</h2>
+            </div>
+            <h3>Process Commands</h3>
+            <pre># View running processes
+ps               # Your processes
+ps aux           # All processes, detailed
+
+# Real-time monitoring
+top              # Press q to quit
+htop             # Better (if installed)
+
+# Find specific process
+ps aux | grep python
+
+# Kill process by PID
+kill 1234
+kill -9 1234     # Force kill
+
+# Kill by name
+killall python
+pkill blast</pre>
+            <div class="info">
+                <strong>Biotech Use:</strong> Monitor BLAST runs, kill stuck jobs, check resource usage
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                A process is a running program with unique PID. ps shows snapshot. top shows real-time. kill sends signals: default TERM asks nicely, -9 forces. Monitor memory-intensive aligners, kill runaway jobs, track parallel analyses.
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 10 of 16</span>
+                <h2>Filters - grep</h2>
+            </div>
+            <h3>grep - Search Text</h3>
+            <pre># Basic search
+grep "pattern" file.txt
+
+# Case-insensitive
+grep -i "sequence" data.txt
+
+# Show line numbers
+grep -n "error" log.txt
+
+# Count matches
+grep -c ">" sequences.fasta
+
+# Invert match
+grep -v "comment" data.txt
+
+# Recursive in directories
+grep -r "TODO" project/</pre>
+            <div class="info">
+                <strong>Examples:</strong>
+                <ul>
+                    <li><code>grep ">" sequences.fasta</code> - Extract FASTA headers</li>
+                    <li><code>grep -c "ATGC" dna.txt</code> - Count sequences</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                grep searches for patterns. -i ignores case, -n shows line numbers, -c counts, -v inverts. Use to extract FASTA headers, find genes, filter files, search logs. Essential for bioinformatics text processing.
+            </div>
+        </div>
+
+        <!-- Slide 11 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 11 of 16</span>
+                <h2>Pipes - Command Chaining</h2>
+            </div>
+            <h3>Pipe (|) Examples</h3>
+            <pre># Basic pipe
+ls -l | grep ".txt"
+
+# Multiple pipes
+cat genes.txt | sort | uniq | wc -l
+
+# Count FASTA sequences
+grep ">" sequences.fasta | wc -l
+
+# Find largest files
+du -sh * | sort -rh | head -10
+
+# Count per chromosome
+grep -v "^@" aligned.sam | cut -f 3 | sort | uniq -c</pre>
+            <div class="info">
+                <strong>Power:</strong> Combine simple tools into powerful workflows without intermediate files
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Pipes connect commands - output of one becomes input of next. Build complex workflows incrementally. Essential for genomics: extract fields, filter, count. No intermediate files needed. Test each step, then combine.
+            </div>
+        </div>
+
+        <!-- Slide 12 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 12 of 16</span>
+                <h2>Input/Output Redirection</h2>
+            </div>
+            <h3>Redirection Operators</h3>
+            <pre># Output to file (overwrite)
+command > output.txt
+
+# Append to file
+command >> output.txt
+
+# Redirect errors
+command 2> errors.log
+
+# Redirect both stdout and stderr
+command > output.txt 2>&1
+command &> all_output.txt
+
+# Input from file
+sort < unsorted.txt
+
+# Discard output
+command > /dev/null 2>&1</pre>
+            <div class="success">
+                <strong>Example:</strong> <code>bwa mem ref.fa reads.fq > aligned.sam 2> bwa.log</code>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Redirection controls data flow. > overwrites, >> appends. 2> redirects errors. &> redirects both streams. < reads input from file. Critical for bioinformatics: save results, log errors separately, chain analyses.
+            </div>
+        </div>
+
+        <!-- Slide 13 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 13 of 16</span>
+                <h2>File Compression - tar & gzip</h2>
+            </div>
+            <div class="grid-2">
+                <div class="box">
+                    <h3>tar - Archive</h3>
+                    <pre># Create archive
+tar -cvf archive.tar folder/
+
+# Extract
+tar -xvf archive.tar
+
+# Compressed (.tar.gz)
+tar -czvf archive.tar.gz folder/
+tar -xzvf archive.tar.gz</pre>
+                </div>
+                <div class="box">
+                    <h3>gzip - Compress</h3>
+                    <pre># Compress
+gzip large_file.txt
+
+# Decompress
+gunzip file.txt.gz
+
+# View compressed
+zcat file.txt.gz
+zgrep "pattern" file.txt.gz</pre>
+                </div>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                tar bundles files. Add z for gzip compression. FASTQ files compress 75-90% with gzip. Most bioinformatics tools read .gz directly. Use tar -czvf for backups, gzip for daily compression.
+            </div>
+        </div>
+
+        <!-- Slide 14 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 14 of 16</span>
+                <h2>Regular Expressions with grep</h2>
+            </div>
+            <h3>Basic Regex</h3>
+            <pre># Start/end of line
+grep "^chr" genome.txt       # Starts with chr
+grep "gene$" file.txt        # Ends with gene
+
+# Character classes
+grep "[0-9]" data.txt        # Any digit
+grep "[ATGC]" dna.txt        # DNA bases
+
+# Quantifiers
+grep "A\{3\}" seq.txt        # Exactly 3 A's
+grep -E "chr[0-9]+" file.txt # One or more digits</pre>
+            <div class="success">
+                <strong>Biotech:</strong>
+                <ul>
+                    <li><code>grep "^>" file.fa</code> - FASTA headers</li>
+                    <li><code>grep -E "chr[0-9XY]+" variants.txt</code> - Chromosomes</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Regex enables pattern matching. ^ is line start, $ is end. [ATGC] matches DNA bases. Use -E for extended regex. Essential for validating sequences, extracting IDs, parsing formats.
+            </div>
+        </div>
+
+        <!-- Slide 15 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 15 of 16</span>
+                <h2>Best Practices</h2>
+            </div>
+            <div class="grid-2">
+                <div class="box-green">
+                    <h3>Do ✓</h3>
+                    <ul>
+                        <li>Use absolute paths in scripts</li>
+                        <li>Comment your code</li>
+                        <li>Test on small datasets first</li>
+                        <li>Keep backups</li>
+                        <li>Log errors: <code>2> errors.log</code></li>
+                        <li>Use version control (git)</li>
+                    </ul>
+                </div>
+                <div class="box-red">
+                    <h3>Don't ✗</h3>
+                    <ul>
+                        <li>Never use <code>rm -rf</code> without checking</li>
+                        <li>Don't use chmod 777</li>
+                        <li>Avoid spaces in filenames</li>
+                        <li>Don't work on original data</li>
+                        <li>Don't ignore errors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Professional practices prevent disasters. Test destructive commands. Document everything. Keep raw data read-only. Log everything. Use meaningful names. Backup before changes.
+            </div>
+        </div>
+
+        <!-- Slide 16 -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-number">Slide 16 of 16</span>
+                <h2>Resources & Next Steps</h2>
+            </div>
+            <div class="grid-2">
+                <div class="box">
+                    <h3>Resources</h3>
+                    <p><strong>Man pages:</strong> <code>man command_name</code></p>
+                    <p><strong>Online:</strong></p>
+                    <ul>
+                        <li>explainshell.com</li>
+                        <li>regex101.com</li>
+                        <li>Biostars.org</li>
+                    </ul>
+                    <p><strong>Books:</strong></p>
+                    <ul>
+                        <li>Bioinformatics Data Skills by Buffalo</li>
+                        <li>The Linux Command Line by Shotts</li>
+                    </ul>
+                </div>
+                <div class="box-green">
+                    <h3>Practice</h3>
+                    <ol>
+                        <li>Navigate file system</li>
+                        <li>Create project directory structure</li>
+                        <li>Practice grep on FASTA files</li>
+                        <li>Write processing scripts</li>
+                        <li>Build command pipelines</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="notes">
+                <div class="notes-title">📝 Speaker Notes:</div>
+                Mas
