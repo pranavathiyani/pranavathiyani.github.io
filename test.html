@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Unit-I Timed Quiz</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #quiz-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        #timer {
+            font-size: 1.2rem;
+            color: var(--danger);
+        }
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        button {
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background: var(--light);
+            border-color: var(--secondary);
+        }
+        button:disabled {
+            cursor: not-allowed;
+        }
+        .correct { background-color: var(--success) !important; color: white; border-color: var(--success); }
+        .wrong { background-color: var(--danger) !important; color: white; border-color: var(--danger); }
+        #result-screen { display: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="start-screen">
+        <h1>Linux Unit-I Quiz</h1>
+        <p>25 Questions | 25 Seconds Per Question</p>
+        <button onclick="startQuiz()" style="background: var(--secondary); color: white; width: 100%;">Start Quiz</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div class="header">
+            <span id="progress">Question 1/25</span>
+            <span id="timer">Time: 25s</span>
+        </div>
+        <div id="question-text" class="question"></div>
+        <div id="options-container" class="options"></div>
+    </div>
+
+    <div id="result-screen">
+        <h1>Quiz Completed!</h1>
+        <p id="final-score" style="font-size: 1.5rem; font-weight: bold;"></p>
+        <button onclick="location.reload()" style="background: var(--primary); color: white;">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "Which path starts from the root directory (/) and provides the complete location?", a: ["Absolute path", "Relative path", "Virtual path", "Symbolic path"], c: 0 },
+        { q: "Which command is used to create a new directory?", a: ["touch", "mkdir", "newdir", "md"], c: 1 },
+        { q: "What numeric value represents 'Read, Write, and Execute' permissions?", a: ["5", "6", "7", "4"], c: 2 },
+        { q: "Which command displays the manual pages for other commands?", a: ["help", "info", "man", "doc"], c: 2 },
+        { q: "Which operator appends output to the end of a file?", a: [">", ">>", "|", "<"], c: 1 },
+        { q: "To change the owner of a file, use which command?", a: ["chmod", "chown", "chgrp", "usermod"], c: 1 },
+        { q: "What is the flag for creating a symbolic link with 'ln'?", a: ["-h", "-l", "-s", "-sym"], c: 2 },
+        { q: "Which command is used to see currently running processes?", a: ["ps", "proc", "jobs", "ls -p"], c: 0 },
+        { q: "Which command views the first 10 lines of a file?", a: ["tail", "start", "head", "top"], c: 2 },
+        { q: "The 'cat' command stands for what?", a: ["Catalog", "Category", "Concatenate", "Capture"], c: 2 },
+        { q: "Which tool uses regular expressions to search for text inside files?", a: ["find", "grep", "search", "locate"], c: 1 },
+        { q: "What does 'chmod 755' give the owner?", a: ["Read only", "Read/Write", "Full (R/W/X)", "Execute only"], c: 2 },
+        { q: "Which compression tool usually offers the highest ratio?", a: ["tar", "gzip", "bzip2", "zip"], c: 2 },
+        { q: "What character is used to pipe output between commands?", a: [">", "|", "&", ";"], c: 1 },
+        { q: "Which directory contains user home folders by default?", a: ["/root", "/user", "/home", "/etc"], c: 2 },
+        { q: "Standard Input (stdin) is which file descriptor?", a: ["0", "1", "2", "3"], c: 0 },
+        { q: "Standard Error (stderr) is which file descriptor?", a: ["0", "1", "2", "3"], c: 2 },
+        { q: "To delete a non-empty directory, which command is safest?", a: ["del", "rm -r", "rmdir", "erase"], c: 1 },
+        { q: "Which symbol represents the current user's home directory?", a: ["/", ".", "~", ".."], c: 2 },
+        { q: "The command 'mv' is used for moving and what else?", a: ["Copying", "Renaming", "Deleting", "Linking"], c: 1 },
+        { q: "Which compression command creates a .gz file?", a: ["zip", "bzip2", "gzip", "tar"], c: 2 },
+        { q: "In permissions, what does 'o' stand for?", a: ["Owner", "Operator", "Others", "Origin"], c: 2 },
+        { q: "How do you search for a file by name starting from root?", a: ["search / -name", "find / -name", "grep / -name", "ls -r"], c: 1 },
+        { q: "Which shell is the most common default on Linux?", a: ["sh", "csh", "bash", "ksh"], c: 2 },
+        { q: "What does 'chmod u+x' do?", a: ["Add execute for user", "Add execute for others", "Remove execute", "Add read for user"], c: 0 }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 25;
+    let timerInterval;
+
+    function startQuiz() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if (currentQuestion >= quizData.length) return endQuiz();
+        
+        timeLeft = 25;
+        document.getElementById('timer').innerText = `Time: ${timeLeft}s`;
+        document.getElementById('progress').innerText = `Question ${currentQuestion + 1}/${quizData.length}`;
+        
+        const q = quizData[currentQuestion];
+        document.getElementById('question-text').innerText = q.q;
+        
+        const optionsDiv = document.getElementById('options-container');
+        optionsDiv.innerHTML = '';
+        
+        q.a.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(index);
+            optionsDiv.appendChild(btn);
+        });
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        timeLeft--;
+        document.getElementById('timer').innerText = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+            selectOption(-1); // Auto-fail on timeout
+        }
+    }
+
+    function selectOption(index) {
+        clearInterval(timerInterval);
+        const q = quizData[currentQuestion];
+        const buttons = document.querySelectorAll('#options-container button');
+        
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.c) btn.classList.add('correct');
+            else if (i === index) btn.classList.add('wrong');
+        });
+
+        if (index === q.c) score++;
+
+        setTimeout(() => {
+            currentQuestion++;
+            showQuestion();
+        }, 1500);
+    }
+
+    function endQuiz() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `You scored ${score} out of ${quizData.length}`;
+    }
+</script>
+
+</body>
+</html>
