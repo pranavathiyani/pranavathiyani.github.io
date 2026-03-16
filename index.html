@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pranavathiyani G. — Bioinformatics · SASTRA</title>
+<meta name="description" content="Dr. Pranavathiyani G., Assistant Professor (Research), Division of Bioinformatics, SASTRA Deemed University.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1c1917; --ink2:#44403c; --ink3:#78716c;
+  --paper:#faf8f4; --paper2:#f3f0eb; --paper3:#eae6df;
+  --rule:rgba(28,25,23,0.1);
+  --accent:#1d4e6e; --accent2:rgba(29,78,110,0.09);
+  --gold:#b8860b; --gold2:rgba(184,134,11,0.09);
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:3rem 1.5rem;position:relative;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(28,25,23,0.04) 27px,rgba(28,25,23,0.04) 28px);
+  pointer-events:none;z-index:0;
+}
+
+/* ── CARD ── */
+.card{
+  position:relative;z-index:1;max-width:720px;width:100%;
+  background:#fff;border:1px solid var(--rule);
+  box-shadow:0 1px 3px rgba(28,25,23,0.06),0 8px 40px rgba(28,25,23,0.08),
+             0 0 0 4px var(--paper),0 0 0 5px var(--rule);
+  animation:rise .65s ease both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--gold) 55%,transparent)}
+.card-section{padding:2rem 2.8rem;border-bottom:1px solid var(--rule)}
+.card-section:last-child{border-bottom:none}
+
+/* ── HEADER ── */
+.header{display:flex;align-items:flex-start;gap:2rem}
+.avatar{
+  width:92px;height:92px;flex-shrink:0;
+  border:1px solid var(--rule);
+  overflow:hidden;position:relative;
+  background:var(--paper2);
+}
+.avatar img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  display:block;
+}
+.avatar-fallback{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+}
+.avatar-fallback::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:28%;
+  background:var(--accent);opacity:.08;
+}
+.avatar-initials{
+  font-family:var(--serif);font-size:2rem;font-weight:700;
+  color:var(--accent);opacity:.4;letter-spacing:-.04em;z-index:1;
+}
+.name{font-family:var(--serif);font-size:1.95rem;font-weight:700;line-height:1.05;letter-spacing:-.01em}
+.name-phd{
+  font-family:var(--sans);font-size:.82rem;font-weight:400;
+  color:var(--ink3);margin-left:.3rem;
+}
+.title-line{font-size:.88rem;font-weight:500;color:var(--accent);margin-top:.45rem;line-height:1.45}
+.affil-line{font-family:var(--mono);font-size:.68rem;color:var(--ink3);margin-top:.3rem;line-height:1.5}
+.header-badges{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.75rem}
+.hbadge{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;
+  padding:.2rem .6rem;background:var(--accent2);border:1px solid rgba(29,78,110,.14);color:var(--accent)}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.sec-label::after{content:'';flex:0 0 40px;height:1px;background:var(--rule)}
+
+/* ── IDENTITY CYCLER ── */
+.identity-wrap{
+  display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;
+  font-family:var(--serif);font-size:1.05rem;color:var(--ink2);
+  line-height:1.6;
+}
+.identity-prefix{font-weight:300;font-style:italic}
+.identity-word{
+  display:inline-block;color:var(--accent);font-weight:600;font-style:italic;
+  border-bottom:2px solid rgba(29,78,110,.25);padding-bottom:.05rem;min-width:2ch;
+}
+.identity-cursor{
+  display:inline-block;width:2px;height:1em;background:var(--accent);
+  margin-left:1px;vertical-align:middle;animation:iblink .75s step-end infinite;
+}
+@keyframes iblink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── QUOTE CAROUSEL ── */
+.quote-wrap{
+  padding:1.8rem 2.8rem;
+  background:var(--paper2);
+  border-bottom:1px solid var(--rule);
+  text-align:center;
+  position:relative;
+  min-height:110px;
+  display:flex;align-items:center;justify-content:center;
+}
+.quote-mark-open{
+  position:absolute;top:.8rem;left:1.6rem;
+  font-family:var(--serif);font-size:4rem;line-height:1;
+  color:var(--accent);opacity:.12;
+  font-weight:700;user-select:none;
+}
+.quote-mark-close{
+  position:absolute;bottom:.2rem;right:1.6rem;
+  font-family:var(--serif);font-size:4rem;line-height:1;
+  color:var(--accent);opacity:.12;
+  font-weight:700;user-select:none;
+}
+.quote-inner{
+  max-width:520px;
+  position:relative;z-index:1;
+}
+.quote-text{
+  font-family:var(--serif);font-style:italic;
+  font-size:.98rem;color:var(--ink2);line-height:1.75;
+  font-weight:400;
+  opacity:0;
+  transition:opacity .7s ease;
+}
+.quote-text.visible{opacity:1}
+.quote-attr{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink3);
+  margin-top:.65rem;
+  opacity:0;transition:opacity .7s ease .15s;
+}
+.quote-attr.visible{opacity:1}
+.quote-dots{
+  display:flex;justify-content:center;gap:.4rem;margin-top:1rem;
+}
+.qdot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--ink3);opacity:.2;
+  transition:all .3s;cursor:pointer;
+}
+.qdot.active{background:var(--accent);opacity:.7;transform:scale(1.3)}
+
+.pub-item{padding:.75rem 0;border-bottom:1px solid var(--rule)}
+.pub-item:last-child{border-bottom:none}
+.pub-title{font-family:var(--serif);font-style:italic;font-size:.88rem;color:var(--ink);line-height:1.4}
+.pub-meta{font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:.22rem;
+  display:flex;flex-wrap:wrap;gap:.45rem;align-items:center}
+.pub-journal{color:var(--accent)}
+
+/* ── AWARDS ── */
+.awards-list{display:flex;flex-direction:column;gap:.45rem}
+.award-item{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem .85rem;
+  background:var(--paper2);border:1px solid var(--rule);transition:all .2s}
+.award-item:hover{background:#fff;border-color:rgba(184,134,11,.2)}
+.award-star{color:var(--gold);font-size:.85rem;margin-top:.1rem;flex-shrink:0}
+.award-text .at{font-size:.83rem;font-weight:500;line-height:1.3}
+.award-text .as{font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:.1rem}
+
+/* ── LINKS ── */
+.links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
+.link-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;
+  background:var(--paper2);border:1px solid var(--rule);text-decoration:none;color:var(--ink2);
+  transition:all .2s;position:relative;overflow:hidden}
+.link-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--accent);transform:scaleY(0);transition:transform .2s}
+.link-item:hover{background:#fff;border-color:rgba(29,78,110,.22);color:var(--accent);
+  box-shadow:0 2px 12px rgba(28,25,23,.07);transform:translateX(2px)}
+.link-item:hover::before{transform:scaleY(1)}
+.link-icon{font-size:.9rem;flex-shrink:0;width:20px;text-align:center;opacity:.5;transition:opacity .2s}
+.link-item:hover .link-icon{opacity:1}
+.link-text .lt{font-size:.78rem;font-weight:500;display:block;line-height:1.2}
+.link-text .ls{font-family:var(--mono);font-size:.57rem;color:var(--ink3);display:block;margin-top:.06rem}
+.link-item:hover .link-text .ls{color:rgba(29,78,110,.5)}
+.link-arrow{font-size:.7rem;opacity:0;transition:opacity .2s,transform .2s;color:var(--accent);margin-left:auto;flex-shrink:0}
+.link-item:hover .link-arrow{opacity:1;transform:translateX(2px)}
+.email-block{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;
+  background:var(--paper2);border:1px solid var(--rule);transition:all .2s;
+  position:relative;overflow:hidden;margin-top:.5rem}
+.email-block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--gold);transform:scaleY(0);transition:transform .2s}
+.email-block:hover{background:#fff;border-color:rgba(184,134,11,.22);box-shadow:0 2px 12px rgba(28,25,23,.07)}
+.email-block:hover::before{transform:scaleY(1)}
+.email-icon{font-size:.9rem;opacity:.5;width:20px;text-align:center;flex-shrink:0;transition:opacity .2s}
+.email-block:hover .email-icon{opacity:1}
+.email-stack a{font-family:var(--mono);font-size:.68rem;color:var(--ink2);text-decoration:none;transition:color .2s;display:block}
+.email-stack a:hover{color:var(--gold)}
+
+/* ── TERMINAL ── */
+.lab-terminal{background:#0f1117;position:relative;overflow:hidden;min-height:180px}
+.bubble{position:absolute;border-radius:50%;border:1px solid rgba(245,197,24,0.15);
+  background:rgba(245,197,24,0.025);pointer-events:none;animation:floatbub linear infinite}
+@keyframes floatbub{
+  0%{transform:translateY(0) scale(1);opacity:0}
+  15%{opacity:.8}85%{opacity:.5}
+  100%{transform:translateY(-200px) scale(1.08);opacity:0}
+}
+.term-bar{background:#1a1c24;padding:.45rem 1rem;display:flex;align-items:center;gap:.5rem;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.term-dots span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.term-dots .d1{background:#ff5f57}.term-dots .d2{background:#febc2e}.term-dots .d3{background:#28c840}
+.term-title{font-family:var(--mono);font-size:.6rem;color:rgba(255,255,255,.3);letter-spacing:.1em;margin:0 auto}
+.term-body{padding:1rem 1.2rem .8rem;position:relative;z-index:2}
+.term-line{font-family:var(--mono);font-size:.75rem;line-height:1.7;display:flex;align-items:flex-start;gap:.5rem}
+.term-prompt{color:#28c840;flex-shrink:0}
+.term-out{color:rgba(255,255,255,.4)}
+.term-out.blue{color:#63d4f5}
+.term-out.yellow{color:#f5c518}
+.term-input-row{display:flex;align-items:center;gap:.5rem;margin-top:.25rem;font-family:var(--mono);font-size:.75rem}
+#termInput{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:.75rem;
+  color:#f5c518;caret-color:#f5c518;flex:1;min-width:0}
+#termInput::placeholder{color:rgba(245,197,24,.2)}
+.term-cursor{display:inline-block;width:7px;height:13px;background:#f5c518;
+  animation:blink .9s step-end infinite;vertical-align:middle;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* tooltip hint */
+.term-tooltip{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);
+  padding:.65rem 1.2rem;
+  font-family:var(--mono);font-size:.68rem;color:rgba(255,255,255,.7);
+  letter-spacing:.1em;text-align:center;line-height:1.6;
+  pointer-events:none;z-index:5;
+  opacity:1;transition:opacity .5s;
+}
+.term-tooltip strong{color:#f5c518;font-weight:500}
+.term-tooltip.hidden{opacity:0}
+
+.term-hint{font-family:var(--mono);font-size:.55rem;color:rgba(255,255,255,.18);
+  padding:.3rem 1.2rem .7rem;letter-spacing:.06em;position:relative;z-index:2}
+
+/* ── FOOTER ── */
+.card-foot{display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:.5rem;padding:1.1rem 2.8rem}
+.foot-loc{font-family:var(--mono);font-size:.6rem;color:var(--ink3)}
+.foot-loc span{color:var(--ink2)}
+.foot-copy{font-family:var(--mono);font-size:.58rem;color:var(--ink3)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:560px){
+  .card-section{padding:1.8rem 1.5rem}
+  .header{flex-direction:column;gap:1rem}
+  .avatar{width:72px;height:72px}
+  .name{font-size:1.6rem}
+  .links-grid{grid-template-columns:1fr}
+  .card-foot{padding:1rem 1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-section">
+    <div class="header">
+      <!-- Avatar: place your photo as pg.jpg in the same folder as index.html -->
+      <div class="avatar">
+        <img src="pg.png" alt="Pranavathiyani G."
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="avatar-fallback" style="display:none">
+          <span class="avatar-initials">PG</span>
+        </div>
+      </div>
+
+      <div style="flex:1">
+        <h1 class="name">Pranavathiyani G. <span class="name-phd">PhD</span></h1>
+        <div class="title-line">
+          Assistant Professor (Research)<br>
+          Division of Bioinformatics · School of Chemical &amp; Biotechnology
+        </div>
+        <div class="affil-line">
+          SASTRA Deemed University · Thanjavur, Tamil Nadu — 613401<br>
+          JNC 305, SCBT · pranavathiyani@scbt.sastra.edu
+        </div>
+        <div class="header-badges">
+          <span class="hbadge">Bioinformatics</span>
+          <span class="hbadge">Systems Biology</span>
+          <span class="hbadge">Antimicrobial Resistance</span>
+          <span class="hbadge">Multi-Omics</span>
+          <span class="hbadge">AI / ML</span>
+          <span class="hbadge">Data Science</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT ME -->
+  <div class="card-section">
+    <div class="identity-wrap">
+      <span class="identity-prefix">In bioinformatics, he thinks in</span>
+      <span class="identity-word" id="identWord"></span><span class="identity-cursor"></span>
+    </div>
+  </div>
+
+  <!-- QUOTE CAROUSEL -->
+  <div class="quote-wrap" id="quoteWrap">
+    <span class="quote-mark-open">"</span>
+    <span class="quote-mark-close">"</span>
+    <div class="quote-inner">
+      <div class="quote-text" id="quoteText"></div>
+      <div class="quote-attr" id="quoteAttr"></div>
+      <div class="quote-dots" id="quoteDots"></div>
+    </div>
+  </div>
+
+  <!-- SELECTED PUBLICATIONS -->
+  <div class="card-section">
+    <div class="sec-label">Selected Publications</div>
+
+    <div class="pub-item">
+      <div class="pub-title">Functional (re)annotation of proteome using integrative sequence and AI-based structural approaches</div>
+      <div class="pub-meta">
+        <span><strong style="color:var(--ink2)">Pranavathiyani G</strong>, Gambhir S, Kinatukara P, Bhardwaj A.</span>
+        <span class="pub-journal">Current Research in Structural Biology · 2025</span>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-title">Prediction of Essential Proteins of Klebsiella pneumoniae using Integrative Bioinformatics and Systems Biology</div>
+      <div class="pub-meta">
+        <span><strong style="color:var(--ink2)">Pranavathiyani G</strong>, Pan A.</span>
+        <span class="pub-journal">OMICS: A Journal of Integrative Biology · 2024</span>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-title">A Comparative Genomics Approach for Shortlisting Broad-Spectrum Drug Targets in Nontuberculous Mycobacteria</div>
+      <div class="pub-meta">
+        <span>Swain A, <strong style="color:var(--ink2)">Pranavathiyani G</strong>, Prava J, Rajeev AC, et al.</span>
+        <span class="pub-journal">Microbial Drug Resistance · 2020</span>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-title">Novel Target Exploration from Hypothetical Proteins of K. pneumoniae MGH 78578 — Host-Pathogen Interaction</div>
+      <div class="pub-meta">
+        <span><strong style="color:var(--ink2)">Pranavathiyani G</strong>, Prava J, Rajeev AC, Pan A.</span>
+        <span class="pub-journal">Frontiers in Cellular and Infection Microbiology · 2020</span>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-title">Integrated transcriptome interactome study of oncogenes and tumor suppressor genes in breast cancer</div>
+      <div class="pub-meta">
+        <span><strong style="color:var(--ink2)">Pranavathiyani G</strong>, et al.</span>
+        <span class="pub-journal">Genes &amp; Diseases · 2019</span>
+      </div>
+    </div>
+
+    <div style="margin-top:.85rem">
+      <a href="https://scholar.google.com/citations?user=iPMRqAoAAAAJ" target="_blank" rel="noopener"
+        style="font-family:var(--mono);font-size:.63rem;color:var(--accent);text-decoration:none;
+               border-bottom:1px solid rgba(29,78,110,.25);padding-bottom:.1rem;transition:border-color .2s"
+        onmouseover="this.style.borderColor='var(--accent)'"
+        onmouseout="this.style.borderColor='rgba(29,78,110,.25)'">
+        View all 12 publications on Google Scholar →
+      </a>
+    </div>
+  </div>
+
+  <!-- AWARDS -->
+  <div class="card-section">
+    <div class="sec-label">Awards &amp; Fellowships</div>
+    <div class="awards-list">
+      <div class="award-item">
+        <span class="award-star">★</span>
+        <div class="award-text">
+          <div class="at">DBT-BINC Research Fellowship — All India Rank 5</div>
+          <div class="as">Bioinformatics National Certification Exam · DBT, Govt. of India · 2017</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <span class="award-star">★</span>
+        <div class="award-text">
+          <div class="at">Gold Medal — 1st Rank in B.Sc. Bioinformatics</div>
+          <div class="as">University-level rank · Pondicherry University</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <span class="award-star">◆</span>
+        <div class="award-text">
+          <div class="at">BioC2023 Virtual Scholarship</div>
+          <div class="as">Bioconductor Conference · Dana-Farber Cancer Institute, Boston · 2023</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <span class="award-star">◆</span>
+        <div class="award-text">
+          <div class="at">EMBL &amp; EMBO Conference Fee Waivers (×3)</div>
+          <div class="as">Next Generation Infection Biology · Multiomics to Mechanisms · Chemical Biology · 2020–2022</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <span class="award-star">◆</span>
+        <div class="award-text">
+          <div class="at">India|EMBO Travel Grant</div>
+          <div class="as">Human Microbiome: Resistance and Disease · NIBGM, West Bengal · 2019</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINKS -->
+  <div class="card-section">
+    <div class="sec-label">Profiles &amp; Connect</div>
+    <div class="links-grid">
+      <a class="link-item" href="https://scholar.google.com/citations?user=iPMRqAoAAAAJ" target="_blank" rel="noopener">
+        <span class="link-icon">🎓</span>
+        <span class="link-text"><span class="lt">Google Scholar</span><span class="ls">Publications &amp; citations</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="link-item" href="https://orcid.org/0000-0003-4854-8238" target="_blank" rel="noopener">
+        <span class="link-icon">🔬</span>
+        <span class="link-text"><span class="lt">ORCID</span><span class="ls">0000-0003-4854-8238</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="link-item" href="https://www.linkedin.com/in/pranavathiyani/" target="_blank" rel="noopener">
+        <span class="link-icon">💼</span>
+        <span class="link-text"><span class="lt">LinkedIn</span><span class="ls">in/pranavathiyani</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="link-item" href="https://www.researchgate.net/profile/Pranavathiyani-G" target="_blank" rel="noopener">
+        <span class="link-icon">📄</span>
+        <span class="link-text"><span class="lt">ResearchGate</span><span class="ls">Papers &amp; preprints</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="link-item" href="https://github.com/pranavathiyani" target="_blank" rel="noopener">
+        <span class="link-icon">⌨</span>
+        <span class="link-text"><span class="lt">GitHub</span><span class="ls">pranavathiyani</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+      <a class="link-item" href="https://twitter.com/pranavathiyani" target="_blank" rel="noopener">
+        <span class="link-icon">𝕏</span>
+        <span class="link-text"><span class="lt">Twitter / X</span><span class="ls">@pranavathiyani</span></span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+    <div class="email-block">
+      <span class="email-icon">✉</span>
+      <div class="email-stack">
+        <a href="mailto:pranavathiyani@scbt.sastra.edu">pranavathiyani@scbt.sastra.edu</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINAL LAB CTA -->
+  <div class="lab-terminal" id="labTerm">
+
+    <!-- floating bubbles -->
+    <div class="term-bar">
+      <div class="term-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <div class="term-title">pranavathiyani@sastra ~ bash</div>
+    </div>
+
+    <!-- tooltip hint — fades when user starts typing -->
+    <div class="term-tooltip" id="termTooltip">
+      type <strong>cd lab/</strong> and press Enter<br>
+      <span style="font-size:.6rem;opacity:.6">to visit PranavOmics Lab</span>
+    </div>
+
+    <div class="term-body">
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-out">ls</span></div>
+      <div class="term-line" style="margin-left:1.1rem">
+        <span class="term-out blue">lab/</span>
+        <span class="term-out" style="margin-left:1rem;opacity:.35">publications/</span>
+        <span class="term-out" style="margin-left:1rem;opacity:.35">cv.pdf</span>
+      </div>
+      <div class="term-line" style="margin-top:.2rem">
+        <span class="term-prompt">$</span>
+        <span class="term-out yellow" id="termEcho">&nbsp;</span>
+      </div>
+      <div class="term-input-row">
+        <span class="term-prompt">$</span>
+        <input id="termInput" type="text" autocomplete="off"
+               autocorrect="off" spellcheck="false" placeholder="type here..." />
+        <span class="term-cursor" id="termCursor"></span>
+      </div>
+    </div>
+    <div class="term-hint">try: &nbsp;cd lab/ &nbsp;·&nbsp; ./lab &nbsp;·&nbsp; open lab &nbsp;·&nbsp; help</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="card-foot">
+    <div class="foot-loc">📍 <span>Thanjavur, Tamil Nadu, India</span></div>
+    <div class="foot-copy">© 2025 Pranavathiyani G.</div>
+  </div>
+
+</div>
+
+<script>
+/* ── IDENTITY TYPEWRITER ── */
+(function(){
+  const el = document.getElementById('identWord');
+  if(!el) return;
+  const words = [
+    'sequences','networks','graphs','pathways',
+    'pipelines','nodes','interactomes','resistomes',
+    'data structures','biological systems',
+  ];
+  let wi=0, ci=0, deleting=false;
+  function tick(){
+    const w=words[wi];
+    if(!deleting){
+      el.textContent=w.slice(0,ci+1); ci++;
+      if(ci===w.length){ deleting=true; setTimeout(tick,1800); return; }
+      setTimeout(tick,68);
+    } else {
+      el.textContent=w.slice(0,ci-1); ci--;
+      if(ci===0){ deleting=false; wi=(wi+1)%words.length; setTimeout(tick,320); return; }
+      setTimeout(tick,38);
+    }
+  }
+  setTimeout(tick,700);
+})();
+
+/* ── QUOTE CAROUSEL ── */
+(function(){
+  const quotes = [
+    { t: "In biology, nothing makes sense except in the light of evolution.",
+      a: "Theodosius Dobzhansky" },
+    { t: "All models are wrong, but some are useful.",
+      a: "George Box" },
+    { t: "The genome is a book that writes itself, edits itself and reads itself.",
+      a: "— on the wonder of biology" },
+    { t: "Without data, you're just another person with an opinion.",
+      a: "W. Edwards Deming" },
+    { t: "Essentially, all models are approximations. The question is: how wrong do they have to be to not be useful?",
+      a: "George Box" },
+    { t: "Life is the most complicated thing in the universe. And yet it is made of the simplest possible parts.",
+      a: "— systems biology, in spirit" },
+    { t: "A network of protein interactions is worth a thousand gel images.",
+      a: "— every computational biologist, ever" },
+    { t: "Biology is the study of complicated things that give the appearance of having been designed for a purpose.",
+      a: "Richard Dawkins" },
+    { t: "The goal is not to have data. The goal is to understand.",
+      a: "— on bioinformatics" },
+    { t: "Resistance is not futile — it is a research question.",
+      a: "— AMR bioinformatics motto" },
+  ];
+
+  const textEl  = document.getElementById('quoteText');
+  const attrEl  = document.getElementById('quoteAttr');
+  const dotsEl  = document.getElementById('quoteDots');
+  if(!textEl) return;
+
+  // shuffle once
+  quotes.sort(()=>Math.random()-.5);
+
+  let current = 0;
+  let timer;
+
+  // build dots
+  quotes.forEach((_,i)=>{
+    const d = document.createElement('div');
+    d.className = 'qdot' + (i===0?' active':'');
+    d.addEventListener('click',()=>{ clearTimeout(timer); goTo(i); });
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(idx){
+    // fade out
+    textEl.classList.remove('visible');
+    attrEl.classList.remove('visible');
+    setTimeout(()=>{
+      current = (idx + quotes.length) % quotes.length;
+      textEl.textContent = quotes[current].t;
+      attrEl.textContent = '— ' + quotes[current].a;
+      // update dots
+      dotsEl.querySelectorAll('.qdot').forEach((d,i)=>
+        d.classList.toggle('active', i===current));
+      // fade in
+      requestAnimationFrame(()=>{
+        textEl.classList.add('visible');
+        attrEl.classList.add('visible');
+      });
+      timer = setTimeout(()=> goTo(current+1), 6000);
+    }, 600);
+  }
+
+  // start
+  textEl.textContent = quotes[0].t;
+  attrEl.textContent = '— ' + quotes[0].a;
+  requestAnimationFrame(()=>{
+    textEl.classList.add('visible');
+    attrEl.classList.add('visible');
+  });
+  timer = setTimeout(()=> goTo(1), 6000);
+})();
+
+/* ── BUBBLES ── */
+(function(){
+  const term = document.getElementById('labTerm');
+  [50,75,40,90,60,45,80,55].forEach((s,i)=>{
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.style.cssText = `width:${s}px;height:${s}px;left:${10+i*11}%;bottom:-${s}px;`+
+      `animation-duration:${8+i*0.7}s;animation-delay:${i*1.2}s;`;
+    term.appendChild(b);
+  });
+})();
+
+/* ── TERMINAL ── */
+(function(){
+  const input   = document.getElementById('termInput');
+  const echo    = document.getElementById('termEcho');
+  const cursor  = document.getElementById('termCursor');
+  const tooltip = document.getElementById('termTooltip');
+
+  input.addEventListener('focus', ()=> cursor.style.display='none');
+  input.addEventListener('blur',  ()=> cursor.style.display='inline-block');
+
+  // hide tooltip as soon as user types
+  input.addEventListener('input', ()=>{
+    if(input.value.length > 0) tooltip.classList.add('hidden');
+    else tooltip.classList.remove('hidden');
+  });
+
+  document.getElementById('labTerm').addEventListener('click', ()=> input.focus());
+
+  const GO = ['cd lab/','cd lab','./lab','open lab','ls lab','goto lab','go lab','launch lab','lab','go'];
+
+  input.addEventListener('keydown', e=>{
+    if(e.key !== 'Enter') return;
+    const val = input.value.trim().toLowerCase();
+    if(!val) return;
+
+    echo.textContent = input.value.trim();
+
+    if(GO.includes(val)){
+      tooltip.classList.add('hidden');
+      addLine('<span style="color:#28c840">→ launching PranavOmics Lab...</span>');
+      input.style.display='none'; cursor.style.display='none';
+      setTimeout(()=>{ window.location.href='./lab/'; }, 900);
+    } else if(val==='help'){
+      addLine('available: <span style="color:#63d4f5">cd lab/</span> · <span style="color:#63d4f5">./lab</span> · <span style="color:#63d4f5">open lab</span>');
+      input.value=''; echo.textContent='\u00a0';
+      tooltip.classList.remove('hidden');
+    } else {
+      addLine(`<span style="color:#c0392b">bash: ${escHtml(val)}: command not found</span>`);
+      input.value=''; echo.textContent='\u00a0';
+      tooltip.classList.remove('hidden');
+    }
+  });
+
+  function addLine(html){
+    const d = document.createElement('div');
+    d.style.cssText = 'margin-left:1.1rem;font-family:var(--mono);font-size:.7rem;line-height:1.65;color:rgba(255,255,255,.35)';
+    d.innerHTML = html;
+    input.parentElement.appendChild(d);
+  }
+  function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+})();
+</script>
+</body>
+</html>
