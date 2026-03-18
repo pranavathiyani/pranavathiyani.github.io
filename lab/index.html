@@ -3,362 +3,308 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PranavOmics Lab — Cooking...</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='78' font-size='82'>🧪</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title id="pageTitle">PranavOmics Lab</title>
+<link rel="icon" id="pageFavicon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-
 body{
-  background:#08100c;
-  color:#d4edd9;
-  font-family:'Oswald',sans-serif;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  text-align:center;
-  position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;position:relative;font-family:'Oswald',sans-serif;
 }
-
-/* ── GRAIN ── */
 body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:100;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
-  opacity:.6;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.55;
 }
-
-/* ── AMBIENT GLOW ── */
-.glow{
-  position:fixed;
-  border-radius:50%;
-  filter:blur(80px);
-  pointer-events:none;
-  animation:pulse ease-in-out infinite;
-}
-.glow-1{width:500px;height:500px;background:rgba(45,206,108,.07);top:-100px;left:-100px;animation-duration:8s;animation-delay:0s}
-.glow-2{width:400px;height:400px;background:rgba(45,206,108,.05);bottom:-80px;right:-80px;animation-duration:10s;animation-delay:-3s}
-.glow-3{width:300px;height:300px;background:rgba(99,212,245,.04);top:40%;left:60%;animation-duration:12s;animation-delay:-6s}
-@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
-
-/* ── PARTICLES ── */
-.particle{
-  position:fixed;
-  width:3px;height:3px;
-  background:#2dce6c;
-  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
-  pointer-events:none;
-  animation:rise linear infinite;
-  opacity:0;
-}
-@keyframes rise{
-  0%{transform:translateY(100vh) rotate(0deg);opacity:0}
-  8%{opacity:.7}
-  92%{opacity:.4}
-  100%{transform:translateY(-5vh) rotate(540deg);opacity:0}
-}
-
-/* ── HAZARD TAPE ── */
-.hazard{
-  position:fixed;top:0;left:0;right:0;
-  height:7px;
-  background:repeating-linear-gradient(-45deg,#f5c518 0,#f5c518 14px,#08100c 14px,#08100c 28px);
-  opacity:.5;z-index:10;
-}
-.hazard-bottom{top:auto;bottom:0}
-
-/* ── FLASK SVG — animated bubbles ── */
-.flask-wrap{
-  position:relative;
-  margin-bottom:2rem;
-  animation:sway 4s ease-in-out infinite;
-}
-@keyframes sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
-
-svg.flask{width:90px;height:90px;overflow:visible}
-
-.liquid{
-  animation:bubble 3s ease-in-out infinite;
-  transform-origin:center bottom;
-}
-@keyframes bubble{
-  0%,100%{d:path("M28 58 Q36 52 45 58 Q54 64 62 58 L62 75 Q54 72 45 75 Q36 78 28 75 Z")}
-  33%{d:path("M28 56 Q36 48 45 56 Q54 64 62 56 L62 75 Q54 70 45 75 Q36 80 28 75 Z")}
-  66%{d:path("M28 60 Q36 55 45 60 Q54 65 62 60 L62 75 Q54 74 45 75 Q36 76 28 75 Z")}
-}
-
-/* vapour lines rising from flask */
-.vapour-line{
-  position:absolute;
-  width:2px;
-  background:linear-gradient(to top,rgba(45,206,108,.5),transparent);
-  border-radius:2px;
-  bottom:88px;
-  animation:vaprise 2.5s ease-out infinite;
-  opacity:0;
-}
-.vapour-line:nth-child(1){left:38px;height:24px;animation-delay:0s}
-.vapour-line:nth-child(2){left:46px;height:18px;animation-delay:.6s}
-.vapour-line:nth-child(3){left:54px;height:28px;animation-delay:1.2s}
-@keyframes vaprise{
-  0%{opacity:0;transform:translateY(0) scaleX(1)}
-  30%{opacity:.8}
-  100%{opacity:0;transform:translateY(-32px) scaleX(.3)}
-}
-
-/* ── MAIN TEXT ── */
-.eyebrow{
-  font-family:'Share Tech Mono',monospace;
-  font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(45,206,108,.55);margin-bottom:1rem;
-}
-
-.headline{
-  font-size:clamp(3rem,12vw,7rem);
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:-.02em;
-  line-height:.95;
-  animation:flicker 8s ease-in-out infinite;
-}
-.headline .l1{display:block;color:#d4edd9}
-.headline .l2{display:block;color:#2dce6c}
-
-@keyframes flicker{
-  0%,95%,100%{opacity:1}
-  96%{opacity:.9}
-  97%{opacity:1}
-  98%{opacity:.85}
-  99%{opacity:1}
-}
-
-.tagline{
-  font-family:'Share Tech Mono',monospace;
-  font-size:clamp(.7rem,2vw,.9rem);
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(45,206,108,.5);
-  margin-top:1.2rem;
-}
-
-/* ── LOADING BAR ── */
-.bar-wrap{
-  width:min(360px,80vw);
-  margin-top:2.5rem;
-  position:relative;
-}
-.bar-label{
-  font-family:'Share Tech Mono',monospace;
-  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(45,206,108,.45);
-  display:flex;justify-content:space-between;margin-bottom:.4rem;
-}
-.bar-track{
-  height:3px;
-  background:rgba(45,206,108,.12);
-  border:1px solid rgba(45,206,108,.18);
-  overflow:hidden;
-  position:relative;
-}
-.bar-fill{
-  height:100%;
-  background:linear-gradient(90deg,#1aab53,#2dce6c,#a8ffcb);
-  width:0%;
-  animation:cook 18s ease-in-out forwards;
-}
-@keyframes cook{
-  0%{width:0%}
-  15%{width:22%}
-  30%{width:38%}
-  45%{width:51%}
-  /* pause — "let it cook" */
-  60%{width:51%}
-  75%{width:73%}
-  88%{width:89%}
-  /* final pause — "almost done" */
-  95%{width:89%}
-  100%{width:99%}
-}
-.bar-pct{
-  font-family:'Share Tech Mono',monospace;
-  font-size:.58rem;letter-spacing:.1em;
-  color:#2dce6c;
-  margin-top:.35rem;
-  text-align:right;
-}
-
-/* ── STATUS MESSAGES ── */
-.status{
-  font-family:'Share Tech Mono',monospace;
-  font-size:.72rem;letter-spacing:.1em;
-  color:rgba(45,206,108,.6);
-  margin-top:1rem;
-  height:1.2em;
-  overflow:hidden;
-}
-.status span{
-  display:block;
-  opacity:0;
-  animation:statusshow .4s ease forwards;
-}
-@keyframes statusshow{to{opacity:1}}
-
-/* ── BOTTOM LINK ── */
-.back-home{
-  position:fixed;bottom:2.2rem;left:50%;transform:translateX(-50%);
-  font-family:'Share Tech Mono',monospace;font-size:.6rem;
-  letter-spacing:.16em;text-transform:uppercase;
-  color:rgba(45,206,108,.35);text-decoration:none;
-  border-bottom:1px solid rgba(45,206,108,.18);padding-bottom:.1rem;
-  transition:color .2s,border-color .2s;z-index:20;
-}
-.back-home:hover{color:#2dce6c;border-color:rgba(45,206,108,.5)}
-
-/* ── FORMULA decoration ── */
-.formula{
-  position:fixed;
-  font-family:'Share Tech Mono',monospace;
-  font-size:.62rem;
-  color:rgba(45,206,108,.08);
-  pointer-events:none;
-  animation:fdrift 12s ease-in-out infinite alternate;
-}
+.glow{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;animation:gpulse ease-in-out infinite}
+@keyframes gpulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.particle{position:fixed;width:3px;height:3px;pointer-events:none;animation:prise linear infinite;opacity:0;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
+@keyframes prise{0%{transform:translateY(100vh) rotate(0deg);opacity:0}8%{opacity:.7}92%{opacity:.35}100%{transform:translateY(-5vh) rotate(540deg);opacity:0}}
+.tape{position:fixed;left:0;right:0;height:7px;z-index:10;opacity:.45}
+.tape-top{top:0}.tape-bottom{bottom:0}
+.flask-wrap{position:relative;margin-bottom:1.8rem;animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+svg.flask{width:88px;height:88px;overflow:visible}
+.vap{position:absolute;width:2px;border-radius:2px;bottom:90px;animation:vaprise 2.5s ease-out infinite;opacity:0}
+.vap:nth-child(1){left:36px;height:22px;animation-delay:0s}
+.vap:nth-child(2){left:44px;height:16px;animation-delay:.6s}
+.vap:nth-child(3){left:52px;height:26px;animation-delay:1.2s}
+@keyframes vaprise{0%{opacity:0;transform:translateY(0)}30%{opacity:.8}100%{opacity:0;transform:translateY(-30px)}}
+.eyebrow{font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;margin-bottom:1rem;font-family:'Share Tech Mono',monospace}
+.headline{font-size:clamp(3rem,12vw,7rem);font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:.95;animation:flicker 9s ease-in-out infinite}
+.headline .l1{display:block}
+.headline .l2{display:block}
+@keyframes flicker{0%,94%,100%{opacity:1}95%{opacity:.88}97%{opacity:1}98.5%{opacity:.82}99%{opacity:1}}
+.tagline{font-size:clamp(.65rem,2vw,.85rem);letter-spacing:.18em;text-transform:uppercase;margin-top:1.1rem;font-family:'Share Tech Mono',monospace;opacity:.55}
+.bar-wrap{width:min(360px,82vw);margin-top:2.4rem}
+.bar-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:.38rem;opacity:.45}
+.bar-track{height:3px;border:1px solid rgba(255,255,255,.15);overflow:hidden;background:rgba(255,255,255,.04)}
+.bar-fill{height:100%;width:0%;animation:cookprog 18s ease-in-out forwards}
+@keyframes cookprog{0%{width:0%}15%{width:22%}30%{width:38%}45%{width:51%}60%{width:51%}73%{width:68%}85%{width:83%}94%{width:89%}100%{width:99%}}
+.bar-pct{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:.1em;margin-top:.32rem;text-align:right;opacity:.7}
+.status{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;margin-top:.9rem;height:1.2em;overflow:hidden;opacity:.6}
+.status span{display:block;opacity:0;animation:son .4s ease forwards}
+@keyframes son{to{opacity:1}}
+.formula{position:fixed;font-family:'Share Tech Mono',monospace;font-size:.6rem;pointer-events:none;animation:fdrift 12s ease-in-out infinite alternate;opacity:.07}
 @keyframes fdrift{0%{transform:translateY(0)}100%{transform:translateY(-12px)}}
+.back-home{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:.1rem;transition:opacity .2s;z-index:20;opacity:.35;text-decoration:none;color:inherit}
+.back-home:hover{opacity:.8}
+.switcher{position:fixed;bottom:1.4rem;right:1.4rem;display:flex;align-items:center;gap:.45rem;z-index:50;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:2rem;padding:.35rem .6rem}
+.switcher-label{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);padding-right:.2rem;white-space:nowrap}
+.tbtn{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:none;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative}
+.tbtn:hover{transform:scale(1.2);border-color:rgba(255,255,255,.5)}
+.tbtn.active{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.35)}
+.ttip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:.08em;padding:.2rem .5rem;white-space:nowrap;border-radius:2px;opacity:0;pointer-events:none;transition:opacity .15s}
+.tbtn:hover .ttip{opacity:1}
 </style>
 </head>
 <body>
 
-<div class="hazard"></div>
-<div class="hazard hazard-bottom"></div>
-<div class="glow glow-1"></div>
-<div class="glow glow-2"></div>
-<div class="glow glow-3"></div>
+<div class="tape tape-top" id="tapeTop"></div>
+<div class="tape tape-bottom" id="tapeBot"></div>
+<div id="glows"></div>
 <div id="particles"></div>
 
-<!-- floating formula decoration -->
-<div class="formula" style="top:12%;left:6%;animation-delay:0s">C₁₄H₁₈N₆O₅S</div>
-<div class="formula" style="top:70%;left:4%;animation-delay:-3s">blaKPC-2 · blaNDM-1</div>
-<div class="formula" style="top:20%;right:5%;animation-delay:-6s">STRING · CARD · RGI</div>
-<div class="formula" style="bottom:18%;right:7%;animation-delay:-9s">P(AMR) = σ(Wx+b)</div>
-<div class="formula" style="top:50%;left:3%;animation-delay:-4s">ATCGGCTAGCTA</div>
-<div class="formula" style="bottom:30%;right:4%;animation-delay:-2s">GNN · XAI · KEGG</div>
+<div class="formula" id="f1" style="top:12%;left:6%"></div>
+<div class="formula" id="f2" style="top:70%;left:4%;animation-delay:-3s"></div>
+<div class="formula" id="f3" style="top:20%;right:5%;animation-delay:-6s"></div>
+<div class="formula" id="f4" style="bottom:18%;right:7%;animation-delay:-9s"></div>
 
-<!-- FLASK -->
 <div class="flask-wrap">
-  <!-- vapour lines -->
-  <div class="vapour-line"></div>
-  <div class="vapour-line"></div>
-  <div class="vapour-line"></div>
-  <!-- flask SVG -->
+  <div class="vap" id="v1"></div>
+  <div class="vap" id="v2"></div>
+  <div class="vap" id="v3"></div>
   <svg class="flask" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- flask body outline -->
-    <path d="M32 35 L22 68 Q20 78 30 80 L60 80 Q70 78 68 68 L58 35 Z"
-          fill="rgba(45,206,108,0.06)" stroke="rgba(45,206,108,0.4)" stroke-width="1.5" stroke-linejoin="round"/>
-    <!-- liquid fill (animated) -->
-    <clipPath id="flaskClip">
-      <path d="M22 68 Q20 78 30 80 L60 80 Q70 78 68 68 Z"/>
-    </clipPath>
-    <rect x="18" y="55" width="54" height="28" fill="rgba(45,206,108,0.22)" clip-path="url(#flaskClip)"/>
-    <!-- bubble 1 -->
-    <circle cx="38" cy="70" r="2.5" fill="rgba(45,206,108,0.5)">
+    <path id="fBody" d="M32 35 L22 68 Q20 78 30 80 L60 80 Q70 78 68 68 L58 35 Z"
+          fill="rgba(255,255,255,0.04)" stroke-width="1.5" stroke-linejoin="round"/>
+    <clipPath id="fc"><path d="M22 68 Q20 78 30 80 L60 80 Q70 78 68 68 Z"/></clipPath>
+    <rect id="fLiquid" x="18" y="55" width="54" height="28" clip-path="url(#fc)"/>
+    <circle id="fb1" cx="38" cy="70" r="2.5" opacity="0">
       <animate attributeName="cy" values="72;66;72" dur="2.2s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0;1;0" dur="2.2s" repeatCount="indefinite"/>
     </circle>
-    <!-- bubble 2 -->
-    <circle cx="50" cy="74" r="1.8" fill="rgba(168,255,203,0.6)">
+    <circle id="fb2" cx="50" cy="74" r="1.8" opacity="0">
       <animate attributeName="cy" values="76;68;76" dur="1.8s" begin="0.7s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0;1;0" dur="1.8s" begin="0.7s" repeatCount="indefinite"/>
     </circle>
-    <!-- bubble 3 -->
-    <circle cx="44" cy="76" r="1.2" fill="rgba(99,212,245,0.5)">
+    <circle id="fb3" cx="44" cy="76" r="1.2" opacity="0">
       <animate attributeName="cy" values="78;70;78" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0;1;0" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>
     </circle>
-    <!-- flask neck -->
-    <rect x="34" y="18" width="22" height="18" rx="2"
-          fill="rgba(45,206,108,0.04)" stroke="rgba(45,206,108,0.35)" stroke-width="1.5"/>
-    <!-- stopper -->
-    <rect x="31" y="14" width="28" height="6" rx="2"
-          fill="rgba(45,206,108,0.15)" stroke="rgba(45,206,108,0.4)" stroke-width="1"/>
+    <rect id="fNeck" x="34" y="18" width="22" height="18" rx="2"
+          fill="rgba(255,255,255,0.03)" stroke-width="1.5"/>
+    <rect id="fStop" x="31" y="14" width="28" height="6" rx="2"
+          fill="rgba(255,255,255,0.08)" stroke-width="1"/>
   </svg>
 </div>
 
-<!-- MAIN TEXT -->
-<div class="eyebrow">// PranavOmics Lab · Est. 2025 //</div>
-
+<div class="eyebrow" id="eyebrow"></div>
 <div class="headline">
-  <span class="l1">Let it</span>
-  <span class="l2">Cook.</span>
+  <span class="l1" id="line1"></span>
+  <span class="l2" id="line2"></span>
 </div>
+<div class="tagline" id="tagline"></div>
 
-<div class="tagline">Lab site cooking · AMR interactomes in progress</div>
-
-<!-- LOADING BAR -->
 <div class="bar-wrap">
   <div class="bar-label">
-    <span>batch_2025.run</span>
+    <span id="barLabel"></span>
     <span id="pctLabel">0%</span>
   </div>
-  <div class="bar-track">
-    <div class="bar-fill" id="barFill"></div>
-  </div>
-  <div class="bar-pct" id="statusMsg">initialising cook...</div>
+  <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  <div class="bar-pct status" id="statusMsg"><span>initialising...</span></div>
 </div>
 
 <a class="back-home" href="../">← pranavathiyani.github.io</a>
 
+<div class="switcher">
+  <span class="switcher-label">theme</span>
+  <button class="tbtn" id="btn-bb" onclick="setTheme('bb')">🧪<span class="ttip">Breaking Bad</span></button>
+  <button class="tbtn" id="btn-fc" onclick="setTheme('fc')">🥊<span class="ttip">Fight Club</span></button>
+  <button class="tbtn" id="btn-tf" onclick="setTheme('tf')">🤖<span class="ttip">Transformers</span></button>
+  <button class="tbtn" id="btn-mv" onclick="setTheme('mv')">⚡<span class="ttip">Marvel</span></button>
+</div>
+
 <script>
-/* particles */
-for(let i=0;i<30;i++){
-  const p=document.createElement('div');
-  p.className='particle';
+const T = {
+  bb:{w:60,bg:'#08100c',fg:'#d4edd9',acc:'#2dce6c',acc2:'#a8ffcb',
+    tape:'repeating-linear-gradient(-45deg,#f5c518 0,#f5c518 14px,#1a3320 14px,#1a3320 28px)',
+    icon:'🧪',title:'PranavOmics Lab — Cooking...',
+    eyebrow:'// PranavOmics Lab · Est. 2025 //',
+    l1:'Let it',l2:'Cook.',
+    tag:'Lab site cooking · AMR interactomes in progress',
+    barLabel:'batch_2025.run',
+    formulas:['C₁₄H₁₈N₆O₅S','blaKPC-2 · blaNDM-1','STRING · CARD · RGI','P(AMR) = σ(Wx+b)'],
+    msgs:[[0,'initialising cook...'],[8,'loading CARD/RGI database...'],[20,'mapping AMR gene resistome...'],
+          [35,'running OrthoFinder — pan-ESKAPE...'],[51,'⟳  let it cook...'],[62,'training GNN model...'],
+          [75,'evaluating XAI attribution...'],[89,'⟳  patience, almost done...'],[97,'✓  site coming soon']],
+    pc:'#2dce6c',pc2:'#63d4f5',
+    glows:[{s:500,t:'-100px',l:'-100px',c:'rgba(45,206,108,0.07)',d:'8s',dy:'0s'},
+           {s:400,b:'-80px',r:'-80px',c:'rgba(45,206,108,0.05)',d:'10s',dy:'-3s'}]},
+
+  fc:{w:13,bg:'#0a0806',fg:'#e8ddd0',acc:'#c0392b',acc2:'#e74c3c',
+    tape:'repeating-linear-gradient(-45deg,#c0392b 0,#c0392b 12px,#2a0c0a 12px,#2a0c0a 24px)',
+    icon:'🥊',title:'PranavOmics Lab — First Rule...',
+    eyebrow:'// first rule of the lab //',
+    l1:'Do Not',l2:'Talk.',
+    tag:'(about the lab being under construction)',
+    barLabel:'soap_bar.exe',
+    formulas:['Rule #1: Do not talk','Rule #2: DO NOT TALK','Tyler = AMR researcher','We are the data we delete'],
+    msgs:[[0,'you are not your pipeline...'],[10,'loading chaos...'],[22,'breaking all assumptions...'],
+          [38,'⟳  just let it happen...'],[55,'building something real...'],[70,'burning the old models down...'],
+          [85,'⟳  almost there, maybe...'],[97,'✓  ground zero. coming soon.']],
+    pc:'#c0392b',pc2:'#e8ddd0',
+    glows:[{s:450,t:'-80px',l:'-80px',c:'rgba(192,57,43,0.07)',d:'7s',dy:'0s'},
+           {s:350,b:'-60px',r:'-60px',c:'rgba(192,57,43,0.05)',d:'11s',dy:'-4s'}]},
+
+  tf:{w:13,bg:'#080c14',fg:'#c8d8f0',acc:'#4a90d9',acc2:'#f5a623',
+    tape:'repeating-linear-gradient(-45deg,#4a90d9 0,#4a90d9 10px,#f5a623 10px,#f5a623 18px,#1a2540 18px,#1a2540 28px)',
+    icon:'🤖',title:'PranavOmics Lab — Transforming...',
+    eyebrow:'// AUTOBOT LAB SYSTEMS ONLINE //',
+    l1:'Trans',l2:'Forming.',
+    tag:'More than meets the eye · AMR analysis in progress',
+    barLabel:'AUTOBOT_DEPLOY.sys',
+    formulas:['ENERGON_LEVEL: 82%','ARK_SYSTEMS: ONLINE','DECEPTICON_AMR: DETECTED','TRANSFORMING: 5s...'],
+    msgs:[[0,'AUTOBOT SYSTEMS INITIALISING...'],[8,'SCANNING: AMR resistance matrix...'],
+          [20,'DEPLOYING: network analysis module...'],[35,'TRANSFORMING: data pipeline...'],
+          [51,'⟳  HOLD POSITION...'],[63,'UPLOADING: GNN architecture...'],
+          [76,'ROLLOUT: almost complete...'],[89,'⟳  FINAL TRANSFORMATION...'],
+          [97,'✓  AUTOBOTS: ROLL OUT (soon)']],
+    pc:'#4a90d9',pc2:'#f5a623',
+    glows:[{s:500,t:'-100px',l:'-80px',c:'rgba(74,144,217,0.07)',d:'9s',dy:'0s'},
+           {s:380,b:'-70px',r:'-70px',c:'rgba(245,166,35,0.05)',d:'11s',dy:'-5s'}]},
+
+  mv:{w:14,bg:'#0d0608',fg:'#f0e8e0',acc:'#e23636',acc2:'#f5c518',
+    tape:'repeating-linear-gradient(-45deg,#e23636 0,#e23636 14px,#f5c518 14px,#f5c518 22px,#2a0808 22px,#2a0808 36px)',
+    icon:'⚡',title:'PranavOmics Lab — Assembling...',
+    eyebrow:'// PRANAVOMICS INITIATIVE ACTIVE //',
+    l1:'Avengers',l2:'Assemble.',
+    tag:'The lab is assembling · Heroes of AMR research',
+    barLabel:'SHIELD_PROTOCOL.exe',
+    formulas:['INFINITY: AMR_STONES','THREAT_LEVEL: blaNDM-1','ASSEMBLING: TEAM_ESKAPE','SHIELD: NETWORK = ONLINE'],
+    msgs:[[0,'SHIELD PROTOCOL INITIATED...'],[8,'SCANNING for AMR threats...'],
+          [20,'ASSEMBLING: research team...'],[35,'STARK TECH: GNN model loading...'],
+          [51,'⟳  HEROES ASSEMBLING...'],[63,'DR. STRANGE: knowledge graph deployed...'],
+          [76,'HULK SMASH: resistance pathways...'],[89,'⟳  FINAL SNAP incoming...'],
+          [97,'✓  AVENGERS: ONLINE (coming soon)']],
+    pc:'#e23636',pc2:'#f5c518',
+    glows:[{s:480,t:'-90px',l:'-90px',c:'rgba(226,54,54,0.07)',d:'8s',dy:'0s'},
+           {s:380,b:'-70px',r:'-60px',c:'rgba(245,197,24,0.05)',d:'10s',dy:'-4s'}]}
+};
+
+function setTheme(k){localStorage.setItem('labTheme',k);location.reload();}
+
+function pick(){
+  const s=localStorage.getItem('labTheme');
+  if(s&&T[s]){localStorage.removeItem('labTheme');return s;}
+  const keys=Object.keys(T),tot=keys.reduce((a,k)=>a+T[k].w,0);
+  let r=Math.random()*tot;
+  for(const k of keys){r-=T[k].w;if(r<=0)return k;}
+  return 'bb';
+}
+
+const key=pick(), th=T[key];
+
+// Base styles
+document.body.style.background=th.bg;
+document.body.style.color=th.fg;
+document.getElementById('pageTitle').textContent=th.title;
+document.getElementById('pageFavicon').href=
+  'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="78" font-size="82">'+th.icon+'</text></svg>';
+
+// Text
+['eyebrow','line1','line2','tagline','barLabel'].forEach(id=>{
+  const map={eyebrow:th.eyebrow,line1:th.l1,line2:th.l2,tagline:th.tag,barLabel:th.barLabel};
+  document.getElementById(id).textContent=map[id];
+});
+document.getElementById('line2').style.color=th.acc;
+document.getElementById('eyebrow').style.color=th.acc;
+document.getElementById('tagline').style.color=th.acc;
+document.getElementById('pctLabel').style.color=th.acc;
+document.getElementById('statusMsg').style.color=th.acc;
+document.getElementById('barLabel').style.opacity='.5';
+
+// Formulas
+['f1','f2','f3','f4'].forEach((id,i)=>{
+  const el=document.getElementById(id);
+  el.textContent=th.formulas[i]||'';el.style.color=th.acc;
+});
+
+// Tape
+document.getElementById('tapeTop').style.background=th.tape;
+document.getElementById('tapeBot').style.background=th.tape;
+
+// Vapour
+['v1','v2','v3'].forEach(id=>
+  document.getElementById(id).style.background=`linear-gradient(to top,${th.acc}99,transparent)`);
+
+// Flask
+document.getElementById('fBody').setAttribute('stroke',th.acc);
+document.getElementById('fLiquid').setAttribute('fill',th.acc+'44');
+document.getElementById('fNeck').setAttribute('stroke',th.acc);
+document.getElementById('fStop').setAttribute('fill',th.acc+'22');
+document.getElementById('fStop').setAttribute('stroke',th.acc);
+document.getElementById('fb1').setAttribute('fill',th.acc+'cc');
+document.getElementById('fb2').setAttribute('fill',th.acc2+'cc');
+document.getElementById('fb3').setAttribute('fill',th.acc+'88');
+
+// Bar
+document.getElementById('barFill').style.background=
+  `linear-gradient(90deg,${th.acc}88,${th.acc},${th.acc2})`;
+document.querySelector('.bar-track').style.borderColor=th.acc+'44';
+document.querySelector('.bar-track').style.background=th.acc+'11';
+
+// Glows
+const gw=document.getElementById('glows');
+th.glows.forEach(g=>{
+  const el=document.createElement('div');el.className='glow';
+  el.style.cssText=`width:${g.s}px;height:${g.s}px;background:${g.c};animation-duration:${g.d};animation-delay:${g.dy};`;
+  if(g.t)el.style.top=g.t;if(g.b)el.style.bottom=g.b;
+  if(g.l)el.style.left=g.l;if(g.r)el.style.right=g.r;
+  gw.appendChild(el);
+});
+
+// Particles
+const pw=document.getElementById('particles');
+for(let i=0;i<28;i++){
+  const p=document.createElement('div');p.className='particle';
   const s=Math.random()*5+2;
-  p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;
-    animation-duration:${10+Math.random()*12}s;animation-delay:${Math.random()*14}s;
-    ${Math.random()>.6?'background:#63d4f5;':''}`;
-  document.getElementById('particles').appendChild(p);
+  p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;background:${Math.random()>.5?th.pc:th.pc2};animation-duration:${10+Math.random()*12}s;animation-delay:${Math.random()*14}s;`;
+  pw.appendChild(p);
 }
 
-/* status messages synced to bar */
-const messages=[
-  {at:0,   msg:'initialising cook...'},
-  {at:5,   msg:'loading CARD/RGI database...'},
-  {at:12,  msg:'mapping AMR gene resistome...'},
-  {at:22,  msg:'querying STRING PPI network...'},
-  {at:35,  msg:'running OrthoFinder — pan-ESKAPE...'},
-  {at:51,  msg:'⟳ let it cook...'},           // the pause
-  {at:60,  msg:'training GNN model...'},
-  {at:73,  msg:'evaluating XAI attribution...'},
-  {at:85,  msg:'assembling knowledge graph...'},
-  {at:89,  msg:'⟳ patience, it\'s almost done...'},  // final pause
-  {at:97,  msg:'✓ site coming soon'},
-];
+// Active button
+const ab=document.getElementById('btn-'+key);
+if(ab)ab.classList.add('active');
 
-const bar=document.getElementById('barFill');
+// Progress
+const barFill=document.getElementById('barFill');
 const pct=document.getElementById('pctLabel');
-const msg=document.getElementById('statusMsg');
-
-let lastPct=0;
-let msgIdx=0;
-
-function readPct(){
-  /* read computed width as % from animation */
-  const w=bar.getBoundingClientRect().width;
-  const tw=bar.parentElement.getBoundingClientRect().width;
-  return Math.round((w/tw)*100);
-}
-
+const stat=document.getElementById('statusMsg');
+let mi=0;
 setInterval(()=>{
-  const p=readPct();
+  const w=barFill.getBoundingClientRect().width;
+  const tw=barFill.parentElement.getBoundingClientRect().width;
+  const p=tw>0?Math.round((w/tw)*100):0;
   pct.textContent=p+'%';
-  /* trigger next message */
-  while(msgIdx<messages.length && p>=messages[msgIdx].at){
-    msg.innerHTML='';
+  while(mi<th.msgs.length&&p>=th.msgs[mi][0]){
+    stat.innerHTML='';
     const s=document.createElement('span');
-    s.textContent=messages[msgIdx].msg;
-    msg.appendChild(s);
-    msgIdx++;
+    s.textContent=th.msgs[mi][1];
+    stat.appendChild(s);mi++;
   }
 },200);
+
+// Keyboard shortcuts
+let typed='';
+document.addEventListener('keydown',e=>{
+  typed=(typed+e.key.toLowerCase()).slice(-12);
+  const map={cook:'bb',fight:'fc',transform:'tf',marvel:'mv'};
+  for(const[w,k]of Object.entries(map)){if(typed.includes(w)){setTheme(k);break;}}
+});
 </script>
 </body>
 </html>
