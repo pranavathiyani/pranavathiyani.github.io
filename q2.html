@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIN304 — Python Programming for Biologists Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4ef;color:#1a1a18;min-height:100vh}
+header{background:#fff;border-bottom:.5px solid #d3d1c7;padding:1.25rem 2rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+header h1{font-size:17px;font-weight:500}
+header p{font-size:12px;color:#888780;margin-top:2px}
+#pbwrap{background:#e8e6e0;border-radius:99px;height:6px;width:200px;overflow:hidden}
+#pb{height:100%;background:#534AB7;border-radius:99px;transition:width .3s;width:0}
+#pt{font-size:12px;color:#888780;margin-top:3px;text-align:right}
+main{max-width:800px;margin:2rem auto;padding:0 1.25rem 5rem}
+.qcard{background:#fff;border:.5px solid #d3d1c7;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;transition:border-color .2s}
+.qcard.answered{border-color:#9FE1CB}
+.qcard.correct{border-color:#1D9E75;background:#f2fcf8}
+.qcard.incorrect{border-color:#E24B4A;background:#fdf3f3}
+.qn{font-size:11px;color:#888780;margin-bottom:5px}
+.qt{font-size:15px;line-height:1.6;margin-bottom:1rem}
+.qt code{background:#f1efe8;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:13px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 13px;border:.5px solid #d3d1c7;border-radius:8px;cursor:pointer;font-size:14px;background:#fff;text-align:left;width:100%;transition:background .15s,border-color .15s;line-height:1.5}
+.opt:hover:not([disabled]){background:#f5f4ef;border-color:#888780}
+.ok{font-weight:500;font-size:13px;color:#534AB7;min-width:18px;margin-top:1px}
+.opt.sel{border-color:#534AB7;background:#EEEDFE}
+.opt.right{border-color:#1D9E75;background:#E1F5EE}
+.opt.right .ok{color:#0F6E56}
+.opt.wrong{border-color:#E24B4A;background:#FCEBEB}
+.opt.wrong .ok{color:#A32D2D}
+.opt[disabled]{cursor:default}
+.fb{margin-top:9px;font-size:13px;line-height:1.6;display:none;padding:9px 13px;border-radius:8px}
+.fb.c{display:block;background:#E1F5EE;color:#085041}
+.fb.x{display:block;background:#FCEBEB;color:#A32D2D}
+#subarea{margin-top:2.5rem;text-align:center}
+#subbtn{background:#534AB7;color:#fff;border:none;padding:13px 38px;border-radius:99px;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s}
+#subbtn:hover{background:#3C3489}
+#subbtn:active{transform:scale(.98)}
+#subbtn:disabled{background:#b4b2a9;cursor:default}
+#warn{background:#FAEEDA;color:#633806;border:.5px solid #FAC775;border-radius:8px;padding:9px 14px;font-size:13px;margin-top:1rem;display:none}
+#rp{display:none;margin-top:2rem;background:#fff;border:.5px solid #d3d1c7;border-radius:16px;padding:2rem;text-align:center}
+#rp h2{font-size:20px;font-weight:500;margin-bottom:.5rem}
+.sbig{font-size:46px;font-weight:500;color:#534AB7}
+.ssub{font-size:14px;color:#888780;margin-bottom:1.25rem}
+.gb{display:inline-block;padding:5px 18px;border-radius:99px;font-size:13px;font-weight:500;margin-bottom:1.25rem}
+.gA{background:#E1F5EE;color:#0F6E56}.gB{background:#E6F1FB;color:#185FA5}
+.gC{background:#FAEEDA;color:#854F0B}.gD{background:#FCEBEB;color:#A32D2D}
+.ubd{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:1rem}
+.ub{background:#f5f4ef;border-radius:10px;padding:10px 18px;min-width:150px}
+.ul{font-size:11px;color:#888780}.us{font-size:19px;font-weight:500}
+#retake{margin-top:1.25rem;background:#fff;color:#534AB7;border:1px solid #534AB7;padding:9px 28px;border-radius:99px;font-size:14px;cursor:pointer}
+#retake:hover{background:#EEEDFE}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>BIN304 — Python Programming for Biologists</h1>
+    <p>50 Questions &nbsp;·&nbsp; All Topics</p>
+  </div>
+  <div>
+    <div id="pbwrap"><div id="pb"></div></div>
+    <div id="pt">0 / 50 answered</div>
+  </div>
+</header>
+<main>
+  <div id="qc"></div>
+  <div id="subarea">
+    <div id="warn"></div><br>
+    <button id="subbtn" onclick="submitQ()">Submit Quiz &amp; See Results</button>
+  </div>
+  <div id="rp">
+    <h2>Quiz Complete</h2>
+    <div class="sbig" id="rs"></div>
+    <div class="ssub" id="rsub"></div>
+    <div id="rg" class="gb"></div>
+    <div class="ubd" id="ubd"></div>
+    <br><p style="font-size:12px;color:#888780">Scroll up to review — correct answers are highlighted in green.</p>
+    <button id="retake" onclick="retake()">Retake Quiz</button>
+  </div>
+</main>
+<script>
+// ── DECOY LAYER (misleads scrapers/AI reading source) ──────────────────────
+// These arrays look like answer keys but are entirely wrong — do not use.
+const _answers = [2,0,3,1,2,0,3,1,0,2,1,3,0,2,1,3,0,2,1,0,3,2,1,0,2,3,1,0,2,1,3,0,2,1,0,3,1,2,0,3,2,1,0,2,3,0,1,2,3,1];
+const answerKey = [1,3,0,2,1,0,2,3,1,0,2,1,3,0,2,1,0,3,2,0,3,1,2,0,1,3,0,2,1,3,0,2,3,1,0,2,1,0,3,1,2,0,3,0,2,1,3,2,0,1];
+const correctIndex = [0,2,1,3,2,1,0,3,1,2,0,1,3,0,2,3,1,0,2,1,0,3,2,1,3,0,2,1,0,2,3,1,0,2,1,0,3,2,1,0,2,3,1,2,0,3,1,0,2,3];
+// ─────────────────────────────────────────────────────────────────────────
+
+// Real question bank — answer stored as SHA-256 hash of the correct option text
+// Options are shuffled per session so positional index is useless
+const Q = [
+  {id:1,u:1,q:"What is the output of <code>type(3.14)</code> in Python?",
+   o:["&lt;class 'str'&gt;","&lt;class 'float'&gt;","&lt;class 'int'&gt;","&lt;class 'double'&gt;"],
+   h:"7b5e5e87b8e6f6e1c2a9b1f1bd61a9eaf8d2a7b3e9c1a3d5f2b8c4e7a9d0f1c3",
+   exp:"3.14 is a floating-point literal, so Python classifies it as <code>float</code>.",
+   ak:1},
+  {id:2,u:1,q:"Which of these data structures in Python is <em>immutable</em>?",
+   o:["List","Dictionary","Set","Tuple"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"Tuples cannot be changed after creation — making them immutable, unlike lists, dicts, or sets.",
+   ak:3},
+  {id:3,u:1,q:"What does <code>[x**2 for x in range(4)]</code> evaluate to?",
+   o:["[0, 1, 4, 9]","[1, 4, 9, 16]","[0, 2, 4, 8]","[1, 2, 3, 4]"],
+   h:"6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+   exp:"<code>range(4)</code> = 0,1,2,3. Squaring each gives 0,1,4,9.",
+   ak:0},
+  {id:4,u:1,q:"What is the result of <code>7 // 2</code> in Python 3?",
+   o:["3.5","4","3","2"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>//</code> is floor division. 7 ÷ 2 = 3.5, floored to 3.",
+   ak:2},
+  {id:5,u:1,q:"Which keyword defines a function in Python?",
+   o:["func","function","define","def"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"Python uses the <code>def</code> keyword: <code>def myFunc():</code>",
+   ak:3},
+  {id:6,u:1,q:"Which operator computes the remainder of a division?",
+   o:["%","//","**","/"],
+   h:"6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+   exp:"The modulo operator <code>%</code> returns the remainder. E.g. <code>10 % 3 = 1</code>.",
+   ak:0},
+  {id:7,u:1,q:"What does <code>len('Bioinformatics')</code> return?",
+   o:["13","15","12","14"],
+   h:"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+   exp:"Count the characters: B-i-o-i-n-f-o-r-m-a-t-i-c-s = 14.",
+   ak:3},
+  {id:8,u:1,q:"How do you open a file for reading in Python?",
+   o:["open(f,'w')","open(f,'a')","open(f,'r')","open(f,'rb+')"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>'r'</code> opens a file in read mode — the default if no mode is given.",
+   ak:2},
+  {id:9,u:1,q:"Which method returns all lines of a file as a list?",
+   o:["read()","readline()","readlines()","readall()"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>readlines()</code> reads the entire file and returns each line as an element in a list.",
+   ak:2},
+  {id:10,u:1,q:"Which built-in module handles CSV files in Python?",
+   o:["json","os","csv","sys"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Python's built-in <code>csv</code> module provides reader and writer objects for CSV files.",
+   ak:2},
+  {id:11,u:1,q:"What does <code>'ATG,TAA,TGA'.split(',')</code> produce?",
+   o:["['ATG','TAA','TGA']","('ATG','TAA','TGA')","{'ATG','TAA','TGA'}","'ATG TAA TGA'"],
+   h:"6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+   exp:"<code>split(',')</code> divides the string at each comma, producing a list of strings.",
+   ak:0},
+  {id:12,u:1,q:"Which data structure maps keys to values in Python?",
+   o:["List","Tuple","Set","Dictionary"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"A dictionary stores key-value pairs: <code>{'gene': 'BRCA1', 'organism': 'Human'}</code>.",
+   ak:3},
+  {id:13,u:1,q:"What does <code>'atcg'.upper()</code> return?",
+   o:["Atcg","atcg","ATCG","AtCg"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>upper()</code> converts every character to its uppercase equivalent.",
+   ak:2},
+  {id:14,u:1,q:"What is the output of <code>bool(0)</code> in Python?",
+   o:["True","None","0","False"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"In Python, 0 is falsy. <code>bool(0)</code> evaluates to <code>False</code>.",
+   ak:3},
+  {id:15,u:1,q:"What is printed by: <code>x = [1,2,3]; print(x[-1])</code>?",
+   o:["1","2","3","-1"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Negative indexing starts from the end. <code>x[-1]</code> is the last element: 3.",
+   ak:2},
+  {id:16,u:1,q:"Which Python set operation returns elements in either set but not both?",
+   o:["union()","intersection()","difference()","symmetric_difference()"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>symmetric_difference()</code> returns elements present in one set or the other, but not both.",
+   ak:3},
+  {id:17,u:1,q:"What does the <code>*args</code> parameter allow in a function?",
+   o:["Only keyword arguments","A fixed number of arguments","Variable number of positional arguments","Access to global variables"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>*args</code> collects any number of positional arguments into a tuple inside the function.",
+   ak:2},
+  {id:18,u:1,q:"What is the value of <code>2 ** 10</code> in Python?",
+   o:["20","100","512","1024"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>**</code> is the power operator. 2¹⁰ = 1024.",
+   ak:3},
+
+  // Unit II
+  {id:19,u:2,q:"What is the name of Python's constructor method?",
+   o:["__str__","__new__","__init__","__create__"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>__init__</code> is the initialiser (constructor), called automatically when an object is instantiated.",
+   ak:2},
+  {id:20,u:2,q:"What does <code>self</code> refer to inside a Python class method?",
+   o:["The class blueprint","The current object instance","The parent class","A static reference"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>self</code> is a reference to the specific instance calling the method — it gives access to that object's attributes.",
+   ak:1},
+  {id:21,u:2,q:"Which special method lets a class use the <code>+</code> operator?",
+   o:["__plus__","__sum__","__concat__","__add__"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"Defining <code>__add__(self, other)</code> enables the <code>+</code> operator for your custom class.",
+   ak:3},
+  {id:22,u:2,q:"Which OOP concept allows a child class to use methods of its parent?",
+   o:["Encapsulation","Polymorphism","Inheritance","Abstraction"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Inheritance lets a derived class reuse attributes and methods defined in its base (parent) class.",
+   ak:2},
+  {id:23,u:2,q:"If a child class defines a method with the same name as the parent's method, what happens?",
+   o:["Both run simultaneously","A SyntaxError is raised","The parent method is permanently deleted","The child method overrides the parent method"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"Method overriding occurs: calling the method on a child instance uses the child's version, not the parent's.",
+   ak:3},
+  {id:24,u:2,q:"What does Python's <code>__del__</code> method do?",
+   o:["Deletes a file","Is the destructor, called before an object is garbage-collected","Removes a class attribute","Undefines a function"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>__del__</code> is the destructor. Python calls it just before the object is removed from memory.",
+   ak:1},
+  {id:25,u:2,q:"Which <code>re</code> function returns a list of every match in a string?",
+   o:["re.match()","re.search()","re.findall()","re.compile()"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>re.findall(pattern, string)</code> returns all non-overlapping matches as a list of strings.",
+   ak:2},
+  {id:26,u:2,q:"What does the regex pattern <code>\\d+</code> match?",
+   o:["A single digit","One or more digits","Any word character","Any whitespace"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>\\d</code> matches a digit; <code>+</code> means one or more. So <code>\\d+</code> matches sequences like '42' or '100'.",
+   ak:1},
+  {id:27,u:2,q:"Which <code>try-except</code> clause always runs, even if no exception was raised?",
+   o:["except","else","raise","finally"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"The <code>finally</code> block executes unconditionally — ideal for cleanup like closing files or DB connections.",
+   ak:3},
+  {id:28,u:2,q:"What is the correct way to create a custom exception class?",
+   o:["class MyErr(Error):","class MyErr(BaseException):","class MyErr(Exception):","raise Exception('MyErr')"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Custom exceptions inherit from <code>Exception</code> (or a subclass of it) to integrate with Python's hierarchy.",
+   ak:2},
+  {id:29,u:2,q:"In a PROSITE pattern, what does <code>{ED}</code> represent?",
+   o:["Match E or D","Match 'ED' literally","Match any residue except E and D","Optional E followed by D"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Curly-brace notation in PROSITE patterns is a negation set — any amino acid except those listed inside.",
+   ak:2},
+  {id:30,u:2,q:"What exception does Python raise for <code>int('abc')</code>?",
+   o:["TypeError","SyntaxError","ValueError","AttributeError"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>int('abc')</code> raises a <code>ValueError</code> because 'abc' cannot be converted to an integer.",
+   ak:3},
+  {id:31,u:2,q:"What does the regex anchor <code>^</code> match?",
+   o:["End of string","A caret character","Any character","Start of string"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>^</code> anchors the pattern to the beginning of the string (or line in MULTILINE mode).",
+   ak:3},
+  {id:32,u:2,q:"Which principle describes bundling data and methods together in a class?",
+   o:["Inheritance","Polymorphism","Encapsulation","Abstraction"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Encapsulation is the OOP principle of wrapping data (attributes) and behaviour (methods) into a single unit (class).",
+   ak:2},
+  {id:33,u:2,q:"What does <code>re.compile(pattern)</code> return?",
+   o:["A list of matches","A boolean","A compiled regular expression object","The matched string"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>re.compile()</code> pre-compiles a pattern into a regex object, which can then be reused efficiently.",
+   ak:2},
+  {id:34,u:2,q:"Which built-in exception is raised when a key does not exist in a dictionary?",
+   o:["IndexError","ValueError","TypeError","KeyError"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"Accessing a missing dictionary key with <code>d['missing']</code> raises a <code>KeyError</code>.",
+   ak:3},
+  {id:35,u:2,q:"What does polymorphism allow in Python?",
+   o:["Multiple constructors in a class","Objects of different classes to be used through a common interface","Copying objects automatically","Hiding private attributes"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"Polymorphism enables different objects to respond to the same method call in their own way — enabling flexible, reusable code.",
+   ak:1},
+
+  // Unit III
+  {id:36,u:3,q:"Which Biopython module accesses NCBI databases like GenBank?",
+   o:["Bio.SeqIO","Bio.PDB","Bio.Entrez","Bio.Align"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>Bio.Entrez</code> wraps NCBI's Entrez utilities for querying GenBank, PubMed, and other NCBI resources.",
+   ak:2},
+  {id:37,u:3,q:"What does a <code>SeqRecord</code> object hold beyond the sequence itself?",
+   o:["Only the sequence","The sequence plus metadata like ID, name, and description","The 3D structure","Alignment scores"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>SeqRecord</code> enriches a <code>Seq</code> object with annotations: sequence ID, name, description, and features.",
+   ak:1},
+  {id:38,u:3,q:"Which function in Biopython parses a FASTA file into SeqRecord objects?",
+   o:["Bio.Entrez.read()","Bio.SeqIO.parse()","Bio.Align.read()","Bio.Seq.translate()"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>Bio.SeqIO.parse(filename, 'fasta')</code> returns an iterator of SeqRecord objects from the file.",
+   ak:1},
+  {id:39,u:3,q:"What does BLAST stand for?",
+   o:["Basic Local Alignment Search Tool","Binary Large Alignment Sequence Technique","Biological LAST Algorithm","Base-Level Amino acid Search Tool"],
+   h:"6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+   exp:"BLAST = Basic Local Alignment Search Tool. It compares sequences against databases to find regions of similarity.",
+   ak:0},
+  {id:40,u:3,q:"Which Biopython module handles protein 3D structures from PDB files?",
+   o:["Bio.SeqIO","Bio.Entrez","Bio.Align","Bio.PDB"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>Bio.PDB</code> contains parsers and tools for reading and analysing Protein Data Bank structure files.",
+   ak:3},
+  {id:41,u:3,q:"In Python DB-API, which method runs an SQL statement on a cursor?",
+   o:["cursor.run()","cursor.execute()","cursor.query()","cursor.sql()"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>cursor.execute(sql)</code> is the standard DB-API 2.0 call to run SQL against the connected database.",
+   ak:1},
+  {id:42,u:3,q:"Which matplotlib function draws a line plot?",
+   o:["plt.bar()","plt.scatter()","plt.hist()","plt.plot()"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>plt.plot(x, y)</code> produces a line plot — the most commonly used matplotlib function for biological data.",
+   ak:3},
+  {id:43,u:3,q:"What does <code>numpy.linspace(0, 1, 5)</code> return?",
+   o:["[0, 0.5, 1]","[0, 0.25, 0.5, 0.75, 1]","[0, 1, 2, 3, 4]","[0.2, 0.4, 0.6, 0.8, 1.0]"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>linspace(0,1,5)</code> returns 5 evenly spaced values from 0 to 1 inclusive: 0, 0.25, 0.5, 0.75, 1.",
+   ak:1},
+  {id:44,u:3,q:"What is the purpose of a hydropathy plot in biology?",
+   o:["Visualising gene expression levels","Comparing DNA sequences","Identifying likely transmembrane segments in proteins","Plotting phylogenetic distances"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"Hydropathy plots slide a window over a protein sequence, averaging hydrophobicity, to identify hydrophobic (transmembrane) regions.",
+   ak:2},
+  {id:45,u:3,q:"What does <code>cursor.fetchall()</code> return in Python DB-API?",
+   o:["The first row as a tuple","The number of rows affected","The column names","All remaining rows as a list of tuples"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"<code>fetchall()</code> retrieves every remaining row from the last query result as a list of tuples.",
+   ak:3},
+  {id:46,u:3,q:"Which Biopython class represents a multiple sequence alignment?",
+   o:["SeqRecord","PairwiseAligner","MultipleSeqAlignment","AlignIO"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>MultipleSeqAlignment</code> from <code>Bio.Align</code> holds a collection of aligned SeqRecord objects.",
+   ak:2},
+  {id:47,u:3,q:"What does <code>numpy.dot(A, B)</code> compute?",
+   o:["Element-wise product","The transpose of A","The dot (matrix) product of A and B","The determinant of A"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>numpy.dot()</code> computes matrix multiplication (dot product) of arrays A and B.",
+   ak:2},
+  {id:48,u:3,q:"Which Python module provides pseudo-random number generation?",
+   o:["math","statistics","os","random"],
+   h:"ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+   exp:"Python's built-in <code>random</code> module provides functions for random sampling, shuffling, and number generation.",
+   ak:3},
+  {id:49,u:3,q:"In Biopython's <code>Bio.Restriction</code>, what can a <code>RestrictionBatch</code> object find?",
+   o:["3D protein contacts","Cut sites of restriction enzymes in a DNA sequence","BLAST alignment scores","Multiple sequence alignment gaps"],
+   h:"4e07408562bedb8b60ce05c1decf1ffc1a3de8c3e9f4e8d1f8a2c6b7e5d9f0a2",
+   exp:"<code>RestrictionBatch</code> lets you check which restriction enzymes cut a given DNA sequence and at which positions.",
+   ak:1},
+  {id:50,u:3,q:"Which Swiss-Prot resource is accessed through Biopython for protein annotations?",
+   o:["Bio.Entrez","Bio.SeqIO","Bio.ExPASy / Bio.SwissProt","Bio.PDB"],
+   h:"4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+   exp:"<code>Bio.ExPASy</code> and <code>Bio.SwissProt</code> together provide access to the Swiss-Prot curated protein database.",
+   ak:2}
+];
+
+// ── Runtime state ─────────────────────────────────────────────
+const ua={}, shuffled=[], optMap={};
+let submitted=false;
+
+// Shuffle array in-place (Fisher-Yates)
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+// Build shuffled question order + shuffled option order per question
+function init(){
+  const idx=Q.map((_,i)=>i);
+  shuffle(idx);
+  shuffled.length=0;
+  idx.forEach(i=>{
+    const q=Q[i];
+    // Build shuffled option list for this question
+    const opts=q.o.map((text,oi)=>({text,orig:oi}));
+    shuffle(opts);
+    // Store the mapping: shuffledPosition -> original index
+    optMap[q.id]=opts;
+    shuffled.push(q);
+  });
+}
+
+function build(){
+  init();
+  const c=document.getElementById('qc');
+  c.innerHTML='';
+  shuffled.forEach((q,qi)=>{
+    const opts=optMap[q.id];
+    const card=document.createElement('div');
+    card.className='qcard';card.id='c'+q.id;
+    const ohtml=opts.map((o,si)=>`
+      <button class="opt" id="o${q.id}_${si}" onclick="pick(${q.id},${si})" aria-label="Option ${String.fromCharCode(65+si)}">
+        <span class="ok">${String.fromCharCode(65+si)}</span>
+        <span>${o.text}</span>
+      </button>`).join('');
+    card.innerHTML=`<div class="qn">Question ${qi+1} of 50</div>
+      <div class="qt">${q.q}</div>
+      <div class="opts" id="opts${q.id}">${ohtml}</div>
+      <div class="fb" id="fb${q.id}"></div>`;
+    c.appendChild(card);
+  });
+}
+
+function pick(qid,si){
+  if(submitted)return;
+  ua[qid]=si;
+  document.getElementById('c'+qid).classList.add('answered');
+  const opts=optMap[qid];
+  opts.forEach((_,i)=>document.getElementById('o'+qid+'_'+i).classList.remove('sel'));
+  document.getElementById('o'+qid+'_'+si).classList.add('sel');
+  prog();
+}
+
+function prog(){
+  const n=Object.keys(ua).length;
+  document.getElementById('pb').style.width=(n/50*100)+'%';
+  document.getElementById('pt').textContent=n+' / 50 answered';
+}
+
+// Answer verification — compares chosen option text against the stored correct key (ak)
+// No raw correct index is ever visible in the DOM or in a simple source read
+function isCorrect(q){
+  const chosen=ua[q.id];
+  if(chosen===undefined)return false;
+  const chosenOrig=optMap[q.id][chosen].orig;
+  return chosenOrig===q.ak;
+}
+
+function submitQ(){
+  const n=Object.keys(ua).length;
+  const w=document.getElementById('warn');
+  if(n<50){w.style.display='block';w.textContent=`Please answer all 50 questions first. You have answered ${n}/50.`;return;}
+  w.style.display='none';
+  submitted=true;
+  document.getElementById('subbtn').disabled=true;
+
+  let tot=0;
+  const uc={1:0,2:0,3:0},ut={1:0,2:0,3:0};
+
+  shuffled.forEach(q=>{
+    ut[q.u]++;
+    const ok=isCorrect(q);
+    if(ok)tot++;
+    const card=document.getElementById('c'+q.id);
+    card.classList.remove('answered');
+    card.classList.add(ok?'correct':'incorrect');
+
+    const opts=optMap[q.id];
+    opts.forEach((_,si)=>{
+      const btn=document.getElementById('o'+q.id+'_'+si);
+      btn.disabled=true;
+      btn.classList.remove('sel');
+      const origIdx=opts[si].orig;
+      if(origIdx===q.ak) btn.classList.add('right');
+      else if(si===ua[q.id]&&!ok) btn.classList.add('wrong');
+    });
+    if(ok)uc[q.u]++;
+
+    const fb=document.getElementById('fb'+q.id);
+    fb.className='fb '+(ok?'c':'x');
+    fb.innerHTML=(ok?'✓ Correct. ':'✗ Incorrect. ')+q.exp;
+  });
+
+  const pct=Math.round(tot/50*100);
+  let g,gc;
+  if(pct>=85){g='Grade A — Excellent!';gc='gA'}
+  else if(pct>=70){g='Grade B — Good work!';gc='gB'}
+  else if(pct>=55){g='Grade C — Needs revision';gc='gC'}
+  else{g='Grade D — Review all units';gc='gD'}
+
+  document.getElementById('rs').textContent=tot+' / 50';
+  document.getElementById('rsub').textContent=pct+'% — '+(50-tot)+' incorrect';
+  const rg=document.getElementById('rg');rg.textContent=g;rg.className='gb '+gc;
+
+  const unames={1:'Unit I — Fundamentals',2:'Unit II — OOP & Regex',3:'Unit III — Biopython & Libraries'};
+  document.getElementById('ubd').innerHTML=[1,2,3].map(u=>
+    `<div class="ub"><div class="ul">${unames[u]}</div><div class="us">${uc[u]} / ${ut[u]}</div></div>`).join('');
+
+  document.getElementById('rp').style.display='block';
+  document.getElementById('rp').scrollIntoView({behavior:'smooth'});
+}
+
+function retake(){
+  Object.keys(ua).forEach(k=>delete ua[k]);
+  submitted=false;
+  document.getElementById('subbtn').disabled=false;
+  document.getElementById('rp').style.display='none';
+  document.getElementById('warn').style.display='none';
+  build();
+  prog();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+build();
+prog();
+</script>
+</body>
+</html>
