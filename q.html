@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIN522 · Unit I Quiz — Data Types &amp; Built-in Functions</title>
+<style>
+  :root{
+    --ink:#1A2E35;
+    --teal:#2A9D8F;
+    --amber:#E9C46A;
+    --orange:#E76F51;
+    --paper:#EFF4F3;
+    --line:#DCE4E3;
+    --muted:#5A6B72;
+    --white:#FFFFFF;
+    --code-bg:#12222A;
+    --code-tx:#E8EEF0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:820px;margin:0 auto}
+
+  header{margin-bottom:22px}
+  .pill{
+    display:inline-block;background:var(--teal);color:#fff;
+    font-size:12px;font-weight:700;letter-spacing:2px;
+    padding:5px 14px;border-radius:20px;
+  }
+  h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:12px 0 4px;font-weight:700}
+  .sub{color:var(--muted);font-size:15px}
+
+  .bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:20px 0 8px}
+  .bar > i{display:block;height:100%;width:0;background:var(--teal);transition:width .25s ease}
+  .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:16px}
+
+  .card{
+    background:var(--white);border:1px solid var(--line);
+    border-radius:12px;padding:26px 26px 22px;
+    box-shadow:0 2px 10px rgba(26,46,53,.06);
+  }
+  .qnum{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--teal);text-transform:uppercase;margin-bottom:10px}
+  .qtext{font-family:Cambria,Georgia,serif;font-size:21px;font-weight:700;line-height:1.4}
+  pre.code{
+    background:var(--code-bg);color:var(--code-tx);
+    font-family:"Courier New",monospace;font-size:15px;
+    padding:14px 16px;border-radius:8px;margin:14px 0 4px;overflow-x:auto;
+  }
+
+  .opts{list-style:none;margin-top:18px}
+  .opts li{margin-bottom:10px}
+  .opt{
+    display:flex;align-items:center;gap:12px;width:100%;
+    text-align:left;cursor:pointer;
+    background:var(--paper);border:1.5px solid var(--line);
+    border-radius:9px;padding:12px 14px;
+    font-size:16px;font-family:inherit;color:var(--ink);
+    transition:border-color .15s,background .15s;
+  }
+  .opt:hover{border-color:var(--teal)}
+  .opt:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .opt .key{
+    flex:0 0 26px;height:26px;border-radius:50%;
+    background:var(--white);border:1.5px solid var(--line);
+    display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--muted);
+  }
+  .opt.sel{background:#E4EEEC;border-color:var(--teal)}
+  .opt.sel .key{background:var(--teal);border-color:var(--teal);color:#fff}
+  .opt code{font-family:"Courier New",monospace;font-size:15px}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
+  button.btn{
+    font-family:inherit;font-size:15px;font-weight:700;
+    padding:11px 24px;border-radius:8px;cursor:pointer;
+    border:1.5px solid var(--line);background:var(--white);color:var(--ink);
+  }
+  button.btn:hover:not(:disabled){border-color:var(--muted)}
+  button.btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  button.btn:disabled{opacity:.4;cursor:not-allowed}
+  button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.primary:hover:not(:disabled){background:#0f1f26}
+  button.submit{background:var(--orange);color:#fff;border-color:var(--orange)}
+  button.submit:hover:not(:disabled){background:#d9603f}
+  .hint{font-size:13px;color:var(--muted);text-align:center}
+
+  .score{background:var(--ink);color:#fff;border-radius:12px;padding:26px;text-align:center;margin-bottom:22px}
+  .score .big{font-family:Cambria,Georgia,serif;font-size:52px;font-weight:700;line-height:1}
+  .score .lbl{color:var(--amber);font-size:15px;margin-top:6px}
+  .score .pct{color:#9FB2AE;font-size:14px;margin-top:4px}
+
+  .rev{
+    background:var(--white);border:1px solid var(--line);
+    border-left:5px solid var(--teal);border-radius:10px;
+    padding:18px 20px;margin-bottom:14px;
+  }
+  .rev.wrong{border-left-color:var(--orange)}
+  .rev .tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;padding:3px 9px;border-radius:4px;margin-bottom:8px;
+    background:#E4EEEC;color:var(--teal);
+  }
+  .rev.wrong .tag{background:#FBEEE9;color:var(--orange)}
+  .rev .q{font-family:Cambria,Georgia,serif;font-size:17px;font-weight:700;margin-bottom:8px}
+  .rev pre.code{font-size:14px;margin:8px 0}
+  .rev .line{font-size:15px;margin:4px 0}
+  .yours{color:var(--orange)}
+  .right{color:var(--teal)}
+  .expl{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:15px;color:var(--muted)}
+  .expl code,.line code,.q code,.qtext code{
+    font-family:"Courier New",monospace;background:var(--paper);
+    padding:1px 5px;border-radius:3px;font-size:.92em;color:var(--ink);
+  }
+  .again{display:block;margin:26px auto 0}
+  @media (max-width:560px){
+    h1{font-size:24px}
+    .qtext{font-size:19px}
+    .card{padding:20px 18px}
+    .nav{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="pill">BIN522</span>
+    <h1>Unit I — Data Types &amp; Built-in Functions</h1>
+    <p class="sub">20 questions · one at a time · answers and explanations appear only after you submit</p>
+  </header>
+
+  <div id="quiz">
+    <div class="bar"><i id="fill"></i></div>
+    <div class="meta">
+      <span id="counter">Question 1 of 20</span>
+      <span id="answered">0 of 20 answered</span>
+    </div>
+
+    <div class="card">
+      <div class="qnum" id="qnum">Question 1</div>
+      <div class="qtext" id="qtext"></div>
+      <pre class="code" id="qcode" hidden></pre>
+      <ul class="opts" id="opts"></ul>
+    </div>
+
+    <div class="nav">
+      <button class="btn" id="prev">&larr; Back</button>
+      <span class="hint" id="hint"></span>
+      <button class="btn primary" id="next">Next &rarr;</button>
+    </div>
+  </div>
+
+  <div id="results" hidden></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { q:"What is the data type of <code>42</code>?",
+    opts:["int","float","str","list"], a:0,
+    e:"Whole numbers with no decimal point are <code>int</code>. <code>type(42)</code> gives <code>&lt;class 'int'&gt;</code>." },
+
+  { q:"What is the data type of <code>3.14</code>?",
+    opts:["int","float","str","dict"], a:1,
+    e:"Any number written with a decimal point is a <code>float</code> — even <code>2.0</code>." },
+
+  { q:"What is the data type of <code>\"ATGC\"</code>?",
+    opts:["list","str","tuple","set"], a:1,
+    e:"Anything inside quotes — single or double — is a string (<code>str</code>), a sequence of characters." },
+
+  { q:"What is the data type of <code>['A', 'B', 'C']</code>?",
+    opts:["tuple","set","list","dict"], a:2,
+    e:"Square brackets <code>[ ]</code> create a <code>list</code> — an ordered collection you can change." },
+
+  { q:"What is the data type of <code>('A', 'B')</code>?",
+    opts:["list","tuple","set","str"], a:1,
+    e:"Round brackets <code>( )</code> create a <code>tuple</code> — ordered, but fixed once created." },
+
+  { q:"What is the data type of <code>{'name': 'Ravi'}</code>?",
+    opts:["set","dict","list","tuple"], a:1,
+    e:"Curly braces holding <code>key: value</code> pairs make a <code>dict</code>. You look values up by their key." },
+
+  { q:"What is the data type of <code>{1, 2, 3}</code>?",
+    opts:["dict","list","set","tuple"], a:2,
+    e:"Curly braces with plain items and no colons make a <code>set</code> — unordered, no duplicates." },
+
+  { q:"Which of these can you <b>not</b> change after creating it?",
+    opts:["list","dict","set","tuple"], a:3,
+    e:"A <code>tuple</code> is immutable. Lists, dicts and sets are all mutable — you can add, remove or edit items." },
+
+  { q:"Which type stores items as <b>key &rarr; value</b> pairs?",
+    opts:["list","dict","tuple","set"], a:1,
+    e:"Only a <code>dict</code> maps keys to values, like a phone book: <code>prices['milk']</code>." },
+
+  { q:"Which type keeps only unique items and drops duplicates?",
+    opts:["list","tuple","set","str"], a:2,
+    e:"A <code>set</code> stores each item once. <code>set([1, 1, 2])</code> gives <code>{1, 2}</code>." },
+
+  { q:"Which built-in function tells you the data type of a value?",
+    opts:["len()","type()","str()","print()"], a:1,
+    e:"<code>type(x)</code> reports what <code>x</code> is. For example <code>type(3.5)</code> gives <code>&lt;class 'float'&gt;</code>." },
+
+  { q:"What is the output?", code:"print(len(\"Python\"))",
+    opts:["5","6","7","Error"], a:1,
+    e:"<code>len()</code> counts the items. \"Python\" has 6 characters: P-y-t-h-o-n." },
+
+  { q:"What is the output?", code:"print(len([10, 20, 30]))",
+    opts:["3","30","60","Error"], a:0,
+    e:"<code>len()</code> on a list counts how many elements it has, not their values. Three items &rarr; 3." },
+
+  { q:"What is the output?", code:"print(int(\"7\") + 3)",
+    opts:["73","\"73\"","10","Error"], a:2,
+    e:"<code>int(\"7\")</code> converts the string into the number 7, so 7 + 3 = 10. Without <code>int()</code> this would be an error." },
+
+  { q:"What is the output?", code:"print(str(5) + \"0\")",
+    opts:["5","50","15","Error"], a:1,
+    e:"<code>str(5)</code> makes the string <code>\"5\"</code>, and <code>+</code> joins two strings together &rarr; <code>\"50\"</code>." },
+
+  { q:"What type does <code>input()</code> always return?",
+    opts:["int","float","str","It depends on what is typed"], a:2,
+    e:"<code>input()</code> always returns a <code>str</code>. If you need a number, convert it: <code>int(input())</code>." },
+
+  { q:"What is the output?", code:"print(max([3, 9, 2]))",
+    opts:["3","9","2","14"], a:1,
+    e:"<code>max()</code> returns the largest item in the collection. <code>min()</code> returns the smallest." },
+
+  { q:"What is the output?", code:"print(sum([1, 2, 3]))",
+    opts:["3","6","123","Error"], a:1,
+    e:"<code>sum()</code> adds up every number in the list: 1 + 2 + 3 = 6." },
+
+  { q:"What is the output?", code:"print(sorted([3, 1, 2]))",
+    opts:["[3, 2, 1]","[1, 2, 3]","[1, 3, 2]","6"], a:1,
+    e:"<code>sorted()</code> returns a new list arranged smallest to largest. The original list is left unchanged." },
+
+  { q:"What is the output?", code:"print(list(\"ABC\"))",
+    opts:["\"ABC\"","['ABC']","['A', 'B', 'C']","Error"], a:2,
+    e:"<code>list()</code> splits a string into its individual characters, one per element." }
+];
+
+const N = QUESTIONS.length;
+const picks = new Array(N).fill(null);
+let cur = 0;
+
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function render(){
+  const q = QUESTIONS[cur];
+  $("qnum").textContent = "Question " + (cur + 1);
+  $("qtext").innerHTML = q.q;
+
+  const codeEl = $("qcode");
+  if (q.code){ codeEl.textContent = q.code; codeEl.hidden = false; }
+  else { codeEl.hidden = true; }
+
+  const ul = $("opts");
+  ul.innerHTML = "";
+  q.opts.forEach(function(text, i){
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt" + (picks[cur] === i ? " sel" : "");
+    b.innerHTML = '<span class="key">' + "ABCD"[i] + '</span><code>' + esc(text) + '</code>';
+    b.setAttribute("aria-pressed", picks[cur] === i);
+    b.onclick = function(){ picks[cur] = i; render(); };   // records the choice only — no feedback
+    li.appendChild(b);
+    ul.appendChild(li);
+  });
+
+  const done = picks.filter(function(p){ return p !== null; }).length;
+  $("counter").textContent = "Question " + (cur + 1) + " of " + N;
+  $("answered").textContent = done + " of " + N + " answered";
+  $("fill").style.width = ((cur + 1) / N * 100) + "%";
+  $("prev").disabled = (cur === 0);
+
+  const next = $("next");
+  if (cur === N - 1){
+    next.textContent = "Submit quiz";
+    next.className = "btn submit";
+    next.disabled = (done < N);
+    $("hint").textContent = (done < N) ? "Answer all " + N + " questions to submit" : "";
+  } else {
+    next.innerHTML = "Next &rarr;";
+    next.className = "btn primary";
+    next.disabled = false;
+    $("hint").textContent = "";
+  }
+}
+
+$("prev").onclick = function(){ if (cur > 0){ cur--; render(); } };
+$("next").onclick = function(){
+  if (cur < N - 1){ cur++; render(); } else { showResults(); }
+};
+
+function showResults(){
+  let score = 0;
+  QUESTIONS.forEach(function(q, i){ if (picks[i] === q.a) score++; });
+  const pct = Math.round(score / N * 100);
+  const label = pct >= 80 ? "Solid grasp of the basics"
+              : pct >= 60 ? "Good start — review the misses below"
+              : "Worth another pass through Unit I";
+
+  let html = '<div class="score">'
+    + '<div class="big">' + score + ' / ' + N + '</div>'
+    + '<div class="lbl">' + label + '</div>'
+    + '<div class="pct">' + pct + '% correct</div>'
+    + '</div>';
+
+  QUESTIONS.forEach(function(q, i){
+    const ok = (picks[i] === q.a);
+    html += '<div class="rev' + (ok ? '' : ' wrong') + '">'
+      + '<span class="tag">Q' + (i + 1) + ' &middot; ' + (ok ? 'Correct' : 'Incorrect') + '</span>'
+      + '<div class="q">' + q.q + '</div>'
+      + (q.code ? '<pre class="code">' + esc(q.code) + '</pre>' : '')
+      + (ok ? '' : '<div class="line yours"><b>Your answer:</b> <code>' + esc(q.opts[picks[i]]) + '</code></div>')
+      + '<div class="line right"><b>Correct answer:</b> <code>' + esc(q.opts[q.a]) + '</code></div>'
+      + '<div class="expl">' + q.e + '</div>'
+      + '</div>';
+  });
+
+  html += '<button class="btn primary again" id="again">Take the quiz again</button>';
+
+  $("quiz").hidden = true;
+  const r = $("results");
+  r.hidden = false;
+  r.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  $("again").onclick = function(){
+    picks.fill(null);
+    cur = 0;
+    r.hidden = true;
+    $("quiz").hidden = false;
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+}
+
+render();
+</script>
+</body>
+</html>
