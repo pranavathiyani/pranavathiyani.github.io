@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Data — 30 questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFBFC; --panel:#FFF; --ink:#10151B; --muted:#5A6672; --line:#E3E7EB;
+    --accent:#174EA6; --soft:#E8F0FE;
+    --ok:#1E7A46; --ok-soft:#E6F4EC; --no:#B3261E; --no-soft:#FBEAE8; --warn:#C2410C;
+    --disp:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:30px 20px 90px}
+  .hidden{display:none !important}
+
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 8px}
+  h1{font-family:var(--disp);font-weight:700;font-size:38px;line-height:1.12;margin:0 0 16px;letter-spacing:-.015em}
+  h2{font-family:var(--disp);font-weight:700;font-size:22px;margin:0 0 10px}
+  p.lead{color:var(--muted);max-width:66ch;font-size:17px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
+
+  button.btn{font:600 15px/1 var(--body);border-radius:10px;padding:14px 24px;cursor:pointer;
+    border:1px solid var(--accent);background:var(--accent);color:#fff}
+  button.btn.ghost{background:transparent;color:var(--accent)}
+  button.btn:disabled{opacity:.35;cursor:not-allowed}
+  button.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0 30px}
+  .fact{border:1px solid var(--line);border-radius:11px;padding:15px;background:var(--panel)}
+  .fact .v{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1}
+  .fact .k{font-size:12.5px;color:var(--muted);margin-top:5px}
+
+  /* quiz chrome */
+  .bar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .prog{flex:1;height:3px;background:var(--line);border-radius:3px;overflow:hidden}
+  .prog span{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+  .count{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+
+  .timer{position:relative;width:52px;height:52px;flex:none}
+  .timer svg{transform:rotate(-90deg)}
+  .timer circle{fill:none;stroke-width:4}
+  .timer .track{stroke:var(--line)}
+  .timer .arc{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .3s}
+  .timer.low .arc{stroke:var(--warn)}
+  .timer.crit .arc{stroke:var(--no)}
+  .timer b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);
+    font-size:14px;font-weight:700}
+  .timer.crit b{color:var(--no)}
+
+  .qtext{font-family:var(--disp);font-weight:500;font-size:24px;line-height:1.35;margin:0 0 8px}
+  .qsub{font-family:var(--mono);font-size:12.5px;color:var(--muted);background:#F4F6F8;
+    border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 18px;white-space:pre-wrap}
+  .opts{display:grid;gap:9px}
+  .opt{display:flex;gap:13px;align-items:flex-start;text-align:left;width:100%;background:var(--panel);
+    border:1px solid var(--line);border-radius:11px;padding:14px 16px;font:400 15.5px/1.45 var(--body);
+    color:var(--ink);cursor:pointer;transition:border-color .12s,background .12s}
+  .opt:hover{border-color:#B9C4CE;background:#FCFDFE}
+  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt.sel{border-color:var(--accent);background:var(--soft)}
+  .opt .ltr{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);border-radius:6px;min-width:24px;height:24px;display:grid;
+    place-items:center;flex:none;margin-top:1px}
+  .opt.sel .ltr{border-color:var(--accent);color:var(--accent)}
+
+  .foot{display:flex;align-items:center;gap:12px;margin-top:22px}
+  .spacer{flex:1}
+  .note{font-size:13px;color:var(--muted)}
+
+  /* results */
+  .score{font-family:var(--disp);font-weight:700;font-size:64px;line-height:1;margin:0}
+  .score small{font-size:22px;color:var(--muted);font-weight:500}
+  .themes{display:grid;gap:10px;margin:22px 0 6px}
+  .theme{display:flex;align-items:center;gap:14px}
+  .theme .nm{width:170px;font-size:14px;font-weight:600;flex:none}
+  .theme .tr{flex:1;height:8px;background:var(--line);border-radius:8px;overflow:hidden}
+  .theme .tr i{display:block;height:100%;background:var(--accent);border-radius:8px}
+  .theme .sc{font-family:var(--mono);font-size:12.5px;color:var(--muted);width:44px;text-align:right;flex:none}
+
+  .rev{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+  .rev.ok{border-left:3px solid var(--ok)}
+  .rev.no{border-left:3px solid var(--no)}
+  .rev .rq{font-weight:600;margin-bottom:8px}
+  .rev .ra{font-size:14px;margin:3px 0}
+  .rev .ra .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+  .rev .ex{font-size:14px;color:var(--muted);margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+  .tick{color:var(--ok);font-weight:600}
+  .cross{color:var(--no);font-weight:600}
+
+  @media(max-width:700px){
+    h1{font-size:28px}.qtext{font-size:20px}.facts{grid-template-columns:1fr}
+    .theme .nm{width:120px;font-size:13px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= START ================= -->
+<section id="start">
+  <p class="eyebrow">INT411</p>
+  <h1>Thirty questions<br>about big data</h1>
+  <p class="lead">This is just for your own understanding of big data. Nothing is recorded, nothing is graded.
+    Work them out as you go — most of them can be reasoned from what is written in the question itself.</p>
+
+  <div class="facts">
+    <div class="fact"><div class="v">30</div><div class="k">questions, one at a time</div></div>
+    <div class="fact"><div class="v">60 sec</div><div class="k">each — it moves on by itself</div></div>
+    <div class="fact"><div class="v">~30 min</div><div class="k">start to finish, then a full review</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>How it runs</h2>
+    <p style="color:var(--muted);margin:0 0 14px">
+      One question on screen at a time. The ring counts down from a minute; when it empties, the quiz
+      moves on whether or not you have chosen. You can change your answer until you move on, but you
+      cannot go back. Explanations for all thirty come at the end.</p>
+    <button class="btn" id="go">Start</button>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="quiz" class="hidden">
+  <div class="bar">
+    <div class="timer" id="timer">
+      <svg width="52" height="52"><circle class="track" cx="26" cy="26" r="22"></circle>
+        <circle class="arc" id="arc" cx="26" cy="26" r="22"></circle></svg>
+      <b id="secs">60</b>
+    </div>
+    <div class="prog"><span id="prog"></span></div>
+    <div class="count" id="count">1 / 30</div>
+  </div>
+
+  <div class="panel">
+    <h2 class="qtext" id="qtext"></h2>
+    <pre class="qsub hidden" id="qsub"></pre>
+    <div class="opts" id="opts"></div>
+    <div class="foot">
+      <span class="note" id="hint">Choose one.</span>
+      <span class="spacer"></span>
+      <button class="btn" id="next" disabled>Next</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section id="result" class="hidden">
+  <p class="eyebrow">Done</p>
+  <p class="score"><span id="sc">0</span><small>/30</small></p>
+  <p class="lead" id="scLine" style="margin-top:8px"></p>
+
+  <div class="panel" style="margin:24px 0">
+    <h2>Where you stand</h2>
+    <div class="themes" id="themes"></div>
+  </div>
+
+  <h2 style="margin:30px 0 14px">Every question, worked through</h2>
+  <div id="review"></div>
+
+  <div style="margin-top:26px">
+    <button class="btn ghost" id="again">Run it again</button>
+  </div>
+</section>
+
+</div>
+
+<script>
+const Q=[
+/* ---------- SCALE: what actually breaks ---------- */
+{t:'Scale',
+ q:'A sequencing run produces 400 million reads. Each read takes roughly 250 bytes on disk. Roughly how big is the file?',
+ o:['About 1 GB','About 10 GB','About 100 GB','About 1 TB'], a:2,
+ e:'400,000,000 × 250 bytes = 100,000,000,000 bytes = 100 GB. Getting comfortable multiplying record count by record size is how you predict, before you start, whether a job will fit.'},
+
+{t:'Scale',
+ q:'Your laptop has 16 GB of RAM. Which of these will fail first?',
+ o:['Sorting a 2 GB spreadsheet in memory','Loading a 40 GB alignment file entirely into memory','Reading a 500 GB file line by line and counting the lines','Storing a 100 GB file on a 1 TB disk'], a:1,
+ e:'Only one of these needs everything held at once, and 40 GB will not fit in 16 GB. Reading line by line never holds more than one line, so file size is irrelevant. Disk is not RAM — 100 GB sits happily on a 1 TB disk.'},
+
+{t:'Scale',
+ q:'Which of these can NOT be done by reading a file one line at a time, keeping almost nothing in memory?',
+ o:['Count how many reads there are','Find the longest read','Compute the average read quality','Find every read that appears twice anywhere in the file'], a:3,
+ e:'Counting, finding a maximum and averaging each need only a running total — a few numbers. Finding duplicates means you must remember every read you have already seen, so memory grows with the file. This distinction — can I stream it, or must I hold it? — is the practical dividing line.'},
+
+{t:'Scale',
+ q:'A sequencer produces about 6 TB per run, and your lab does 3 runs a week. Roughly how much data will you accumulate in a year?',
+ o:['About 90 TB','About 300 TB','About 1 PB','About 10 PB'], a:2,
+ e:'6 TB × 3 × 52 ≈ 940 TB, which is roughly a petabyte. The point is not the exact number — it is that a mid-sized lab crosses the petabyte line in a year without doing anything unusual.'},
+
+{t:'Scale',
+ q:'You must send 100 TB of data to a collaborator over a 1 Gbit/s internet link. Roughly how long, at full speed?',
+ o:['About 2 hours','About 1 day','About 9 days','About 3 months'], a:2,
+ e:'1 Gbit/s is about 125 MB per second. 100 TB ÷ 125 MB/s ≈ 800,000 seconds ≈ 9 days — and that assumes you get the full line rate, which you never do.'},
+
+{t:'Scale',
+ q:'Given that, what is the fastest way to actually get those 100 TB to your collaborator?',
+ o:['Compress it and email it','Physically ship a box of hard disks','Buy a faster laptop','Re-sequence the samples at their site'], a:1,
+ e:'Shipping disks by courier genuinely beats the internet at this scale — the bandwidth of a van full of drives is enormous. Cloud providers sell exactly this service. Compression buys you a factor of two or three; it does not turn 9 days into 2 hours.'},
+
+{t:'Scale',
+ q:'Sequencing has become cheaper faster than computers have become more powerful. What follows from that?',
+ o:['The gap between data produced and data analysed keeps widening','Storage will automatically keep up','Analysis will get easier every year on its own','Sequencing will soon stop improving'], a:0,
+ e:'Two curves are moving, and the data one is moving faster. That is why the problem gets worse each year rather than better, and it is the reason this course exists.'},
+
+{t:'Scale',
+ q:'A 900 GB dataset must be analysed with a tool that needs about three times the data size in memory. Your lab server has 1 TB of RAM. What is true?',
+ o:['It fits — 900 GB is less than 1 TB','It does not fit — the tool needs roughly 2.7 TB','It fits if you compress the file first','RAM is irrelevant; only disk size matters'], a:1,
+ e:'The file size is not the requirement — the tool\'s working memory is. 900 GB × 3 ≈ 2.7 TB, well past 1 TB. Compression shrinks the file on disk, not the expanded data the tool holds while running.'},
+
+/* ---------- WHAT MAKES DATA "BIG" ---------- */
+{t:'What makes data big',
+ q:'Which is the best working definition of "big data"?',
+ o:['Any dataset larger than one terabyte','Data that breaks the tools you normally use','Data that is stored in the cloud','Data that comes from many different sources'], a:1,
+ e:'There is no magic threshold. "Big" is relative to your machine and your method — the same file can be an impossible problem in one lab and an ordinary afternoon in another.'},
+
+{t:'What makes data big',
+ q:'A 500 GB file sits on a lab server with 1 TB of RAM, and your usual script finishes in 20 minutes. Is this big data?',
+ o:['Yes — 500 GB is a lot of data','No — your normal tools still cope with it','Only if it is genomic data','Yes, because it will not fit on a laptop'], a:1,
+ e:'It sounds enormous, and it is irrelevant. Nothing has broken. It becomes big data on the day it stops fitting, or the day the job stops finishing in the time you have.'},
+
+{t:'What makes data big',
+ q:'Which of these would make an ordinary-sized dataset genuinely hard to work with?',
+ o:['It is stored as a text file','It arrives faster than you can process it','It has more than a hundred columns','It was produced last year'], a:1,
+ e:'Difficulty is not only about size. If new data lands faster than you clear the backlog, you never catch up — the queue grows forever regardless of how small each file is.'},
+
+{t:'What makes data big',
+ q:'Which is NOT one of the four Vs?',
+ o:['Volume','Velocity','Visualisation','Veracity'], a:2,
+ e:'Volume, velocity, variety and veracity. Visualisation is something you do with data, not a property that makes it hard to handle.'},
+
+{t:'The four Vs',
+ q:'"The sequencer runs overnight, every night. We have never finished analysing yesterday\'s data before today\'s lands." Which V is this?',
+ o:['Volume','Velocity','Variety','Veracity'], a:1,
+ e:'Velocity is the rate of arrival. The total size might be manageable — the problem is that it will not stop coming, and the backlog compounds.'},
+
+{t:'The four Vs',
+ q:'"Our study has sequencing reads, alignments, variant tables, clinical notes and MRI scans." Which V is this?',
+ o:['Volume','Velocity','Variety','Veracity'], a:2,
+ e:'Variety is the number of different shapes the data comes in. Each of these needs a different tool, and the hard work is getting them to speak to each other.'},
+
+{t:'The four Vs',
+ q:'"About 20% of our samples have missing, duplicated or mislabelled metadata." Which V is this?',
+ o:['Volume','Velocity','Variety','Veracity'], a:3,
+ e:'Veracity is how much you can trust what you have. It is the quietest of the four and by far the most dangerous, because nothing crashes — you simply get a confident, wrong answer.'},
+
+{t:'The four Vs',
+ q:'An ICU streams vital signs every second from 200 beds. Which V dominates here?',
+ o:['Volume — it adds up over a year','Velocity — it is continuous and must be handled as it arrives','Variety — vitals come in several forms','Veracity — sensors are occasionally wrong'], a:1,
+ e:'All four are present, but the defining difficulty is that the data never stops and decisions must be made while it is still arriving. A batch job that runs tonight is no use to a patient deteriorating now.'},
+
+{t:'The four Vs',
+ q:'A batch effect contaminates your samples, and you run the analysis across 500 machines instead of one. What happens to the error?',
+ o:['It gets averaged out across the machines','It is corrected automatically by the extra computation','It propagates into every result, just faster','It becomes negligible at large scale'], a:2,
+ e:'Scale amplifies errors — it does not fix them. A wrong answer computed quickly across a thousand machines is still a wrong answer. This is why veracity matters more to a biologist than raw speed ever will.'},
+
+{t:'The four Vs',
+ q:'Which situation should worry you MOST in a clinical study?',
+ o:['The dataset is 40 TB','New data arrives every hour','The data comes from six different file formats','Nobody is certain which samples came from which patients'], a:3,
+ e:'The first three are engineering problems with known solutions. The fourth means every result you produce is untrustworthy, and no amount of compute will save you. Size is a cost; veracity is a threat.'},
+
+/* ---------- SHAPES OF DATA ---------- */
+{t:'Shapes of data',
+ q:'A FASTQ file has a strict four-line record per read, but no columns, no schema and no enforced types. What kind of data is it?',
+ o:['Structured','Semi-structured','Unstructured','It is not data'], a:1,
+ e:'It describes itself — you always know what each line means — but there is no table and no schema to validate against. That middle ground is what semi-structured means.'},
+
+{t:'Shapes of data',
+ q:'Which of these is genuinely unstructured?',
+ o:['A VCF table of variants','A spreadsheet of lab results','A pathologist\'s free-text report','A JSON file of sample metadata'], a:2,
+ e:'Free text has no format at all — no fields, no rows, nothing to query directly. You must extract structure from it before a computer can do much. JSON is semi-structured; the first two are structured.'},
+
+{t:'Shapes of data',
+ q:'Two labs send you sample sheets as JSON. One includes a "tissue" field; the other does not. What does this tell you?',
+ o:['One of the files is corrupted','JSON cannot store tissue information','This is normal for semi-structured data — records may differ','You must convert both to images'], a:2,
+ e:'Semi-structured formats allow records to carry different fields. That flexibility is exactly why they are used — and exactly why you cannot assume a field exists before you check.'},
+
+{t:'Shapes of data',
+ q:'Which will be hardest to answer without preprocessing: "how many patients had a fever?"',
+ o:['From a table with a temperature column','From a JSON record with a temperature field','From ten thousand free-text discharge summaries','From a spreadsheet of vitals'], a:2,
+ e:'The information exists in all four, but only the free text requires you to first work out how a human wrote it down — "febrile", "temp 38.9", "ran a fever overnight". Extracting structure is the whole job.'},
+
+/* ---------- BOTTLENECKS AND JUDGMENT ---------- */
+{t:'Bottlenecks',
+ q:'A job is running slowly. You check: the CPU is 5% busy, and the disk is 100% busy the whole time. What will help?',
+ o:['A faster processor','More processor cores','A faster disk, or reading less data','A newer programming language'], a:2,
+ e:'The CPU is idle — it is waiting. Adding more of the thing that is already idle changes nothing. Finding which resource is saturated, before you spend money, is the single most useful habit in this field.'},
+
+{t:'Bottlenecks',
+ q:'What most reduces the time needed to read a 500 GB file from start to finish?',
+ o:['A faster CPU','More RAM','A faster disk','A better sorting algorithm'], a:2,
+ e:'If all you are doing is reading, the disk sets the pace. This is what "I/O bound" means — and most large-scale data work is I/O bound, not compute bound, which surprises people coming from programming courses.'},
+
+{t:'Bottlenecks',
+ q:'You need to know whether ANY read in a 500 GB file contains a particular 20-letter sequence. What do you need?',
+ o:['Enough RAM to hold all 500 GB','A cluster of machines','Nothing special — read it through and stop when you find it','To load it into a database first'], a:2,
+ e:'You never need more than one read in memory at a time, and you can stop the moment you find a match. Recognising when a problem is streamable saves you from building infrastructure you did not need.'},
+
+{t:'Bottlenecks',
+ q:'When is a large cluster the WRONG choice?',
+ o:['When one machine can finish the job in the time you have','When the data is genomic','When the dataset is over 1 TB','When the job takes more than an hour'], a:0,
+ e:'A cluster adds coordination, network traffic, failure handling and complexity. If a single machine finishes in time, it is faster, simpler and cheaper. Distributed computing is a last resort, not a badge of honour.'},
+
+{t:'Bottlenecks',
+ q:'Your data fits on disk but not in memory. What is the cheapest practical fix?',
+ o:['Buy a machine with more RAM than the data','Process the file in chunks, keeping only summaries in memory','Delete part of the dataset','Convert it to a different file format'], a:1,
+ e:'Most useful computations — counts, totals, maxima, filters — never need the whole dataset at once. Restructuring the computation is almost always cheaper than restructuring the hardware.'},
+
+/* ---------- AI IN BIOLOGY ---------- */
+{t:'AI in biology',
+ q:'A chatbot confidently gives you a PDB accession number for a protein you asked about. What should you do?',
+ o:['Use it — the model was confident','Check it against the actual database before using it','Ask the model again and take the majority answer','Assume it is right if it is formatted correctly'], a:1,
+ e:'Language models generate text that looks right, and identifiers are exactly the kind of thing they fabricate convincingly. Confidence is not evidence. A correctly formatted accession that does not exist is worse than no answer, because it will pass a glance.'},
+
+{t:'AI in biology',
+ q:'A structure prediction comes back with very low confidence scores across one region of a protein. What is the most reasonable reading?',
+ o:['The prediction is broken and should be discarded','That region may be genuinely disordered, or the model has little to go on','The protein does not exist','Confidence scores can be ignored'], a:1,
+ e:'Low confidence is information, not failure. Intrinsically disordered regions genuinely have no single structure — the model is telling you something true about the biology, as well as about its own uncertainty.'},
+
+{t:'AI in biology',
+ q:'You ask a model to summarise 200 papers you have not read. What is the main risk?',
+ o:['It will take too long','It may invent citations or misattribute findings, and you will not notice','It cannot read English','Papers cannot be summarised'], a:1,
+ e:'The danger is not that the summary is obviously wrong — it is that it is plausible, fluent, and wrong in a way you cannot detect precisely because you have not read the papers. The tool is most dangerous exactly where you are least able to check it.'},
+
+{t:'AI in biology',
+ q:'A model trained almost entirely on human genomic data is applied to a plant genome. What is the concern?',
+ o:['Plants have no genomes','The model has not seen data like this, so its performance is unknown','It will simply run more slowly','The file format will be incompatible'], a:1,
+ e:'A model is only reliable on data resembling what it was trained on. Outside that range it does not announce its ignorance — it keeps producing confident output. Asking "what was this trained on?" is a data question, and it decides whether the answer means anything.'},
+
+{t:'AI in biology',
+ q:'A model predicts disease risk with 99% accuracy on the data it was trained on. What does that tell you about new patients?',
+ o:['It will be 99% accurate on them too','Almost nothing — it must be tested on data it has never seen','It is ready for clinical use','Accuracy on training data is the only measure that matters'], a:1,
+ e:'A model can score perfectly by memorising its training data and still be useless on anyone new. Only performance on held-out, unseen data means anything — and in a clinical setting, on patients from a different hospital entirely.'}
+];
+
+const $=id=>document.getElementById(id);
+const LIMIT=60, R=22, CIRC=2*Math.PI*R;
+let i=0, picked=null, answers=new Array(Q.length).fill(null), tick=null, left=LIMIT;
+
+$('arc').style.strokeDasharray=CIRC;
+
+function startTimer(){
+  clearInterval(tick); left=LIMIT; paint();
+  tick=setInterval(()=>{ left--; paint(); if(left<=0){ clearInterval(tick); advance(); } },1000);
+}
+function paint(){
+  $('secs').textContent=left;
+  $('arc').style.strokeDashoffset=CIRC*(1-left/LIMIT);
+  const t=$('timer');
+  t.classList.toggle('low',left<=20&&left>10);
+  t.classList.toggle('crit',left<=10);
+}
+function render(){
+  picked=null;
+  $('count').textContent=`${i+1} / ${Q.length}`;
+  $('prog').style.width=(i/Q.length*100)+'%';
+  $('qtext').textContent=Q[i].q;
+  $('qsub').classList.add('hidden');
+  $('next').disabled=true;
+  $('next').textContent = i===Q.length-1 ? 'Finish' : 'Next';
+  $('hint').textContent='Choose one.';
+  const box=$('opts'); box.innerHTML='';
+  Q[i].o.forEach((t,n)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML=`<span class="ltr">${'ABCD'[n]}</span><span>${t}</span>`;
+    b.onclick=()=>{
+      picked=n;
+      [...box.children].forEach((c,m)=>c.classList.toggle('sel',m===n));
+      $('next').disabled=false;
+      $('hint').textContent='You can still change it.';
+    };
+    box.appendChild(b);
+  });
+  startTimer();
+}
+function advance(){
+  answers[i]=picked;
+  i++;
+  if(i>=Q.length){ finish(); return; }
+  render();
+}
+$('next').onclick=()=>{ clearInterval(tick); advance(); };
+$('go').onclick=()=>{ $('start').classList.add('hidden'); $('quiz').classList.remove('hidden'); i=0; answers.fill(null); render(); };
+$('again').onclick=()=>{ $('result').classList.add('hidden'); $('quiz').classList.remove('hidden'); i=0; answers.fill(null); render(); };
+
+function finish(){
+  clearInterval(tick);
+  $('quiz').classList.add('hidden');
+  $('result').classList.remove('hidden');
+  window.scrollTo({top:0});
+
+  let score=0; const th={};
+  Q.forEach((q,n)=>{
+    const ok = answers[n]===q.a;
+    if(ok) score++;
+    if(!th[q.t]) th[q.t]={c:0,t:0};
+    th[q.t].t++; if(ok) th[q.t].c++;
+  });
+  $('sc').textContent=score;
+  $('scLine').textContent =
+    score>=24 ? 'You already reason about data the way this course wants you to. Unit I will be about why these things are true, and what they cost.'
+    : score>=15 ? 'A solid instinct for the numbers, with gaps worth naming. The breakdown below shows where.'
+    : 'A good place to be starting from — none of this is meant to be obvious yet, and the explanations below are the actual lesson.';
+
+  const tw=$('themes'); tw.innerHTML='';
+  Object.entries(th).forEach(([nm,v])=>{
+    const d=document.createElement('div'); d.className='theme';
+    d.innerHTML=`<div class="nm">${nm}</div><div class="tr"><i style="width:${v.c/v.t*100}%"></i></div>
+      <div class="sc">${v.c}/${v.t}</div>`;
+    tw.appendChild(d);
+  });
+
+  const rv=$('review'); rv.innerHTML='';
+  Q.forEach((q,n)=>{
+    const ok = answers[n]===q.a;
+    const yours = answers[n]===null ? '<span class="cross">ran out of time</span>' : q.o[answers[n]];
+    const d=document.createElement('div');
+    d.className='rev '+(ok?'ok':'no');
+    d.innerHTML=`<div class="rq">${n+1}. ${q.q}</div>
+      <div class="ra"><span class="k">You</span>${ok?'<span class="tick">✓ </span>':''}${yours}</div>
+      ${ok?'':`<div class="ra"><span class="k">Answer</span><span class="tick">${q.o[q.a]}</span></div>`}
+      <div class="ex">${q.e}</div>`;
+    rv.appendChild(d);
+  });
+}
+</script>
+</body>
+</html>
