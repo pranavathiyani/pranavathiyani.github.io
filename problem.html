@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INT411 . In-class problems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFBFC; --panel:#FFF; --ink:#131820; --muted:#5B6672; --line:#E4E8EC;
+    --accent:#174EA6; --soft:#E8F0FE; --warn:#B45309; --warn-soft:#FEF3E2;
+    --disp:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:28px 20px 60px}
+  .noselect{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:6px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  h1{font-family:var(--disp);font-weight:700;font-size:29px;line-height:1.15;margin:0 0 6px}
+  .sub{color:var(--muted);margin:0}
+
+  .gate{background:var(--warn-soft);border:1px solid #F3D9AE;border-radius:12px;padding:16px 18px;margin:22px 0}
+  .gate b{color:var(--warn)}
+  .gate .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px}
+  .gate .f{flex:1;min-width:170px}
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.06em;margin-bottom:5px}
+  input{width:100%;font:400 15px/1.5 var(--body);color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+  input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  .btn{font:600 15px/1 var(--body);background:var(--accent);color:#fff;border:0;border-radius:10px;
+    padding:12px 20px;cursor:pointer}
+  .btn:hover{background:#123f85}
+
+  #locked{color:var(--muted);text-align:center;padding:40px 20px;font-size:15px}
+  #sheet{display:none}
+
+  .yours{background:var(--soft);border-radius:12px;padding:14px 18px;margin:18px 0;font-size:15px}
+  .yours .big{font-family:var(--disp);font-weight:700;font-size:19px;color:var(--accent)}
+
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin:16px 0}
+  .tagline{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .qn{font-family:var(--disp);font-weight:700;font-size:14px;color:#fff;background:var(--accent);
+    border-radius:7px;padding:5px 11px}
+  .mins{font-size:12px;color:var(--muted)}
+  .qtitle{font-family:var(--disp);font-weight:500;font-size:19px;margin:0 0 10px}
+  .story{font-size:15.5px;margin:0 0 12px}
+  .hl{background:#FFF4CE;padding:1px 5px;border-radius:4px;font-weight:600}
+  .ask{font-weight:600;margin:14px 0 4px}
+
+  .submit-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:26px 22px;margin:22px 0 0;text-align:center}
+  .submit-card h3{font-family:var(--disp);font-size:18px;margin:0 0 6px}
+  .submit-card p{color:var(--muted);font-size:14.5px;margin:0 0 16px}
+  .gobtn{display:inline-block;font:600 16px/1 var(--body);background:var(--accent);color:#fff;
+    text-decoration:none;border-radius:11px;padding:15px 30px}
+  .gobtn:hover{background:#123f85}
+
+  @media(max-width:600px){h1{font-size:23px}.qtitle{font-size:17px}}
+</style>
+</head>
+<body oncontextmenu="return false">
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">INT411 . Big Data Analytics</p>
+  <h1 class="noselect">In-class problems</h1>
+  <p class="sub noselect">Your numbers are your own. Reason it out and show your steps.</p>
+</header>
+
+<div class="gate noselect">
+  <b>To begin, enter two things:</b>
+  <div class="row">
+    <div class="f"><label>Your register number</label><input id="reg" placeholder="e.g. 12521 4067 0231" inputmode="numeric"></div>
+    <div class="f"><label>Code (from the board)</label><input id="code" placeholder="4-digit code" inputmode="numeric"></div>
+    <button class="btn" onclick="unlock()">Unlock my problems</button>
+  </div>
+  <p style="margin:10px 0 0;font-size:13px;color:var(--warn)">The code is on the board. Your problems use your own numbers, so a copied answer will be wrong.</p>
+</div>
+
+<div id="locked" class="noselect">Enter your register number and the board code above to reveal your problems.</div>
+
+<div id="sheet">
+
+  <div class="yours noselect">
+    Your personal numbers for today:<br>
+    <span class="big" id="derived"></span>
+  </div>
+
+  <div class="q">
+    <div class="tagline noselect"><span class="qn">Q1</span><span class="mins">the empty seat</span></div>
+    <p class="story noselect">A cinema has <span class="hl" id="seats">100</span> seats, numbered 1 up to that number.
+      Every seat is sold except one. People walk in one at a time and show their ticket number.
+      You cannot write them all down, so you keep only <b>one running total</b> in your head.</p>
+    <p class="story noselect">If everyone had come, the ticket numbers would add up to <b><span id="fullsum">5050</span></b>.
+      But one person never showed. Your running total stopped at <b><span id="gottotal">4909</span></b>.</p>
+    <p class="ask noselect">Which seat is empty? Show the subtraction, and explain in one line how you found it
+      without remembering every ticket.</p>
+  </div>
+
+  <div class="q">
+    <div class="tagline noselect"><span class="qn">Q2</span><span class="mins">stuck at the finish</span></div>
+    <p class="story noselect"><span class="hl" id="friends">10</span> friends split a huge stack of papers to grade,
+      one pile each. They all grade at exactly the same speed. Most finish in ten minutes.
+      One is <b>still grading an hour later</b>. Nobody is slow, nobody made a mistake.</p>
+    <p class="ask noselect">What must have happened to that one pile? Give one simple way to prevent it,
+      and say in your own words why just adding <b>more friends</b> would not fix it.</p>
+  </div>
+
+  <div class="submit-card">
+    <h3>Done? Submit your answers</h3>
+    <p>Open the Google Form and enter your register number, your cinema seat count, and both answers.</p>
+    <a class="gobtn" id="gobtn" href="#" target="_blank" rel="noopener">Open the submission form</a>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ====== EDIT THESE TWO LINES ONLY ====== */
+var BOARD_CODE = "1223";
+var FORM_URL   = "https://forms.gle/3jT3U6Aqi1txqxYq5";
+/* ======================================= */
+
+document.addEventListener('copy',function(e){
+  var tag=(e.target.tagName||'').toLowerCase();
+  if(tag!=='textarea'&&tag!=='input') e.preventDefault();
+});
+function digits(s){ return (s.match(/\d/g)||[]).map(Number); }
+
+function unlock(){
+  var reg=document.getElementById('reg').value.trim();
+  var code=document.getElementById('code').value.trim();
+  var d=digits(reg);
+  if(d.length<4){ alert('Please type your full register number (at least 4 digits).'); return; }
+  if(code!==BOARD_CODE){ alert('That code does not match the board. Check the board and try again.'); return; }
+
+  var last2=d[d.length-2]*10+d[d.length-1];
+  var sumd=d.reduce(function(a,b){return a+b;},0);
+  var cnum=parseInt(code,10);
+
+  var seats=90+(last2%11);
+  var fullsum=seats*(seats+1)/2;
+  var missing=1+((cnum+sumd)%seats);
+  var gottotal=fullsum-missing;
+  var friends=8+(sumd%8);
+
+  document.getElementById('seats').textContent=seats;
+  document.getElementById('fullsum').textContent=fullsum;
+  document.getElementById('gottotal').textContent=gottotal;
+  document.getElementById('friends').textContent=friends;
+  document.getElementById('derived').textContent='cinema '+seats+' seats  .  '+friends+' friends';
+  document.getElementById('gobtn').href=FORM_URL;
+
+  document.querySelector('.gate').style.display='none';
+  document.getElementById('locked').style.display='none';
+  document.getElementById('sheet').style.display='block';
+  window.scrollTo({top:0});
+}
+</script>
+</body>
+</html>
