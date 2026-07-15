@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bioinformatics — Unit I Quiz</title>
+<style>
+  :root{
+    --ink:#0B3B3C; --teal:#0E7C7B; --seafoam:#5EEAD4; --mint:#F0FAF8;
+    --coral:#E9724C; --amber:#E8A33A; --text:#12312F; --muted:#5B7373;
+    --line:#D9EAE7; --good:#0E9F6E; --bad:#DC4A2B; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#0B3B3C 0%,#0E5654 45%,#0E7C7B 100%);
+    color:var(--text);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px; min-height:100dvh;
+  }
+  .wrap{width:100%; max-width:640px;}
+  .card{
+    background:var(--card); border-radius:20px; padding:28px 26px 26px;
+    box-shadow:0 18px 50px rgba(0,0,0,.28); position:relative; overflow:hidden;
+  }
+
+  /* ---------- start screen ---------- */
+  #start{text-align:center; padding:20px 6px 10px;}
+  .dna{font-family:"Courier New",monospace; letter-spacing:2px; color:#Bfeee7; opacity:.5; font-size:13px; margin-bottom:18px;}
+  #start h1{font-size:30px; color:var(--ink); line-height:1.15; margin-bottom:10px;}
+  #start .sub{color:var(--teal); font-weight:700; font-size:15px; letter-spacing:.4px; margin-bottom:6px;}
+  #start .meta{color:var(--muted); font-size:14px; margin-bottom:26px;}
+  .btn{
+    background:var(--teal); color:#fff; border:none; border-radius:12px;
+    padding:15px 34px; font-size:17px; font-weight:700; cursor:pointer;
+    transition:transform .08s ease, background .15s ease; box-shadow:0 6px 16px rgba(14,124,123,.35);
+  }
+  .btn:hover{background:#0c6b6a;}
+  .btn:active{transform:translateY(1px);}
+  .hint{margin-top:18px; color:var(--muted); font-size:12.5px;}
+
+  /* ---------- quiz screen ---------- */
+  #quiz{display:none;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:13.5px;}
+  .qcount{color:var(--muted); font-weight:600;}
+  .score{color:var(--teal); font-weight:800;}
+  .timerwrap{height:10px; background:#EAF3F1; border-radius:10px; overflow:hidden; margin-bottom:4px;}
+  #timerbar{height:100%; width:100%; background:var(--teal); border-radius:10px; transition:width .25s linear;}
+  #tlabel{text-align:right; font-size:12px; color:var(--muted); font-weight:700; margin-bottom:18px; height:15px;}
+  .qtext{font-size:20px; font-weight:700; color:var(--ink); line-height:1.35; margin-bottom:20px; min-height:56px;}
+  .opts{display:flex; flex-direction:column; gap:11px;}
+  .opt{
+    text-align:left; background:var(--mint); border:2px solid #E1F1EE; color:var(--text);
+    border-radius:12px; padding:14px 16px; font-size:16px; cursor:pointer;
+    display:flex; align-items:center; gap:12px; transition:border-color .12s, background .12s;
+  }
+  .opt:hover:not(.locked){border-color:var(--seafoam);}
+  .opt .key{
+    flex:0 0 26px; height:26px; border-radius:7px; background:#fff; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--teal);
+  }
+  .opt.locked{cursor:default;}
+  .opt.correct{background:#E4F7EF; border-color:var(--good);}
+  .opt.correct .key{background:var(--good); color:#fff; border-color:var(--good);}
+  .opt.wrong{background:#FCEBE6; border-color:var(--bad);}
+  .opt.wrong .key{background:var(--bad); color:#fff; border-color:var(--bad);}
+  .feedback{margin-top:16px; min-height:22px; font-weight:700; font-size:15px;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+  .nextrow{margin-top:16px; text-align:right; min-height:48px;}
+  #nextbtn{display:none;}
+
+  /* ---------- end screen ---------- */
+  #end{display:none; text-align:center; padding:14px 6px;}
+  #end .em{font-size:46px; margin-bottom:6px;}
+  #end h2{color:var(--ink); font-size:26px; margin-bottom:8px;}
+  .bigscore{font-size:52px; font-weight:800; color:var(--teal); line-height:1; margin:10px 0 4px;}
+  .bigscore span{font-size:24px; color:var(--muted); font-weight:700;}
+  #end .msg{color:var(--muted); font-size:16px; margin:10px 0 24px;}
+
+  @media(max-width:480px){
+    .card{padding:22px 18px;}
+    #start h1{font-size:25px;}
+    .qtext{font-size:18px;}
+    .opt{font-size:15px; padding:12px 13px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <!-- START -->
+    <div id="start">
+      <div class="dna">ATG&nbsp;GCT&nbsp;AAG&nbsp;CTT&nbsp;AGC&nbsp;TAA</div>
+      <div class="sub">DNA · RNA · PROTEIN · DATABASES</div>
+      <h1>Bioinformatics<br>Unit&nbsp;I Quick Quiz</h1>
+      <div class="meta">30 questions &nbsp;·&nbsp; 60 seconds each</div>
+      <button class="btn" id="startbtn">Start&nbsp;&nbsp;▶</button>
+      <div class="hint">Tip: press keys 1–4 to answer, Enter for next</div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz">
+      <div class="topbar">
+        <span class="qcount">Question <b id="qnum">1</b> / 30</span>
+        <span class="score">Score: <span id="scoreval">0</span></span>
+      </div>
+      <div class="timerwrap"><div id="timerbar"></div></div>
+      <div id="tlabel">60s</div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="nextrow"><button class="btn" id="nextbtn">Next&nbsp;→</button></div>
+    </div>
+
+    <!-- END -->
+    <div id="end">
+      <div class="em" id="endem">🎉</div>
+      <h2 id="endtitle">Done!</h2>
+      <div class="bigscore"><span id="finalscore">0</span><span>/30</span></div>
+      <div class="msg" id="endmsg"></div>
+      <button class="btn" id="againbtn">Try Again ↻</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {q:"What does DNA stand for?", a:"Deoxyribonucleic acid", o:["Deoxyribonucleic acid","Dinucleic acid","Double nucleic acid","Deoxyribose acid"]},
+  {q:"What does RNA stand for?", a:"Ribonucleic acid", o:["Ribonucleic acid","Ribonuclear acid","Ribose amino acid","Reduced nucleic acid"]},
+  {q:"Which base is found in RNA but NOT in DNA?", a:"Uracil", o:["Uracil","Thymine","Guanine","Adenine"]},
+  {q:"Which base is found in DNA but NOT in RNA?", a:"Thymine", o:["Thymine","Uracil","Cytosine","Adenine"]},
+  {q:"In DNA, adenine (A) pairs with…", a:"Thymine", o:["Thymine","Guanine","Cytosine","Uracil"]},
+  {q:"In DNA, guanine (G) pairs with…", a:"Cytosine", o:["Cytosine","Adenine","Thymine","Uracil"]},
+  {q:"How many kinds of bases are there in DNA?", a:"4", o:["4","2","20","64"]},
+  {q:"The building blocks of proteins are…", a:"Amino acids", o:["Amino acids","Nucleotides","Sugars","Fatty acids"]},
+  {q:"How many standard amino acids are there?", a:"20", o:["20","4","64","24"]},
+  {q:"How many bases make up one codon?", a:"3", o:["3","1","2","4"]},
+  {q:"Which is the standard start codon?", a:"ATG", o:["ATG","TAA","GGG","CCC"]},
+  {q:"Which of these is a stop codon?", a:"TAA", o:["TAA","ATG","AAA","GGC"]},
+  {q:"The process DNA → RNA is called…", a:"Transcription", o:["Transcription","Translation","Replication","Mutation"]},
+  {q:"The process RNA → protein is called…", a:"Translation", o:["Translation","Transcription","Replication","Splicing"]},
+  {q:"The flow DNA → RNA → protein is known as the…", a:"Central dogma", o:["Central dogma","Genetic code","Gene map","Codon table"]},
+  {q:"DNA is usually…", a:"Double-stranded", o:["Double-stranded","Single-stranded","Triple-stranded","Not stranded"]},
+  {q:"RNA is usually…", a:"Single-stranded", o:["Single-stranded","Double-stranded","Triple-stranded","Circular"]},
+  {q:"The sugar present in DNA is…", a:"Deoxyribose", o:["Deoxyribose","Ribose","Glucose","Fructose"]},
+  {q:"The sugar present in RNA is…", a:"Ribose", o:["Ribose","Deoxyribose","Sucrose","Lactose"]},
+  {q:"A chain of amino acids makes a…", a:"Protein", o:["Protein","Gene","Chromosome","Codon"]},
+  {q:"GenBank is the nucleotide database maintained by…", a:"NCBI", o:["NCBI","EMBL","DDBJ","PDB"]},
+  {q:"NCBI is located in which country?", a:"USA", o:["USA","Japan","Germany","India"]},
+  {q:"DDBJ is located in which country?", a:"Japan", o:["Japan","USA","UK","France"]},
+  {q:"DDBJ stands for DNA Data Bank of…", a:"Japan", o:["Japan","Britain","Berlin","Jinan"]},
+  {q:"Which is the European nucleotide database?", a:"EMBL-ENA", o:["EMBL-ENA","GenBank","DDBJ","PDB"]},
+  {q:"NCBI, EMBL and DDBJ together form the collaboration called…", a:"INSDC", o:["INSDC","BLAST","FASTA","UniProt"]},
+  {q:'The simple text format for sequences that starts with ">" is…', a:"FASTA", o:["FASTA","PDF","CSV","XML"]},
+  {q:"In a FASTA file, the header line begins with which symbol?", a:">", o:[">","#","@","*"]},
+  {q:"A unique identifier for a sequence record in a database is called an…", a:"Accession number", o:["Accession number","Password","Codon","Barcode"]},
+  {q:"Which database mainly stores 3-D protein structures?", a:"PDB", o:["PDB","GenBank","DDBJ","EMBL"]},
+];
+
+const TIME = 60;              // seconds per question
+const KEYS = ["A","B","C","D"];
+let idx=0, score=0, answered=false, tick=null, timeLeft=TIME, current=null;
+
+const $ = id => document.getElementById(id);
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function startQuiz(){
+  idx=0; score=0;
+  $("scoreval").textContent="0";
+  $("start").style.display="none";
+  $("end").style.display="none";
+  $("quiz").style.display="block";
+  render();
+}
+
+function render(){
+  answered=false;
+  current = QUESTIONS[idx];
+  $("qnum").textContent = idx+1;
+  $("qtext").textContent = current.q;
+  $("feedback").textContent=""; $("feedback").className="feedback";
+  $("nextbtn").style.display="none";
+
+  const opts = $("opts"); opts.innerHTML="";
+  const shown = shuffle(current.o);
+  shown.forEach((text,i)=>{
+    const b=document.createElement("button");
+    b.className="opt";
+    b.innerHTML=`<span class="key">${KEYS[i]}</span><span>${text}</span>`;
+    b.onclick=()=>choose(text,b);
+    opts.appendChild(b);
+  });
+
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(tick);
+  timeLeft=TIME;
+  $("timerbar").style.transition="none";
+  $("timerbar").style.width="100%";
+  $("timerbar").style.background="var(--teal)";
+  $("tlabel").textContent=TIME+"s";
+  // force reflow so the reset width applies before transition resumes
+  void $("timerbar").offsetWidth;
+  $("timerbar").style.transition="width .25s linear";
+
+  tick=setInterval(()=>{
+    timeLeft--;
+    $("tlabel").textContent=Math.max(timeLeft,0)+"s";
+    $("timerbar").style.width=(timeLeft/TIME*100)+"%";
+    if(timeLeft<=20 && timeLeft>10) $("timerbar").style.background="var(--amber)";
+    if(timeLeft<=10) $("timerbar").style.background="var(--coral)";
+    if(timeLeft<=0) timeUp();
+  },1000);
+}
+
+function lockAll(){
+  document.querySelectorAll(".opt").forEach(b=>{
+    b.classList.add("locked");
+    const label=b.querySelector("span:last-child").textContent;
+    if(label===current.a) b.classList.add("correct");
+  });
+}
+
+function choose(text,btn){
+  if(answered) return;
+  answered=true;
+  clearInterval(tick);
+  lockAll();
+  if(text===current.a){
+    score++; $("scoreval").textContent=score;
+    $("feedback").textContent="✓ Correct!";
+    $("feedback").className="feedback ok";
+  }else{
+    btn.classList.add("wrong");
+    $("feedback").textContent="✗ Answer: "+current.a;
+    $("feedback").className="feedback no";
+  }
+  showNext();
+}
+
+function timeUp(){
+  if(answered) return;
+  answered=true;
+  clearInterval(tick);
+  lockAll();
+  $("timerbar").style.width="0%";
+  $("tlabel").textContent="0s";
+  $("feedback").textContent="⏰ Time up — answer: "+current.a;
+  $("feedback").className="feedback no";
+  showNext(true);
+}
+
+function showNext(auto){
+  const nb=$("nextbtn");
+  nb.style.display="inline-block";
+  nb.textContent = (idx===QUESTIONS.length-1) ? "See Score →" : "Next →";
+  if(auto){ setTimeout(()=>{ if(answered) next(); }, 1600); }
+}
+
+function next(){
+  if(idx<QUESTIONS.length-1){ idx++; render(); }
+  else showEnd();
+}
+
+function showEnd(){
+  clearInterval(tick);
+  $("quiz").style.display="none";
+  $("end").style.display="block";
+  $("finalscore").textContent=score;
+  const pct = score/QUESTIONS.length;
+  let em="🎉", msg="Great work!";
+  if(pct===1){ em="🏆"; msg="Perfect score — flawless!"; }
+  else if(pct>=0.8){ em="🌟"; msg="Excellent — you know your basics."; }
+  else if(pct>=0.6){ em="👍"; msg="Good going — a little revision and you're set."; }
+  else if(pct>=0.4){ em="📚"; msg="Not bad — review DNA/RNA and the databases."; }
+  else{ em="🌱"; msg="Early days — revisit Unit I and try again."; }
+  $("endem").textContent=em;
+  $("endmsg").textContent=msg;
+}
+
+// events
+$("startbtn").onclick=startQuiz;
+$("againbtn").onclick=startQuiz;
+$("nextbtn").onclick=next;
+
+document.addEventListener("keydown",e=>{
+  if($("start").style.display!=="none"){ if(e.key==="Enter") startQuiz(); return; }
+  if($("end").style.display!=="none"){ if(e.key==="Enter") startQuiz(); return; }
+  if(!answered && ["1","2","3","4"].includes(e.key)){
+    const b=document.querySelectorAll(".opt")[+e.key-1];
+    if(b){ const label=b.querySelector("span:last-child").textContent; choose(label,b); }
+  } else if(answered && (e.key==="Enter"||e.key===" ")){
+    e.preventDefault(); next();
+  }
+});
+</script>
+</body>
+</html>
