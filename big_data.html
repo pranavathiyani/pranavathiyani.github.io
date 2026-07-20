@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Data Bioinformatics Learning Lab</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f8fc;color:#222}
+header{background:#0b5cab;color:white;padding:20px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:white;padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin:18px 0}
+button{background:#0b5cab;color:white;border:none;padding:10px 18px;border-radius:6px;cursor:pointer}
+button:hover{background:#08498a}
+.option{padding:10px;border:1px solid #bbb;border-radius:6px;margin:8px 0;cursor:pointer}
+.option:hover{background:#eef6ff}
+.correct{background:#d7ffd7}
+.wrong{background:#ffd8d8}
+.progress{height:18px;background:#ddd;border-radius:10px;overflow:hidden}
+.bar{height:100%;width:0;background:#0b5cab}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>Big Data Analytics in Bioinformatics</h1>
+<h3>Interactive Learning Lab - Unit I</h3>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>Mission 1: Is it Big Data?</h2>
+<p>Select the most suitable computing platform.</p>
+
+<label>Dataset</label>
+<select id="dataset">
+<option value="Laptop">100 bacterial genomes</option>
+<option value="Workstation">500 RNA-Seq samples</option>
+<option value="Hadoop">1 million human genomes</option>
+<option value="HPC">5000 protein structures</option>
+</select>
+
+<button onclick="checkPlatform()">Check</button>
+<p id="platformResult"></p>
+</div>
+
+<div class="card">
+<h2>Mission 2: Identify the Biggest 'V'</h2>
+
+<div id="quiz"></div>
+
+<button onclick="nextQuestion()">Next Question</button>
+
+<p><b>Score:</b> <span id="score">0</span>/5</p>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Mission 3: Hadoop Challenge</h2>
+
+<p>A FASTQ file is split into blocks. How many replicas should Hadoop normally maintain?</p>
+
+<button onclick="replica(1)">1</button>
+<button onclick="replica(2)">2</button>
+<button onclick="replica(3)">3</button>
+<button onclick="replica(4)">4</button>
+
+<p id="replicaResult"></p>
+</div>
+
+<div class="card">
+<h2>Mission 4: MapReduce Simulator</h2>
+
+<p>DNA Reads</p>
+
+<pre>
+ATG
+ATG
+CGA
+ATG
+TAA
+</pre>
+
+<button onclick="map()">Run MAP</button>
+<button onclick="shuffle()">Shuffle</button>
+<button onclick="reduce()">Reduce</button>
+
+<pre id="mr"></pre>
+
+</div>
+
+</div>
+
+<script>
+
+const questions=[
+{
+q:"Millions of genome files stored in ENA primarily represent...",
+opts:["Volume","Velocity","Veracity","Value"],
+a:0
+},
+{
+q:"Daily COVID genome sequencing demonstrates...",
+opts:["Value","Variety","Velocity","Volume"],
+a:2
+},
+{
+q:"DNA, MRI and clinical notes together represent...",
+opts:["Variety","Volume","Value","Veracity"],
+a:0
+},
+{
+q:"Sequencing errors are related to...",
+opts:["Velocity","Veracity","Value","Volume"],
+a:1
+},
+{
+q:"Finding disease biomarkers represents...",
+opts:["Value","Volume","Variety","Velocity"],
+a:0
+}
+];
+
+let index=0;
+let score=0;
+
+function showQuestion(){
+let q=questions[index];
+let html="<h3>"+q.q+"</h3>";
+q.opts.forEach((o,i)=>{
+html+="<div class='option' onclick='answer("+i+")'>"+o+"</div>";
+});
+document.getElementById("quiz").innerHTML=html;
+}
+showQuestion();
+
+function answer(i){
+let cards=document.getElementsByClassName("option");
+if(i===questions[index].a){
+cards[i].classList.add("correct");
+score++;
+document.getElementById("score").innerText=score;
+}else{
+cards[i].classList.add("wrong");
+cards[questions[index].a].classList.add("correct");
+}
+document.getElementById("bar").style.width=((index+1)/5*100)+"%";
+}
+
+function nextQuestion(){
+if(index<4){
+index++;
+showQuestion();
+}else{
+alert("Quiz Completed! Score: "+score+"/5");
+}
+}
+
+function checkPlatform(){
+let ans=document.getElementById("dataset").value;
+document.getElementById("platformResult").innerHTML="<b>Recommended:</b> "+ans;
+}
+
+function replica(n){
+if(n===3){
+document.getElementById("replicaResult").innerHTML="✅ Correct! Hadoop commonly uses a replication factor of 3.";
+}else{
+document.getElementById("replicaResult").innerHTML="❌ Usually Hadoop stores three replicas for fault tolerance.";
+}
+}
+
+function map(){
+document.getElementById("mr").textContent="MAP OUTPUT\nATG:1\nATG:1\nCGA:1\nATG:1\nTAA:1";
+}
+function shuffle(){
+document.getElementById("mr").textContent="SHUFFLE\nATG -> 1,1,1\nCGA ->1\nTAA ->1";
+}
+function reduce(){
+document.getElementById("mr").textContent="REDUCE\nATG = 3\nCGA = 1\nTAA = 1";
+}
+
+</script>
+
+</body>
+</html>
