@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Data &amp; MapReduce — 40 Question Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E4E8ED;
+  --card:#FFFFFF;
+  --ink:#101623;
+  --muted:#5C6879;
+  --rule:#C9D0D9;
+  --accent:#2A35B8;
+  --accent-soft:#E5E7FB;
+  --good:#17714A;
+  --good-soft:#DBEFE4;
+  --bad:#A81F3A;
+  --bad-soft:#F8E1E6;
+  --amber:#A96500;
+  --amber-soft:#F6E9D5;
+  --display:"Space Grotesk",system-ui,sans-serif;
+  --serif:"Source Serif 4",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--display);
+  -webkit-font-smoothing:antialiased;
+  padding:22px 16px 60px;
+}
+.shell{max-width:840px;margin:0 auto}
+
+/* ---------- header ---------- */
+.masthead{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;margin-bottom:12px;
+}
+.wordmark{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+.wordmark b{color:var(--ink)}
+.counter{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted)}
+
+/* ---------- partition strip (signature) ---------- */
+.strip{display:flex;gap:2px;height:12px;margin-bottom:18px}
+.blk{flex:1;background:var(--rule);border-radius:1px;transition:background .18s}
+.blk.correct{background:var(--good)}
+.blk.wrong{background:var(--bad)}
+.blk.now{background:var(--accent)}
+.striplab{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--muted);margin:-12px 0 18px;text-transform:uppercase;
+}
+
+/* ---------- card ---------- */
+.card{
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-radius:3px;
+  padding:0 0 26px;
+  box-shadow:0 1px 0 rgba(16,22,35,.05);
+}
+
+/* ---------- timer ---------- */
+.timerwrap{position:relative;height:6px;background:var(--rule);overflow:hidden}
+.timerfill{height:100%;width:100%;background:var(--accent);transform-origin:left;transition:background .3s}
+.timerfill.free{background:var(--good)}
+.timerfill.crit{background:var(--bad)}
+.gate{
+  position:absolute;top:0;left:50%;width:1px;height:100%;
+  background:var(--card);
+}
+.tbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 26px 0;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;color:var(--muted);text-transform:uppercase;
+}
+.clock{font-weight:700;color:var(--ink);font-size:13px;letter-spacing:.06em}
+.clock.crit{color:var(--bad)}
+
+/* ---------- question ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);
+  padding:22px 26px 0;
+}
+.qtext{
+  font-family:var(--serif);font-size:23px;line-height:1.42;font-weight:600;
+  margin:10px 0 22px;padding:0 26px;
+}
+.opts{list-style:none;margin:0;padding:0 26px;display:grid;gap:8px}
+.opt{
+  display:flex;align-items:stretch;gap:0;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--rule);border-radius:2px;
+  font-family:var(--display);font-size:15.5px;color:var(--ink);
+  cursor:pointer;padding:0;overflow:hidden;transition:border-color .14s,background .14s;
+}
+.opt:hover{border-color:var(--ink)}
+.opt .key{
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  background:var(--paper);color:var(--muted);
+  padding:14px 13px;display:flex;align-items:center;
+  border-right:1px solid var(--rule);transition:background .14s,color .14s;
+}
+.opt .val{padding:13px 15px;line-height:1.45}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .key{background:var(--accent);color:#fff;border-right-color:var(--accent)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt[disabled]{cursor:default}
+.opt.iscorrect{border-color:var(--good);background:var(--good-soft)}
+.opt.iscorrect .key{background:var(--good);color:#fff;border-right-color:var(--good)}
+.opt.ischosen-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.ischosen-wrong .key{background:var(--bad);color:#fff;border-right-color:var(--bad)}
+
+/* ---------- actions ---------- */
+.actions{padding:24px 26px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:13px 26px;border-radius:2px;border:1px solid var(--ink);
+  background:var(--ink);color:#fff;cursor:pointer;transition:opacity .14s;
+}
+.btn:hover{opacity:.85}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn[disabled]{
+  background:var(--paper);color:var(--muted);border-color:var(--rule);cursor:not-allowed;opacity:1;
+}
+.btn.ghost{background:transparent;color:var(--ink)}
+.hint{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+/* ---------- verdict / explanation ---------- */
+.verdict{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 26px;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.verdict.ok{background:var(--good-soft);color:var(--good)}
+.verdict.no{background:var(--bad-soft);color:var(--bad)}
+.verdict.skip{background:var(--amber-soft);color:var(--amber)}
+.expl{
+  padding:0 26px;margin:22px 0 0;
+  font-family:var(--serif);font-size:16.5px;line-height:1.62;
+}
+.expl .lead{
+  display:block;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+}
+.qrecall{
+  font-family:var(--serif);font-size:18px;line-height:1.45;font-weight:600;
+  padding:22px 26px 0;margin:0;
+}
+
+/* ---------- start / results ---------- */
+.hero{padding:34px 26px 0}
+.hero h1{
+  font-family:var(--serif);font-size:38px;line-height:1.12;font-weight:600;
+  margin:8px 0 14px;letter-spacing:-.015em;
+}
+.hero p{font-family:var(--serif);font-size:16.5px;line-height:1.6;color:var(--muted);margin:0 0 8px;max-width:58ch}
+.rules{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.rules li{
+  display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--rule);
+  font-size:14.5px;align-items:baseline;
+}
+.rules b{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;min-width:58px}
+.score{
+  font-family:var(--mono);font-size:64px;font-weight:700;letter-spacing:-.03em;
+  line-height:1;margin:6px 0 4px;
+}
+.score span{font-size:24px;color:var(--muted)}
+.breakdown{width:100%;border-collapse:collapse;margin:26px 0 0;font-size:14px}
+.breakdown th{
+  text-align:left;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  padding:0 0 8px;border-bottom:1px solid var(--rule);
+}
+.breakdown td{padding:9px 0;border-bottom:1px solid var(--rule)}
+.breakdown td:last-child,.breakdown th:last-child{text-align:right;font-family:var(--mono)}
+.review{margin:26px 0 0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.review .item{padding:14px 0;border-bottom:1px solid var(--rule)}
+.review .rq{font-family:var(--serif);font-size:15.5px;line-height:1.45;margin:0 0 6px}
+.review .ra{font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--muted)}
+.review .ra em{font-style:normal;color:var(--good);font-weight:700}
+.review .ra s{color:var(--bad);text-decoration-thickness:1px}
+
+@media (max-width:600px){
+  .qtext{font-size:20px}
+  .hero h1{font-size:29px}
+  .eyebrow,.qtext,.opts,.actions,.expl,.verdict,.hero,.qrecall{padding-left:18px;padding-right:18px}
+  .tbar{padding-left:18px;padding-right:18px}
+  .score{font-size:48px}
+  .strip{height:9px;gap:1px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead">
+    <div class="wordmark"><b>Big Data</b> &nbsp;/&nbsp; Foundations, Hadoop &amp; MapReduce</div>
+    <div class="counter" id="counter">40 questions</div>
+  </div>
+  <div class="strip" id="strip"></div>
+  <div class="striplab"><span>Q01</span><span>Q40</span></div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+const Q = [
+{t:"Big Data Types",q:"Which of the following is the clearest example of semi-structured data?",
+o:["A relational table of patient records with a fixed schema","A JSON document whose fields are self-describing and partly optional","A raw MRI scan stored as a DICOM image","A fixed-width flat file produced by a legacy mainframe"],a:1,
+e:"Semi-structured data carries its own markup or tags, so the structure travels inside the data itself rather than being enforced by a separate schema. JSON and XML are the standard examples: two documents in the same collection can legitimately have different fields. Relational tables and fixed-width files are structured (schema decided before the data is written); an image is unstructured."},
+
+{t:"Big Data Types",q:"In the classic 'V' characterisation of big data, Velocity refers to:",
+o:["The total volume of data held in the cluster","The speed at which data arrives and must be ingested or processed","The number of distinct formats a system must handle","The speed of the network interconnect between racks"],a:1,
+e:"Velocity is about rate of flow, not size. It covers both the arrival rate of new records (clickstreams, sensor feeds, sequencing runs) and how quickly a result is needed after arrival. High velocity is what pushes a design from nightly batch towards stream processing."},
+
+{t:"Big Data Types",q:"Veracity, as a dimension of big data, is primarily concerned with:",
+o:["Uncertainty, noise and trustworthiness of the data","Cost per terabyte of storage","The rate of schema change over time","Compression ratio achievable on the raw data"],a:0,
+e:"Veracity asks how much you can believe the data. Sensor drift, duplicate records, missing values, self-reported fields and unreliable third-party feeds all reduce veracity. It matters because analytics on high-volume, low-veracity data produces confident-looking answers that are wrong."},
+
+{t:"Big Data Types",q:"Variety in a big data workload is best illustrated by:",
+o:["Storing one billion rows in a single normalised table","Combining relational tables, log files, free-text notes and images in one analysis","Receiving the same record from two replicas","Running the same query against many partitions in parallel"],a:1,
+e:"Variety refers to heterogeneity of format and source. The difficulty is not that any single format is hard, but that structured, semi-structured and unstructured sources must be reconciled into one analysis, often without a shared key or schema."},
+
+{t:"Big Data Types",q:"Which of these is machine-generated structured data?",
+o:["A doctor's free-text discharge summary","Timestamped readings emitted by a fleet of IoT sensors","A scanned PDF of a signed consent form","A recorded customer support phone call"],a:1,
+e:"Machine-generated data is produced without direct human authorship, and sensor telemetry is typically emitted in a fixed, regular record layout, so it is both machine-generated and structured. Free text, scans and audio are human-generated and unstructured. The distinction matters because machine-generated sources dominate volume and velocity, while human-generated sources dominate variety."},
+
+{t:"Technology Foundations",q:"In the layered big data technology stack, which layer sits at the very bottom?",
+o:["Analytical data warehouses","Redundant physical infrastructure","Reporting and visualisation","Big data analytics applications"],a:1,
+e:"The stack is built bottom-up: redundant physical infrastructure (commodity servers, storage, network, power) first, then security, then interfaces and feeds, then operational databases and organising data services, then analytical warehouses, and finally analytics, reporting and applications on top. Redundancy at the bottom is what lets every layer above assume that individual node failure is normal."},
+
+{t:"Technology Foundations",q:"The 'interfaces and feeds' layer of the stack exists to:",
+o:["Enforce ACID transactions across the cluster","Move data into and out of the platform through APIs and connectors","Compress cold data for archival","Schedule reducers onto available slots"],a:1,
+e:"Interfaces and feeds are the boundary of the platform: APIs, connectors, message queues and ingestion agents that carry data in from external systems and expose results outward. Treating it as a distinct layer is what allows internal storage and processing choices to change without breaking external producers and consumers."},
+
+{t:"Technology Foundations",q:"Big data platforms favour scaling out on commodity hardware rather than scaling up because:",
+o:["Commodity nodes never fail, so no replication is needed","Adding more small nodes is cheaper and more elastic than buying ever-larger single machines","Distributed systems are simpler to program than single machines","Commodity disks have lower latency than enterprise SSDs"],a:1,
+e:"Scale-up hits a hard economic and physical ceiling: the largest single machine costs disproportionately more per unit of capacity. Scaling out with commodity nodes is cheaper and can grow incrementally, but it makes failure routine rather than exceptional, which is exactly why replication and automatic task re-execution are built into the platform."},
+
+{t:"Big Data Management",q:"An operational database in the big data stack is optimised chiefly for:",
+o:["Long-running scans over historical data for reporting","Low-latency reads and writes of current, individual records","Offline model training on the full corpus","One-time bulk archival of cold data"],a:1,
+e:"Operational stores serve the running application: fetch this user, update this order, append this event. The workload is many small, concurrent, latency-sensitive operations on current data. Long scans over history belong in the analytical warehouse, which is tuned for throughput rather than per-request latency."},
+
+{t:"Big Data Management",q:"In a key-value store such as Redis, Riak or DynamoDB, the value is:",
+o:["Fully indexed so any field inside it can be queried","Opaque to the database and normally retrieved only via its key","Required to conform to a declared schema","Automatically joined with other values at read time"],a:1,
+e:"A pure key-value store treats the value as an uninterpreted blob: the fast path is get(key) and put(key, value). That restriction is what buys predictable O(1) lookup and easy horizontal partitioning, but it means any query that is not by key must be served by an application-maintained secondary index."},
+
+{t:"Big Data Management",q:"The main advantage of a document store such as MongoDB or CouchDB over a plain key-value store is that:",
+o:["It guarantees full ACID transactions across all shards by default","The database understands the internal structure of the document and can query and index fields inside it","Documents are always smaller than key-value pairs","It removes the need for any primary key"],a:1,
+e:"A document store keeps the self-describing structure (JSON, BSON, XML) and exposes it, so you can query and index on nested fields rather than only on the key. You keep the schema flexibility of semi-structured data while gaining richer access paths."},
+
+{t:"Big Data Management",q:"Wide-column (column-family) stores such as Cassandra and HBase are especially well suited to:",
+o:["Sparse data with millions of rows where different rows populate different columns","Highly normalised data requiring frequent multi-table joins","Small datasets that fit in a single node's memory","Datasets where every row has exactly the same dense set of attributes"],a:0,
+e:"Column families store data grouped by column rather than by row and do not reserve space for absent values, so a row with three populated columns costs nothing for the other ten thousand. This makes them a strong fit for sparse, very wide, append-heavy data, at the cost of joins, which the application must perform itself."},
+
+{t:"Big Data Management",q:"Which workload is the strongest case for a graph database such as Neo4j?",
+o:["Aggregating daily sales totals per region","Traversing multi-hop paths through a protein-protein interaction network","Storing raw sensor readings for later batch analysis","Serving static images to a web front end"],a:1,
+e:"Graph databases make edges first-class and store them adjacent to their nodes, so traversal cost depends on the neighbourhood explored rather than on total dataset size. Multi-hop questions ('what connects A to B through at most four interactions?') would need a self-join per hop in a relational system, and each of those joins scales with table size."},
+
+{t:"Big Data Management",q:"The CAP theorem states that a distributed data store, when a network partition occurs, must:",
+o:["Give up partition tolerance to keep both consistency and availability","Choose between consistency and availability","Sacrifice durability to preserve consistency","Sacrifice all three properties simultaneously"],a:1,
+e:"Partitions are a fact of networks, not a design option, so a distributed store must tolerate them. The real choice is what to do during a partition: refuse requests it cannot serve correctly (favouring consistency) or answer with possibly stale data (favouring availability). Systems are best described by which they give up under partition, not by a permanent two-out-of-three label."},
+
+{t:"Big Data Management",q:"BASE, the consistency model common to many NoSQL stores, stands for:",
+o:["Batch, Atomic, Serialisable, Exact","Basically Available, Soft state, Eventually consistent","Balanced Allocation of Storage Elements","Bulk Access, Sharded Execution"],a:1,
+e:"BASE is the deliberate counterpoint to ACID. The system stays available and accepts that replicas may temporarily disagree ('soft state'), converging once updates propagate. It suits workloads where a few seconds of staleness is harmless and downtime is not, which is why it is common in web-scale operational stores."},
+
+{t:"MapReduce Origins",q:"MapReduce as a programming model for large clusters was published by:",
+o:["Doug Cutting and Mike Cafarella at Yahoo, 2008","Jeffrey Dean and Sanjay Ghemawat at Google, 2004","Matei Zaharia at UC Berkeley, 2010","Michael Stonebraker at MIT, 1996"],a:1,
+e:"The 2004 OSDI paper by Dean and Ghemawat described how Google ran large-scale computations over commodity clusters. Its contribution was not a new algorithm but an abstraction: express the computation as map and reduce, and let the framework handle distribution, scheduling and failure recovery."},
+
+{t:"MapReduce Origins",q:"The names 'map' and 'reduce' were borrowed from:",
+o:["Relational algebra","Functional programming languages such as Lisp","Graph theory","The SQL standard"],a:1,
+e:"In functional languages, map applies a function to every element of a list and reduce (fold) combines elements into a summary. Because these functions are side-effect free, applying them to different elements in any order gives the same answer, which is exactly the property that makes distribution across thousands of machines safe."},
+
+{t:"MapReduce Origins",q:"Which storage system did Google's original MapReduce run over, and what is its open-source counterpart?",
+o:["Bigtable; HBase","Google File System (GFS); HDFS","Chubby; ZooKeeper","Colossus; Cassandra"],a:1,
+e:"MapReduce was designed to run on GFS, which stores files as large replicated chunks spread across the cluster. Hadoop reimplements this as HDFS. The pairing is essential: because the scheduler knows which node holds which block, it can send the computation to the data instead of dragging terabytes across the network."},
+
+{t:"Hadoop",q:"Hadoop originated as part of which project, and how did it get its name?",
+o:["Spun out of Apache Nutch; named after Doug Cutting's son's toy elephant","Spun out of Apache Lucene; an acronym for 'Highly Available Distributed Object-Oriented Platform'","Written at Yahoo from scratch; named after a Norwegian village","Forked from Apache Cassandra; named after a Greek myth"],a:0,
+e:"Doug Cutting and Mike Cafarella needed a scalable storage and processing layer for the Nutch web crawler, and built it after reading Google's GFS and MapReduce papers. The name was simply his son's stuffed elephant — short, easy to spell, and meaningless, which Cutting considered a virtue for project names."},
+
+{t:"Hadoop",q:"The default HDFS block size in Hadoop 2.x onwards is:",
+o:["4 KB","64 MB","128 MB","1 GB"],a:2,
+e:"HDFS uses 128 MB by default (it was 64 MB in Hadoop 1.x). Blocks are deliberately enormous compared with a filesystem block so that seek time becomes negligible against transfer time, and so that the NameNode's in-memory metadata stays small. The trade-off is that HDFS handles many small files very badly."},
+
+{t:"Hadoop",q:"The default HDFS replication factor is 3. Where are the replicas placed?",
+o:["All three on the same node for fast local reads","All three on different racks for maximum spread","One on the local node, a second on a different rack, a third on that same remote rack","Chosen entirely at random with no rack awareness"],a:2,
+e:"Rack-aware placement balances two risks. Keeping one replica local makes writes cheap; putting the other two on a different rack survives the loss of an entire rack including its switch; keeping those two together on that remote rack avoids paying for a third cross-rack transfer. It is a compromise between write bandwidth and fault tolerance, not a pure spread."},
+
+{t:"Hadoop",q:"The HDFS NameNode is responsible for:",
+o:["Storing the actual data blocks on local disk","Holding the filesystem namespace and block-to-DataNode mapping in memory","Executing the map and reduce functions","Compressing files before they are written"],a:1,
+e:"The NameNode is the metadata master: directory tree, file-to-block mapping, and which DataNodes hold which blocks. It never handles file data — clients are redirected to DataNodes for the actual bytes. Because that metadata lives in memory, cluster capacity in files is bounded by NameNode RAM, and in Hadoop 1 the NameNode was a single point of failure."},
+
+{t:"Hadoop",q:"YARN, introduced in Hadoop 2, principally achieved which change?",
+o:["It replaced HDFS with an in-memory filesystem","It separated cluster resource management from the application programming model","It removed the need for a reduce phase","It added SQL support directly to the storage layer"],a:1,
+e:"In Hadoop 1 the JobTracker did both resource management and MapReduce job scheduling, which meant the cluster could only run MapReduce. YARN split these into a global ResourceManager and a per-application ApplicationMaster, so Spark, Tez, Flink and MapReduce can share one cluster. This is what turned Hadoop from a MapReduce engine into a general data platform."},
+
+{t:"Hadoop Ecosystem",q:"Apache Hive is best described as:",
+o:["A distributed coordination service for leader election","A data warehouse layer providing a SQL-like language over data in HDFS","A tool for streaming log data into the cluster","A machine learning library of distributed algorithms"],a:1,
+e:"Hive lets analysts write HiveQL, which the engine compiles into MapReduce, Tez or Spark jobs. It applies schema-on-read: the table definition is metadata layered over files that already exist, so no data is rewritten when the schema is declared. This makes it a warehouse-style batch query tool, not a low-latency database."},
+
+{t:"Hadoop Ecosystem",q:"Pig Latin differs from HiveQL mainly in that it is:",
+o:["A declarative query language closer to SQL","A procedural dataflow language describing a step-by-step sequence of transformations","A configuration format for cluster resources","A binary serialisation format for intermediate data"],a:1,
+e:"HiveQL is declarative: you describe the result and the optimiser chooses the plan. Pig Latin is procedural: you write LOAD, FILTER, GROUP, JOIN, STORE as an explicit pipeline. That suits ETL work where you want direct control over the sequence of transformations, especially on data too messy for a clean table definition."},
+
+{t:"Hadoop Ecosystem",q:"Apache Sqoop is used to:",
+o:["Coordinate distributed locks across nodes","Bulk-transfer data between relational databases and HDFS","Schedule recurring workflows of dependent jobs","Provide random real-time access to HDFS data"],a:1,
+e:"Sqoop ('SQL to Hadoop') performs bulk import and export between RDBMS tables and HDFS, Hive or HBase. It parallelises the transfer by splitting the table on a column and running several mappers, each pulling a range of rows over JDBC."},
+
+{t:"Hadoop Ecosystem",q:"Apache ZooKeeper provides:",
+o:["A distributed coordination service for configuration, naming, and leader election","A columnar storage format for analytical queries","A high-level scripting language for ETL","An in-memory cache for query results"],a:0,
+e:"ZooKeeper maintains a small, strongly consistent, replicated hierarchy of znodes and is used by other components to agree on shared state: who is the active master, which servers are alive, what the current configuration is. It is deliberately not a data store — it holds coordination metadata, and HBase, Kafka and HDFS high availability all depend on it."},
+
+{t:"Hadoop Ecosystem",q:"Apache HBase is best characterised as:",
+o:["A batch SQL engine for historical reporting","A distributed wide-column store giving random, real-time read/write access to data on HDFS","A workflow scheduler for chained MapReduce jobs","A columnar file format used by Hive"],a:1,
+e:"HDFS on its own is write-once and optimised for sequential scans, so single-record lookup and update are impractical. HBase, modelled on Google's Bigtable, layers a sorted wide-column store on top and serves point reads and writes in milliseconds — filling the operational-database role inside the Hadoop ecosystem."},
+
+{t:"MapReduce Tasks",q:"Intermediate key-value pairs emitted by mappers are:",
+o:["Written to HDFS with the usual replication factor of 3","Written to the local disk of the node running the mapper","Held only in the JobTracker's memory","Sent directly to the client application"],a:1,
+e:"Intermediate output is transient, so replicating it through HDFS would be wasteful. It is written to local disk and pulled by reducers during shuffle. The consequence for fault tolerance is important: if a node dies after its map task completed but before its output is consumed, that map task must be re-run, whereas a completed reduce task's output is already safe in HDFS."},
+
+{t:"MapReduce Tasks",q:"The shuffle-and-sort phase is responsible for:",
+o:["Splitting the input file into blocks before mapping begins","Grouping all values sharing a key and delivering them, in key order, to the correct reducer","Compressing the final output written to HDFS","Choosing how many mappers a job should launch"],a:1,
+e:"Shuffle is the transfer of mapper output across the network to reducers; sort ensures each reducer sees its keys in order with all values for a key grouped together. It is the only all-to-all communication step in the job, so it is usually the bottleneck, and it is why reducers cannot begin reducing until every mapper has finished."},
+
+{t:"MapReduce Tasks",q:"A combiner may safely be used when the reduce function is:",
+o:["Commutative and associative, such as sum or max","Any function at all, since combiners are always safe","Guaranteed to emit exactly one output record","Written in the same language as the mapper"],a:0,
+e:"The combiner is a local, partial reduce run on a mapper's output to cut network traffic. Because the framework may call it zero, one or several times, the result must be independent of how the values are grouped — which requires commutativity and associativity. Sum and max qualify; arithmetic mean does not, unless you restructure it to emit (running sum, count) pairs."},
+
+{t:"MapReduce Tasks",q:"The partitioner in a MapReduce job determines:",
+o:["Which HDFS block each mapper reads","Which reducer each intermediate key is sent to","How many map tasks are launched","The order of records inside an input split"],a:1,
+e:"The default HashPartitioner computes hash(key) mod numReduceTasks, which spreads keys evenly when they are evenly distributed. When they are not — one key holding most of the records — that reducer becomes a straggler, and a custom partitioner is the standard remedy for such skew."},
+
+{t:"MapReduce Tasks",q:"If a node running a map task fails midway through a job, the framework:",
+o:["Aborts and restarts the entire job","Re-executes only that map task on another node","Continues without the missing output","Promotes a reducer to take over the map work"],a:1,
+e:"Map tasks are deterministic and independent, so only the lost task needs re-execution — that is the practical payoff of the functional programming model. Completed map tasks on a failed node must also be re-run because their output lived on that node's local disk. If the master itself fails, however, the job does restart."},
+
+{t:"MapReduce Algorithms",q:"To compute the matrix-vector product Mv by MapReduce (with v small enough to fit in memory), the map function should emit:",
+o:["Key j with value m(i,j) for every element","Key i with value m(i,j) × v(j)","Key (i,j) with value v(j)","Key i with value v(i) only"],a:1,
+e:"Each element of the result is x(i) = Σ over j of m(i,j)·v(j). The multiplication needs only one matrix element and one vector element, so it can be done entirely in the map phase; the sum is the grouping operation. Emitting key i means the reducer receives every term of row i and simply adds them."},
+
+{t:"MapReduce Algorithms",q:"For the natural join of R(A,B) with S(B,C) in MapReduce, the mapper should emit:",
+o:["Key A with the whole tuple as value","Key B with a tagged value identifying the source relation","Key C with the value A","A single constant key so that one reducer sees everything"],a:1,
+e:"The join attribute becomes the key so that matching tuples from both relations land in the same reducer. Values are tagged with their relation so the reducer can separate R-tuples from S-tuples and emit the cross product of the two lists. The cost of this pattern is that a heavily repeated B value sends a huge list to one reducer."},
+
+{t:"Communication Cost Model",q:"In the communication cost model, the communication cost of a task is defined as:",
+o:["The number of output records it produces","The size of the input to that task","The elapsed wall-clock time of the task","The number of CPU cycles it consumes"],a:1,
+e:"Total communication cost is the sum of input sizes across all tasks in the workflow. Output is not counted separately because it becomes the input of the next task (or is the final answer, which is typically small). The model is justified when tasks are simple enough that the algorithm runs in time linear in its input, so moving data — not computing on it — dominates."},
+
+{t:"Communication Cost Model",q:"The replication rate r of a MapReduce algorithm is:",
+o:["The number of copies HDFS keeps of each block","The average number of key-value pairs the mappers produce per input, i.e. how many reducers each input reaches","The ratio of reducers to mappers","The fraction of tasks re-executed after failure"],a:1,
+e:"Replication rate measures how much the map phase multiplies the data: it is the number of (key, value) pairs created by all mappers divided by the number of inputs. It is the direct driver of communication cost, and it is entirely separate from HDFS block replication, which is a storage concern."},
+
+{t:"Complexity Theory for MapReduce",q:"Reducer size q is defined as:",
+o:["The number of reduce tasks in the job","An upper bound on the number of inputs a single reducer may receive","The size in bytes of the reducer's output","The amount of RAM installed on a reducer node"],a:1,
+e:"Reducer size bounds the list that any one reducer must handle. Keeping q small has two payoffs: the reducer's inputs fit in main memory, and there are many reducers, so the work parallelises well. Note the terminology — a 'reducer' here is one key together with its list of values, not a physical compute node."},
+
+{t:"Complexity Theory for MapReduce",q:"The characteristic relationship between reducer size q and replication rate r for a given problem is that:",
+o:["They are independent of one another","They increase together","Decreasing q generally forces r to increase — the two trade off against each other","Their product is always exactly 1"],a:2,
+e:"Smaller reducers see less of the data each, so inputs must be sent to more reducers for every required output to be computed somewhere — pushing r up. This trade-off is the object of study in the theory: for problems such as all-pairs similarity join one proves a lower bound on r as a function of q, then looks for a mapping schema that meets it."},
+
+{t:"Complexity Theory for MapReduce",q:"A mapping schema for a problem with reducer size q is an assignment of inputs to reducers such that:",
+o:["No reducer receives more than q inputs, and every required output has some reducer holding all inputs needed to compute it","Every reducer receives exactly q inputs and produces exactly one output","Each input goes to exactly one reducer","The number of reducers equals the number of outputs"],a:0,
+e:"The two conditions capture feasibility and correctness together: the capacity limit keeps each reducer within q, and the coverage requirement guarantees every output is computable. Proving that no mapping schema exists below a given replication rate is how lower bounds in this theory are established."}
+];
+
+const TOTAL = Q.length;          // 40
+const LIMIT = 60;                // seconds allowed per question
+const MIN_DWELL = 30;            // seconds before answer can be locked in
+const LETTERS = ["A","B","C","D"];
+
+let idx = 0, selected = null, answers = [], tid = null, started = 0;
+
+const card = document.getElementById('card');
+const strip = document.getElementById('strip');
+const counter = document.getElementById('counter');
+
+for (let i=0;i<TOTAL;i++){ const d=document.createElement('div'); d.className='blk'; strip.appendChild(d); }
+
+function paintStrip(){
+  [...strip.children].forEach((b,i)=>{
+    b.className = 'blk';
+    if (answers[i] !== undefined) b.classList.add(answers[i].correct ? 'correct' : 'wrong');
+    else if (i === idx) b.classList.add('now');
+  });
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function fmt(s){ const m=Math.floor(s/60), r=s%60; return m+':'+String(r).padStart(2,'0'); }
+
+/* ---------------- start ---------------- */
+function renderStart(){
+  counter.textContent = TOTAL + ' questions';
+  card.innerHTML = `
+    <div class="hero">
+      <div class="eyebrow" style="padding:0">Unit assessment</div>
+      <h1>Big data types, the Hadoop stack, and the theory of MapReduce.</h1>
+      <p>Forty multiple-choice questions covering data types and the technology stack, operational databases, the origins of MapReduce, HDFS and YARN, the Hadoop ecosystem, map and reduce tasks, MapReduce algorithms, the communication cost model, and complexity theory.</p>
+      <ul class="rules">
+        <li><b>60 s</b><span>Each question expires after sixty seconds. If time runs out, whatever you have selected is submitted; nothing selected counts as unanswered.</span></li>
+        <li><b>30 s</b><span>You cannot lock in an answer for the first thirty seconds. Use them to read the distractors properly.</span></li>
+        <li><b>Then</b><span>Every answer is followed by an explanation page before the next question. There is no going back.</span></li>
+        <li><b>Keys</b><span>Press A–D or 1–4 to select, Enter to submit and to advance.</span></li>
+      </ul>
+      <div class="actions" style="padding-left:0;padding-right:0">
+        <button class="btn" id="go">Start the quiz</button>
+      </div>
+    </div>`;
+  document.getElementById('go').onclick = start;
+  document.getElementById('go').focus();
+}
+
+function start(){ idx=0; answers=[]; renderQuestion(); }
+
+/* ---------------- question ---------------- */
+function renderQuestion(){
+  selected = null;
+  const q = Q[idx];
+  counter.textContent = 'Question ' + String(idx+1).padStart(2,'0') + ' / ' + TOTAL;
+  paintStrip();
+  card.innerHTML = `
+    <div class="timerwrap"><div class="timerfill" id="fill"></div><div class="gate"></div></div>
+    <div class="tbar">
+      <span id="phase">Locked — read the options</span>
+      <span class="clock" id="clock">1:00</span>
+    </div>
+    <div class="eyebrow">${esc(q.t)}</div>
+    <div class="qtext">${esc(q.q)}</div>
+    <ul class="opts" id="opts">
+      ${q.o.map((o,i)=>`<li><button class="opt" data-i="${i}"><span class="key">${LETTERS[i]}</span><span class="val">${esc(o)}</span></button></li>`).join('')}
+    </ul>
+    <div class="actions">
+      <button class="btn" id="submit" disabled>Locked · 30s</button>
+      <span class="hint" id="hint">Pick an option any time; you can change it until you submit.</span>
+    </div>`;
+
+  card.querySelectorAll('.opt').forEach(b=>{
+    b.onclick = ()=>{
+      selected = +b.dataset.i;
+      card.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      refreshSubmit();
+    };
+  });
+  document.getElementById('submit').onclick = ()=>commit(selected);
+
+  started = Date.now();
+  tick();
+  clearInterval(tid);
+  tid = setInterval(tick, 200);
+}
+
+function elapsed(){ return (Date.now()-started)/1000; }
+
+function refreshSubmit(){
+  const btn = document.getElementById('submit');
+  if(!btn) return;
+  const left = Math.ceil(MIN_DWELL - elapsed());
+  if (left > 0){ btn.disabled = true; btn.textContent = 'Locked · ' + left + 's'; }
+  else { btn.disabled = selected===null; btn.textContent = selected===null ? 'Select an answer' : 'Submit answer'; }
+}
+
+function tick(){
+  const e = elapsed(), rem = Math.max(0, LIMIT - e);
+  const fill = document.getElementById('fill'), clock = document.getElementById('clock'), phase = document.getElementById('phase');
+  if(!fill) return;
+  fill.style.transform = 'scaleX(' + (rem/LIMIT) + ')';
+  fill.className = 'timerfill' + (rem<=10 ? ' crit' : (e>=MIN_DWELL ? ' free' : ''));
+  clock.textContent = fmt(Math.ceil(rem));
+  clock.className = 'clock' + (rem<=10 ? ' crit' : '');
+  phase.textContent = e < MIN_DWELL ? 'Locked — read the options' : 'Open — submit when ready';
+  refreshSubmit();
+  if (rem <= 0){ clearInterval(tid); commit(selected); }
+}
+
+/* ---------------- explanation ---------------- */
+function commit(choice){
+  clearInterval(tid);
+  const q = Q[idx];
+  const correct = choice === q.a;
+  answers[idx] = { choice, correct, topic: q.t };
+  paintStrip();
+  counter.textContent = 'Question ' + String(idx+1).padStart(2,'0') + ' / ' + TOTAL + ' — reviewed';
+
+  const verdict = choice === null
+    ? ['skip','Time up — not answered']
+    : (correct ? ['ok','Correct'] : ['no','Not correct']);
+
+  card.innerHTML = `
+    <div class="verdict ${verdict[0]}">${verdict[1]}</div>
+    <p class="qrecall">${esc(q.q)}</p>
+    <ul class="opts" style="margin-top:18px">
+      ${q.o.map((o,i)=>{
+        let cls = 'opt';
+        if (i===q.a) cls += ' iscorrect';
+        else if (i===choice) cls += ' ischosen-wrong';
+        return `<li><button class="${cls}" disabled><span class="key">${LETTERS[i]}</span><span class="val">${esc(o)}</span></button></li>`;
+      }).join('')}
+    </ul>
+    <p class="expl"><span class="lead">Why</span>${esc(q.e)}</p>
+    <div class="actions">
+      <button class="btn" id="next">${idx+1 < TOTAL ? 'Next question' : 'See results'}</button>
+      <span class="hint">${idx+1} of ${TOTAL} answered · ${answers.filter(a=>a.correct).length} correct so far</span>
+    </div>`;
+
+  const nb = document.getElementById('next');
+  nb.onclick = ()=>{ if (idx+1 < TOTAL){ idx++; renderQuestion(); } else { renderResults(); } };
+  nb.focus();
+}
+
+/* ---------------- results ---------------- */
+function renderResults(){
+  const score = answers.filter(a=>a.correct).length;
+  const pct = Math.round(score/TOTAL*100);
+  counter.textContent = 'Complete';
+  [...strip.children].forEach((b,i)=>{ b.className='blk ' + (answers[i].correct?'correct':'wrong'); });
+
+  const topics = {};
+  Q.forEach((q,i)=>{
+    topics[q.t] = topics[q.t] || {n:0,c:0};
+    topics[q.t].n++;
+    if (answers[i].correct) topics[q.t].c++;
+  });
+
+  const missed = Q.map((q,i)=>({q,i})).filter(x=>!answers[x.i].correct);
+
+  card.innerHTML = `
+    <div class="hero">
+      <div class="eyebrow" style="padding:0">Result</div>
+      <div class="score">${score}<span>/${TOTAL} · ${pct}%</span></div>
+      <p>${pct>=75 ? 'Solid grasp of the unit. Look at the topics below where you dropped marks.' : pct>=50 ? 'Reasonable coverage, with clear gaps. The topic table shows where to concentrate.' : 'The fundamentals need another pass. Start with the topics scoring lowest below.'}</p>
+      <table class="breakdown">
+        <thead><tr><th>Topic</th><th>Score</th></tr></thead>
+        <tbody>
+          ${Object.entries(topics).map(([t,v])=>`<tr><td>${esc(t)}</td><td>${v.c}/${v.n}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      ${missed.length ? `<div class="review">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:14px 0 4px">To revisit — ${missed.length} question${missed.length>1?'s':''}</div>
+        ${missed.map(({q,i})=>`<div class="item">
+          <p class="rq">${esc(q.q)}</p>
+          <p class="ra">${answers[i].choice===null ? 'Not answered' : '<s>'+LETTERS[answers[i].choice]+'. '+esc(q.o[answers[i].choice])+'</s>'}<br><em>${LETTERS[q.a]}. ${esc(q.o[q.a])}</em></p>
+        </div>`).join('')}
+      </div>` : ''}
+      <div class="actions" style="padding-left:0;padding-right:0">
+        <button class="btn" id="again">Take it again</button>
+      </div>
+    </div>`;
+  document.getElementById('again').onclick = start;
+  document.getElementById('again').focus();
+}
+
+/* ---------------- keyboard ---------------- */
+document.addEventListener('keydown', e=>{
+  const opts = card.querySelectorAll('.opt:not([disabled])');
+  if (opts.length){
+    const k = e.key.toUpperCase();
+    let i = LETTERS.indexOf(k);
+    if (i === -1 && '1234'.includes(k)) i = +k - 1;
+    if (i > -1 && i < opts.length){ e.preventDefault(); opts[i].click(); return; }
+  }
+  if (e.key === 'Enter'){
+    const s = document.getElementById('submit'), n = document.getElementById('next'), g = document.getElementById('go'), a = document.getElementById('again');
+    if (s && !s.disabled){ e.preventDefault(); s.click(); }
+    else if (n){ e.preventDefault(); n.click(); }
+    else if (g){ e.preventDefault(); g.click(); }
+    else if (a){ e.preventDefault(); a.click(); }
+  }
+});
+
+renderStart();
+</script>
+</body>
+</html>
