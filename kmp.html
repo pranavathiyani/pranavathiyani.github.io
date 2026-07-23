@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KMP step-by-step — string search visualiser</title>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --panel:#F1F7F8;
+    --panel2:#FFFFFF;
+    --line:#CFE0E3;
+    --line2:#9EBFC4;
+    --ink:#0B2027;
+    --mute:#57767D;
+    --teal:#01707E;
+    --mint:#00876B;
+    --mintfill:#02BF97;
+    --amber:#B4630B;
+    --amberfill:#F09B3E;
+    --coral:#C4442A;
+    --coralfill:#E4603F;
+    --A:#2E8B3C; --T:#D62839; --U:#D62839; --G:#E08A26; --C:#1C6E92;
+    --mono: ui-monospace, "SF Mono", "IBM Plex Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: "Segoe UI", Inter, system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    --cell: 42px;
+    --gap: 6px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    padding:30px 24px 64px;
+  }
+  .wrap{max-width:1200px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--teal);font-weight:700;margin:0 0 6px;
+  }
+  h1{
+    font-size:clamp(28px,4vw,40px);margin:0 0 8px;font-weight:700;letter-spacing:-.01em;color:var(--ink);
+  }
+  .sub{color:var(--mute);margin:0 0 26px;max-width:72ch;font-size:17px}
+  .sub code{font-family:var(--mono);background:var(--panel);padding:1px 5px;border-radius:4px;color:var(--teal)}
+
+  /* ---------- inputs ---------- */
+  .inputs{
+    display:grid;grid-template-columns:1fr 1fr;gap:18px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:18px;margin-bottom:14px;
+  }
+  @media(max-width:760px){.inputs{grid-template-columns:1fr}}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal);font-weight:700;margin-bottom:6px}
+  input[type=text]{
+    width:100%;padding:12px 13px;border-radius:8px;
+    background:#FFFFFF;border:1.5px solid var(--line2);color:var(--ink);
+    font-family:var(--mono);font-size:18px;letter-spacing:.08em;font-weight:600;
+  }
+  input[type=text]:focus{outline:3px solid var(--mintfill);outline-offset:1px;border-color:var(--mintfill)}
+  .hint{font-size:13px;color:var(--mute);margin-top:6px;min-height:1.2em}
+  .hint.bad{color:var(--coral);font-weight:600}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 24px;align-items:center}
+  .presets span{font-size:13px;color:var(--mute);margin-right:2px}
+  .chip{
+    font-family:var(--mono);font-size:13px;padding:6px 12px;border-radius:999px;
+    background:#FFFFFF;border:1.5px solid var(--line2);color:var(--ink);cursor:pointer;font-weight:600;
+  }
+  .chip:hover{border-color:var(--teal);color:var(--teal);background:var(--panel)}
+  .chip:focus-visible{outline:3px solid var(--mintfill);outline-offset:2px}
+
+  /* ---------- phase tabs ---------- */
+  .tabs{display:flex;gap:6px;margin-bottom:0}
+  .tab{
+    font-family:var(--sans);font-size:15px;font-weight:700;
+    padding:11px 20px;border-radius:10px 10px 0 0;cursor:pointer;
+    background:#FFFFFF;border:1px solid var(--line);border-bottom:none;color:var(--mute);
+  }
+  .tab[aria-selected=true]{background:var(--panel);color:var(--ink);border-color:var(--line2)}
+  .tab:focus-visible{outline:3px solid var(--mintfill);outline-offset:-3px}
+  .tab small{display:block;font-weight:400;font-size:11px;color:var(--mute);font-family:var(--mono)}
+
+  .stage{
+    background:var(--panel);border:1px solid var(--line2);border-radius:0 12px 12px 12px;
+    padding:22px;
+  }
+
+  /* ---------- controls ---------- */
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+  button.ctl{
+    font-family:var(--sans);font-size:15px;font-weight:700;padding:10px 16px;
+    border-radius:8px;border:1.5px solid var(--line2);background:#FFFFFF;color:var(--ink);cursor:pointer;
+  }
+  button.ctl:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
+  button.ctl:disabled{opacity:.35;cursor:not-allowed}
+  button.ctl:focus-visible{outline:3px solid var(--mintfill);outline-offset:2px}
+  button.primary{background:var(--teal);color:#FFFFFF;border-color:var(--teal)}
+  button.primary:hover:not(:disabled){background:#015C68;color:#FFFFFF;border-color:#015C68}
+  .stepcount{font-family:var(--mono);font-size:14px;color:var(--mute);margin-left:auto;font-weight:600}
+  .speed{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mute)}
+  .speed input{width:100px;accent-color:var(--teal)}
+
+  /* ---------- tracks ---------- */
+  .scroller{overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+  .track{display:flex;gap:var(--gap);width:max-content;min-height:var(--cell)}
+  .rowlabel{font-family:var(--mono);font-size:12px;color:var(--mute);font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;margin:16px 0 6px}
+
+  .cell{
+    width:var(--cell);height:var(--cell);border-radius:6px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:19px;font-weight:700;color:#fff;
+    background:#8EA6AB;border:3px solid transparent;
+    transition:transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .cell.n-A{background:var(--A)} .cell.n-T{background:var(--T)}
+  .cell.n-U{background:var(--U)} .cell.n-G{background:var(--G)}
+  .cell.n-C{background:var(--C)}
+  .cell.dim{opacity:.28}
+  .cell.cursor{border-color:var(--ink);transform:translateY(-5px)}
+  .cell.ok{border-color:var(--mint)}
+  .cell.bad{border-color:var(--coral)}
+  .cell.hit{box-shadow:0 0 0 3px var(--amberfill) inset, 0 0 0 2px #fff}
+  .cell.keep{border-color:var(--amber)}
+  .cell.ghost{background:#DCE7E9;color:#7E979C;border-color:transparent}
+
+  #patTrack{transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .padder{flex:none}
+
+  .idxrow{display:flex;gap:var(--gap);width:max-content;margin-top:5px}
+  .idx{width:var(--cell);flex:none;text-align:center;
+    font-family:var(--mono);font-size:11px;color:#7E979C;font-weight:600}
+  .idx.on{color:var(--amber);font-weight:800}
+
+  /* ---------- narration ---------- */
+  .narrate{
+    display:flex;gap:14px;align-items:flex-start;
+    background:#FFFFFF;border:1.5px solid var(--line2);border-radius:10px;
+    padding:15px 17px;margin-top:20px;min-height:78px;
+  }
+  .badge{
+    flex:none;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.1em;
+    text-transform:uppercase;padding:6px 10px;border-radius:5px;background:#E2EDEF;color:var(--ink);
+  }
+  .badge.ok{background:var(--mintfill);color:#06301F}
+  .badge.bad{background:var(--coralfill);color:#FFFFFF}
+  .badge.jump{background:var(--amberfill);color:#3A2205}
+  .badge.hit{background:var(--ink);color:#FFFFFF}
+  .narrate p{margin:0;font-size:17px;color:var(--ink)}
+  .narrate code{font-family:var(--mono);background:var(--panel);padding:1px 6px;border-radius:4px;
+    font-size:16px;color:var(--teal);font-weight:700}
+  .narrate strong{color:var(--coral)}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#FFFFFF;border:1.5px solid var(--line);border-radius:10px;padding:12px 15px}
+  .stat .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:700}
+  .stat .v{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--ink);margin-top:2px}
+  .stat .v.mint{color:var(--mint)} .stat .v.amber{color:var(--amber)}
+
+  /* ---------- lps table ---------- */
+  .lpsgrid{display:flex;gap:var(--gap);width:max-content}
+  .lpscol{width:var(--cell);flex:none;text-align:center}
+  .lpsval{
+    height:34px;margin-top:5px;border-radius:5px;background:#FFFFFF;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:17px;font-weight:800;color:var(--mint);
+    border:2.5px solid var(--line);
+  }
+  .lpsval.empty{color:#A9C1C5;background:#E8F0F1;border-color:#E8F0F1}
+  .lpsval.just{border-color:var(--amberfill);background:#FDF3E7}
+
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;font-size:13px;color:var(--mute)}
+  .legend b{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+
+  .matches{margin-top:16px;font-family:var(--mono);font-size:14px;color:var(--mute);font-weight:600}
+  .matches b{color:var(--amber)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Knuth–Morris–Pratt</p>
+  <h1>Watch the pattern slide, not the text rewind</h1>
+  <p class="sub">Type any sequence and any pattern. Step through the two phases KMP runs: first it
+  reads the pattern alone to build the LPS table, then it scans the sequence once — the text
+  pointer <code>i</code> only ever moves forward.</p>
+
+  <div class="inputs">
+    <div>
+      <label for="txt">Sequence (text)</label>
+      <input id="txt" type="text" spellcheck="false" autocomplete="off" value="GCTAGCTAATGCCATGCTTAAGCTATGCTAA">
+      <p class="hint" id="txtHint"></p>
+    </div>
+    <div>
+      <label for="pat">Pattern to find</label>
+      <input id="pat" type="text" spellcheck="false" autocomplete="off" value="ATGC">
+      <p class="hint" id="patHint"></p>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span>Try:</span>
+    <button class="chip" data-t="GCTAGCTAATGCCATGCTTAAGCTATGCTAA" data-p="ATG">start codon ATG</button>
+    <button class="chip" data-t="CCGGTATAAAAGGCCTATAAAGGCTTCGA" data-p="TATAAA">TATA box</button>
+    <button class="chip" data-t="GCATTAAGGCTTGATAGCTGACCTAACGT" data-p="TGA">stop codon TGA</button>
+    <button class="chip" data-t="ATAGATAGATAGATACGATAGATAG" data-p="ATAGATAC">heavy self-overlap</button>
+    <button class="chip" data-t="AAAAAAAAAAAAAAAAAAAT" data-p="AAAAT">naive's worst case</button>
+    <button class="chip" data-t="the rain in spain falls mainly on the plain" data-p="ain">plain text</button>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" id="tab1" role="tab" aria-selected="true" aria-controls="p1">
+      Phase 1 — Build LPS <small>read the pattern</small>
+    </button>
+    <button class="tab" id="tab2" role="tab" aria-selected="false" aria-controls="p2">
+      Phase 2 — Search <small>scan the text</small>
+    </button>
+  </div>
+
+  <!-- ===================== PHASE 1 ===================== -->
+  <section class="stage" id="p1" role="tabpanel" aria-labelledby="tab1">
+    <div class="controls">
+      <button class="ctl" id="b1First">&#124;&#9664;</button>
+      <button class="ctl" id="b1Prev">&#9664; Back</button>
+      <button class="ctl primary" id="b1Play">&#9654; Play</button>
+      <button class="ctl" id="b1Next">Next &#9654;</button>
+      <button class="ctl" id="b1Last">&#9654;&#124;</button>
+      <div class="speed">
+        <label for="sp1" style="margin:0;text-transform:none;letter-spacing:0;color:var(--mute);font-size:13px;font-weight:400">Speed</label>
+        <input id="sp1" type="range" min="120" max="1400" value="620" step="20">
+      </div>
+      <span class="stepcount" id="c1"></span>
+    </div>
+
+    <p class="rowlabel">Pattern — comparing <span style="color:var(--amber)">P[i]</span> against <span style="color:var(--mint)">P[len]</span></p>
+    <div class="scroller">
+      <div>
+        <div class="track" id="lpsPat"></div>
+        <div class="idxrow" id="lpsIdx"></div>
+        <p class="rowlabel" style="margin-bottom:2px">LPS — longest prefix that is also a suffix</p>
+        <div class="lpsgrid" id="lpsRow"></div>
+      </div>
+    </div>
+
+    <div class="narrate">
+      <span class="badge" id="n1b">start</span>
+      <p id="n1t"></p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Pattern length m</div><div class="v" id="s1m">0</div></div>
+      <div class="stat"><div class="k">Cursor i</div><div class="v amber" id="s1i">1</div></div>
+      <div class="stat"><div class="k">Matched length len</div><div class="v mint" id="s1len">0</div></div>
+      <div class="stat"><div class="k">Comparisons so far</div><div class="v" id="s1c">0</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== PHASE 2 ===================== -->
+  <section class="stage" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
+    <div class="controls">
+      <button class="ctl" id="b2First">&#124;&#9664;</button>
+      <button class="ctl" id="b2Prev">&#9664; Back</button>
+      <button class="ctl primary" id="b2Play">&#9654; Play</button>
+      <button class="ctl" id="b2Next">Next &#9654;</button>
+      <button class="ctl" id="b2Last">&#9654;&#124;</button>
+      <div class="speed">
+        <label for="sp2" style="margin:0;text-transform:none;letter-spacing:0;color:var(--mute);font-size:13px;font-weight:400">Speed</label>
+        <input id="sp2" type="range" min="120" max="1400" value="620" step="20">
+      </div>
+      <span class="stepcount" id="c2"></span>
+    </div>
+
+    <p class="rowlabel">Text</p>
+    <div class="scroller" id="scroll2">
+      <div>
+        <div class="track" id="txtTrack"></div>
+        <div class="idxrow" id="txtIdx"></div>
+        <p class="rowlabel">Pattern — aligned at the current offset</p>
+        <div class="track" id="patTrack"></div>
+      </div>
+    </div>
+
+    <div class="narrate">
+      <span class="badge" id="n2b">start</span>
+      <p id="n2t"></p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Text pointer i</div><div class="v mint" id="s2i">0</div></div>
+      <div class="stat"><div class="k">Pattern pointer j</div><div class="v amber" id="s2j">0</div></div>
+      <div class="stat"><div class="k">Comparisons (KMP)</div><div class="v" id="s2c">0</div></div>
+      <div class="stat"><div class="k">Matches found</div><div class="v mint" id="s2m">0</div></div>
+    </div>
+
+    <p class="matches" id="hits">No match recorded yet.</p>
+
+    <div class="legend">
+      <span><b style="background:var(--mintfill)"></b>characters agree</span>
+      <span><b style="background:var(--coralfill)"></b>mismatch</span>
+      <span><b style="background:var(--amberfill)"></b>overlap kept on the jump</span>
+      <span><b style="background:var(--ink)"></b>full match recorded</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var txtIn = $("txt"), patIn = $("pat");
+
+  var state = {
+    T:"", P:"", lps:[],
+    build:[], search:[],
+    k1:0, k2:0,
+    timer1:null, timer2:null
+  };
+
+  /* ---------------- traces ---------------- */
+
+  function buildTrace(P){
+    var m = P.length, lps = new Array(m).fill(0), steps = [], cmp = 0;
+    if(m === 0) return {lps:lps, steps:[{i:0,len:0,lps:lps.slice(),kind:"done",cmp:0}]};
+
+    steps.push({i:1,len:0,lps:lps.slice(),kind:"init",cmp:0});
+    var len = 0, i = 1;
+    while(i < m){
+      cmp++;
+      if(P[i] === P[len]){
+        len++; lps[i] = len;
+        steps.push({i:i,len:len,lps:lps.slice(),kind:"extend",cmp:cmp,wrote:i});
+        i++;
+      } else if(len > 0){
+        var from = len;
+        len = lps[len-1];
+        steps.push({i:i,len:len,lps:lps.slice(),kind:"fallback",cmp:cmp,from:from});
+      } else {
+        lps[i] = 0;
+        steps.push({i:i,len:0,lps:lps.slice(),kind:"zero",cmp:cmp,wrote:i});
+        i++;
+      }
+    }
+    steps.push({i:m,len:len,lps:lps.slice(),kind:"done",cmp:cmp});
+    return {lps:lps, steps:steps};
+  }
+
+  function searchTrace(T, P, lps){
+    var n = T.length, m = P.length, steps = [], cmp = 0, hits = [];
+    if(m === 0 || n === 0){
+      return [{i:0,j:0,kind:"done",cmp:0,hits:[]}];
+    }
+    steps.push({i:0,j:0,kind:"init",cmp:0,hits:[]});
+    var i = 0, j = 0, guard = 0;
+    while(i < n && guard++ < 200000){
+      if(T[i] === P[j]){
+        cmp++;
+        steps.push({i:i,j:j,kind:"agree",cmp:cmp,hits:hits.slice()});
+        i++; j++;
+        if(j === m){
+          hits.push(i - m);
+          steps.push({i:i,j:j,kind:"found",cmp:cmp,hits:hits.slice(),start:i-m});
+          var f = j; j = lps[j-1];
+          steps.push({i:i,j:j,kind:"jump",cmp:cmp,hits:hits.slice(),from:f,keep:j});
+        }
+      } else {
+        cmp++;
+        steps.push({i:i,j:j,kind:"clash",cmp:cmp,hits:hits.slice()});
+        if(j > 0){
+          var fr = j; j = lps[j-1];
+          steps.push({i:i,j:j,kind:"jump",cmp:cmp,hits:hits.slice(),from:fr,keep:j});
+        } else {
+          i++;
+          steps.push({i:i,j:j,kind:"slide",cmp:cmp,hits:hits.slice()});
+        }
+      }
+    }
+    steps.push({i:i,j:j,kind:"done",cmp:cmp,hits:hits.slice()});
+    return steps;
+  }
+
+  /* ---------------- cells ---------------- */
+
+  var NT = {A:1,T:1,G:1,C:1,U:1};
+
+  function cell(ch, cls){
+    var d = document.createElement("div");
+    d.className = "cell" + (cls ? " " + cls : "");
+    var up = ch.toUpperCase();
+    if(NT[up]) d.classList.add("n-" + up);
+    d.textContent = (ch === " ") ? "\u00b7" : ch;
+    return d;
+  }
+  function idxLabel(n, on){
+    var d = document.createElement("div");
+    d.className = "idx" + (on ? " on" : "");
+    d.textContent = n;
+    return d;
+  }
+  function clear(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+
+  /* ---------------- render: phase 1 ---------------- */
+
+  function render1(){
+    var st = state.build[state.k1];
+    if(!st) return;
+    var P = state.P, m = P.length;
+
+    var pr = $("lpsPat"), ir = $("lpsIdx"), lr = $("lpsRow");
+    clear(pr); clear(ir); clear(lr);
+
+    for(var k = 0; k < m; k++){
+      var cls = "";
+      if(st.kind !== "done"){
+        if(k === st.i) cls = "cursor";
+        else if(k === st.len && st.len >= 0 && st.kind !== "zero") cls = "ok";
+      }
+      if(st.kind === "extend"){
+        if(k === st.i) cls = "ok cursor";
+        else if(k === st.len - 1) cls = "ok";
+      }
+      if(st.kind === "zero" && k === st.i) cls = "bad cursor";
+      pr.appendChild(cell(P[k], cls));
+      ir.appendChild(idxLabel(k, k === st.i));
+
+      var col = document.createElement("div");
+      col.className = "lpscol";
+      var v = document.createElement("div");
+      var written = (k === 0) || (k < st.i) || (st.wrote === k);
+      v.className = "lpsval" + (written ? "" : " empty") + (st.wrote === k ? " just" : "");
+      v.textContent = written ? st.lps[k] : "\u2013";
+      col.appendChild(v);
+      lr.appendChild(col);
+    }
+
+    $("s1m").textContent = m;
+    $("s1i").textContent = Math.min(st.i, m);
+    $("s1len").textContent = st.len;
+    $("s1c").textContent = st.cmp;
+    $("c1").textContent = "Step " + (state.k1 + 1) + " of " + state.build.length;
+
+    var b = $("n1b"), t = $("n1t"), msg = "", kind = "";
+    if(st.kind === "init"){
+      msg = "LPS[0] is always <code>0</code> — a single character has no proper prefix. Start comparing at <code>i = 1</code> with <code>len = 0</code>.";
+      kind = ""; b.textContent = "start";
+    } else if(st.kind === "extend"){
+      msg = "<code>P[" + st.i + "] = " + P[st.i] + "</code> matches <code>P[" + (st.len-1) + "] = " + P[st.len-1] + "</code>. The overlap grows to <code>" + st.len + "</code>, so <code>LPS[" + st.i + "] = " + st.len + "</code>.";
+      kind = "ok"; b.textContent = "extend";
+    } else if(st.kind === "zero"){
+      msg = "<code>P[" + st.i + "] = " + P[st.i] + "</code> does not match the start of the pattern, and there is no overlap to fall back on. <code>LPS[" + st.i + "] = 0</code>.";
+      kind = "bad"; b.textContent = "reset";
+    } else if(st.kind === "fallback"){
+      msg = "Mismatch with an overlap of <code>" + st.from + "</code> in hand. Instead of restarting, fall back to <code>LPS[" + (st.from-1) + "] = " + st.len + "</code> and retry the same position <code>i = " + st.i + "</code>.";
+      kind = "jump"; b.textContent = "fall back";
+    } else {
+      msg = "LPS is complete: <code>[" + st.lps.join(", ") + "]</code>. Built in one pass over the pattern — <code>O(m)</code>. Now switch to Phase 2 and scan the text.";
+      kind = "hit"; b.textContent = "done";
+    }
+    b.className = "badge" + (kind ? " " + kind : "");
+    t.innerHTML = msg;
+
+    $("b1First").disabled = $("b1Prev").disabled = (state.k1 === 0);
+    $("b1Next").disabled = $("b1Last").disabled = (state.k1 >= state.build.length - 1);
+  }
+
+  /* ---------------- render: phase 2 ---------------- */
+
+  function render2(){
+    var st = state.search[state.k2];
+    if(!st) return;
+    var T = state.T, P = state.P, n = T.length, m = P.length;
+    var offset = st.i - st.j;
+
+    var tt = $("txtTrack"), ti = $("txtIdx"), pt = $("patTrack");
+    clear(tt); clear(ti); clear(pt);
+
+    for(var a = 0; a < n; a++){
+      var cls = "";
+      var inWindow = (a >= offset && a < offset + m);
+      if(!inWindow) cls = "dim";
+      if(st.kind === "agree" && a === st.i) cls = "ok cursor";
+      if(st.kind === "clash" && a === st.i) cls = "bad cursor";
+      if(st.kind === "found"){
+        if(a >= st.start && a < st.start + m) cls = "hit";
+      }
+      for(var h = 0; h < st.hits.length; h++){
+        if(a >= st.hits[h] && a < st.hits[h] + m && cls.indexOf("cursor") === -1 && st.kind !== "found") cls = "hit";
+      }
+      if(st.kind === "jump" && a >= offset && a < offset + st.keep) cls = "keep";
+      tt.appendChild(cell(T[a], cls));
+      ti.appendChild(idxLabel(a, a === st.i));
+    }
+
+    var pad = document.createElement("div");
+    pad.className = "padder";
+    var cw = 42, gp = 6;
+    pad.style.width = Math.max(0, offset) * (cw + gp) + "px";
+    pt.appendChild(pad);
+
+    for(var q = 0; q < m; q++){
+      var pc = "";
+      if(st.kind === "agree" && q === st.j) pc = "ok cursor";
+      else if(st.kind === "clash" && q === st.j) pc = "bad cursor";
+      else if(st.kind === "jump" && q < st.keep) pc = "keep";
+      else if(st.kind === "found") pc = "hit";
+      else if(q >= st.j) pc = "ghost";
+      pt.appendChild(cell(P[q], pc));
+    }
+
+    $("s2i").textContent = st.i;
+    $("s2j").textContent = st.j;
+    $("s2c").textContent = st.cmp;
+    $("s2m").textContent = st.hits.length;
+    $("c2").textContent = "Step " + (state.k2 + 1) + " of " + state.search.length;
+    $("hits").innerHTML = st.hits.length
+      ? "Match starts at index " + (st.hits.length > 1 ? "es " : " ") + "<b>" + st.hits.join(", ") + "</b>"
+      : "No match recorded yet.";
+
+    var b = $("n2b"), t = $("n2t"), msg = "", kind = "";
+    if(st.kind === "init"){
+      msg = "Align the pattern at index <code>0</code>. <code>i</code> walks the text, <code>j</code> walks the pattern.";
+      b.textContent = "start";
+    } else if(st.kind === "agree"){
+      msg = "<code>T[" + st.i + "] = " + T[st.i] + "</code> matches <code>P[" + st.j + "]</code>. Advance both pointers.";
+      kind = "ok"; b.textContent = "match";
+    } else if(st.kind === "clash"){
+      msg = "<code>T[" + st.i + "] = " + T[st.i] + "</code> does not match <code>P[" + st.j + "] = " + P[st.j] + "</code>." +
+            (st.j > 0 ? " But <code>" + st.j + "</code> characters already matched — that prefix is known, so the text pointer stays put." : " Nothing matched yet, so there is nothing to reuse.");
+      kind = "bad"; b.textContent = "mismatch";
+    } else if(st.kind === "jump"){
+      msg = "Consult LPS: <code>j</code> drops from <code>" + st.from + "</code> to <code>" + st.keep + "</code>. The pattern slides forward by <code>" +
+            (st.from - st.keep) + "</code>, keeping the <code>" + st.keep + "</code>-character overlap. <strong>i did not move backward.</strong>";
+      kind = "jump"; b.textContent = "LPS jump";
+    } else if(st.kind === "slide"){
+      msg = "<code>j</code> was already <code>0</code>, so there is no overlap to reuse. Move <code>i</code> forward by one and try again.";
+      b.textContent = "advance";
+    } else if(st.kind === "found"){
+      msg = "Full match. The pattern occurs at index <code>" + st.start + "</code>. The scan continues from here via LPS, so overlapping occurrences are not missed.";
+      kind = "hit"; b.textContent = "match found";
+    } else {
+      msg = "Scan complete after <code>" + st.cmp + "</code> comparisons over a text of length <code>" + n + "</code>. " +
+            (st.hits.length ? st.hits.length + " occurrence" + (st.hits.length > 1 ? "s" : "") + " found." : "The pattern does not occur in this text.");
+      kind = "hit"; b.textContent = "done";
+    }
+    b.className = "badge" + (kind ? " " + kind : "");
+    t.innerHTML = msg;
+
+    var sc = $("scroll2"), cx = st.i * (cw + gp);
+    if(cx < sc.scrollLeft + 60 || cx > sc.scrollLeft + sc.clientWidth - 120){
+      sc.scrollLeft = Math.max(0, cx - sc.clientWidth / 2);
+    }
+
+    $("b2First").disabled = $("b2Prev").disabled = (state.k2 === 0);
+    $("b2Next").disabled = $("b2Last").disabled = (state.k2 >= state.search.length - 1);
+  }
+
+  /* ---------------- rebuild ---------------- */
+
+  function rebuild(){
+    stop(1); stop(2);
+    var T = txtIn.value, P = patIn.value;
+    $("txtHint").textContent = T.length ? T.length + " characters" : "Enter a sequence to search.";
+    $("txtHint").className = "hint" + (T.length ? "" : " bad");
+
+    if(!P.length){
+      $("patHint").textContent = "Enter a pattern.";
+      $("patHint").className = "hint bad";
+    } else if(P.length > T.length){
+      $("patHint").textContent = "Pattern is longer than the text — it cannot occur.";
+      $("patHint").className = "hint bad";
+    } else {
+      $("patHint").textContent = P.length + " characters";
+      $("patHint").className = "hint";
+    }
+
+    state.T = T; state.P = P;
+    var b = buildTrace(P);
+    state.lps = b.lps;
+    state.build = b.steps;
+    state.search = searchTrace(T, P, b.lps);
+    state.k1 = 0; state.k2 = 0;
+    render1(); render2();
+  }
+
+  /* ---------------- playback ---------------- */
+
+  function goto1(k){ state.k1 = Math.max(0, Math.min(k, state.build.length - 1)); render1(); }
+  function goto2(k){ state.k2 = Math.max(0, Math.min(k, state.search.length - 1)); render2(); }
+
+  function stop(which){
+    if(which === 1 && state.timer1){ clearInterval(state.timer1); state.timer1 = null; $("b1Play").innerHTML = "&#9654; Play"; }
+    if(which === 2 && state.timer2){ clearInterval(state.timer2); state.timer2 = null; $("b2Play").innerHTML = "&#9654; Play"; }
+  }
+  function play(which){
+    if(which === 1){
+      if(state.timer1){ stop(1); return; }
+      if(state.k1 >= state.build.length - 1) goto1(0);
+      $("b1Play").innerHTML = "&#10074;&#10074; Pause";
+      state.timer1 = setInterval(function(){
+        if(state.k1 >= state.build.length - 1){ stop(1); return; }
+        goto1(state.k1 + 1);
+      }, Number($("sp1").value));
+    } else {
+      if(state.timer2){ stop(2); return; }
+      if(state.k2 >= state.search.length - 1) goto2(0);
+      $("b2Play").innerHTML = "&#10074;&#10074; Pause";
+      state.timer2 = setInterval(function(){
+        if(state.k2 >= state.search.length - 1){ stop(2); return; }
+        goto2(state.k2 + 1);
+      }, Number($("sp2").value));
+    }
+  }
+
+  $("b1First").onclick = function(){ stop(1); goto1(0); };
+  $("b1Prev").onclick  = function(){ stop(1); goto1(state.k1 - 1); };
+  $("b1Next").onclick  = function(){ stop(1); goto1(state.k1 + 1); };
+  $("b1Last").onclick  = function(){ stop(1); goto1(state.build.length - 1); };
+  $("b1Play").onclick  = function(){ play(1); };
+  $("sp1").oninput     = function(){ if(state.timer1){ stop(1); play(1); } };
+
+  $("b2First").onclick = function(){ stop(2); goto2(0); };
+  $("b2Prev").onclick  = function(){ stop(2); goto2(state.k2 - 1); };
+  $("b2Next").onclick  = function(){ stop(2); goto2(state.k2 + 1); };
+  $("b2Last").onclick  = function(){ stop(2); goto2(state.search.length - 1); };
+  $("b2Play").onclick  = function(){ play(2); };
+  $("sp2").oninput     = function(){ if(state.timer2){ stop(2); play(2); } };
+
+  /* ---------------- tabs ---------------- */
+
+  function selectTab(which){
+    var one = which === 1;
+    $("tab1").setAttribute("aria-selected", one ? "true" : "false");
+    $("tab2").setAttribute("aria-selected", one ? "false" : "true");
+    $("p1").hidden = !one;
+    $("p2").hidden = one;
+    stop(one ? 2 : 1);
+    if(one) render1(); else render2();
+  }
+  $("tab1").onclick = function(){ selectTab(1); };
+  $("tab2").onclick = function(){ selectTab(2); };
+
+  /* ---------------- inputs ---------------- */
+
+  txtIn.oninput = rebuild;
+  patIn.oninput = rebuild;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(c){
+    c.onclick = function(){
+      txtIn.value = c.getAttribute("data-t");
+      patIn.value = c.getAttribute("data-p");
+      rebuild();
+    };
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.target.tagName === "INPUT" && e.target.type === "text") return;
+    var one = $("p1").hidden === false;
+    if(e.key === "ArrowRight"){ e.preventDefault(); stop(one?1:2); one ? goto1(state.k1+1) : goto2(state.k2+1); }
+    if(e.key === "ArrowLeft"){ e.preventDefault(); stop(one?1:2); one ? goto1(state.k1-1) : goto2(state.k2-1); }
+    if(e.key === " "){ e.preventDefault(); play(one?1:2); }
+  });
+
+  rebuild();
+})();
+</script>
+</body>
+</html>
