@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit I quiz — Overview of Biological Data</title>
+<style>
+  :root{
+    --blue:#1a73e8; --red:#d93025; --yellow:#e8a100; --green:#188038;
+    --text:#202124; --muted:#5f6368; --faint:#80868b;
+    --line:#dadce0; --card:#f8f9fa; --bg:#ffffff;
+    --blue-tint:#e8f0fe; --green-tint:#e6f4ea; --red-tint:#fce8e6; --yellow-tint:#fef7e0;
+    --sans:Arial, Helvetica, "Helvetica Neue", sans-serif;
+    --mono:"Courier New", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --radius:8px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:28px 20px 80px}
+  a{color:var(--blue)}
+
+  /* ---------- masthead ---------- */
+  .mast{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px}
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--blue); font-weight:700;
+  }
+  h1{font-size:32px; line-height:1.15; margin:6px 0 8px; font-weight:700; letter-spacing:-.01em}
+  .lede{color:var(--muted); font-size:15px; margin:0 0 26px; max-width:64ch}
+
+  /* ---------- setup ---------- */
+  .panel{
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--card); padding:18px 20px; margin-bottom:18px;
+  }
+  .panel h2{font-size:15px; margin:0 0 4px; font-weight:700}
+  .panel p{margin:0; color:var(--muted); font-size:14px}
+
+  .topics{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:18px 0 0}
+  @media (max-width:680px){ .topics{grid-template-columns:1fr} }
+  .topic{
+    text-align:left; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--bg); padding:16px 18px; cursor:pointer; font:inherit; color:inherit;
+    display:flex; gap:14px; align-items:flex-start; transition:border-color .15s, box-shadow .15s, transform .15s;
+  }
+  .topic:hover{border-color:var(--blue); box-shadow:0 1px 6px rgba(32,33,36,.12)}
+  .topic:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .topic .dot{
+    flex:0 0 auto; width:34px; height:34px; border-radius:50%;
+    display:grid; place-items:center; color:#fff; font-weight:700; font-size:13px;
+    font-family:var(--mono);
+  }
+  .topic .tt{font-weight:700; font-size:15px; margin-bottom:2px}
+  .topic .ts{color:var(--muted); font-size:13px}
+  .topic .tn{color:var(--faint); font-size:12px; font-family:var(--mono); margin-top:6px}
+
+  .rowctl{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px}
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--bg)}
+  .seg button{
+    font:inherit; font-size:13px; border:0; background:transparent; color:var(--muted);
+    padding:7px 14px; cursor:pointer;
+  }
+  .seg button[aria-pressed="true"]{background:var(--blue); color:#fff; font-weight:700}
+  .seg button:focus-visible{outline:3px solid var(--blue); outline-offset:-3px}
+  .lbl{font-size:13px; color:var(--muted); font-weight:700}
+
+  .btn{
+    font:inherit; font-weight:700; font-size:15px; border:0; border-radius:999px;
+    padding:11px 26px; cursor:pointer; background:var(--blue); color:#fff;
+    transition:filter .15s;
+  }
+  .btn:hover{filter:brightness(.93)}
+  .btn:disabled{background:#e0e0e0; color:#9aa0a6; cursor:not-allowed; filter:none}
+  .btn:focus-visible{outline:3px solid var(--text); outline-offset:2px}
+  .btn.ghost{background:transparent; color:var(--blue); border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--blue-tint)}
+
+  /* ---------- signature: the sequence strip ---------- */
+  .strip{display:flex; gap:3px; flex-wrap:wrap; margin:0 0 4px}
+  .strip i{
+    width:16px; height:9px; border-radius:2px; background:#e8eaed; display:block;
+    transition:background .2s;
+  }
+  .strip i.ok{background:var(--green)}
+  .strip i.no{background:var(--red)}
+  .strip i.now{background:var(--blue); box-shadow:0 0 0 2px var(--blue-tint)}
+  .strip.review i{width:20px; height:20px; cursor:pointer; border-radius:3px; display:grid; place-items:center;
+    color:#fff; font-family:var(--mono); font-size:10px; font-style:normal; font-weight:700}
+  .strip.review i:not(.ok):not(.no){color:var(--muted)}
+
+  /* ---------- quiz ---------- */
+  .qhead{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:22px 0 8px}
+  .qcount{font-family:var(--mono); font-size:13px; color:var(--muted); letter-spacing:.04em}
+  .qtopic{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); font-weight:700}
+  .clock{font-family:var(--mono); font-size:13px; color:var(--muted); font-weight:700}
+  .clock.warn{color:var(--yellow)}
+  .clock.crit{color:var(--red)}
+  .bar{height:3px; background:#eceff1; border-radius:2px; overflow:hidden; margin-bottom:22px}
+  .bar span{display:block; height:100%; width:100%; background:var(--blue); transform-origin:left}
+  .bar span.warn{background:var(--yellow)}
+  .bar span.crit{background:var(--red)}
+
+  .qtext{font-size:20px; line-height:1.4; font-weight:700; margin:0 0 18px}
+  .qtext code, .seq{font-family:var(--mono); font-weight:700; background:var(--card);
+    border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:.92em}
+
+  .opts{display:flex; flex-direction:column; gap:9px; margin-bottom:18px}
+  .opt{
+    display:flex; gap:13px; align-items:flex-start; text-align:left;
+    font:inherit; color:inherit; background:var(--bg); cursor:pointer;
+    border:1px solid var(--line); border-radius:var(--radius); padding:13px 16px;
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:var(--blue); background:var(--blue-tint)}
+  .opt:disabled{cursor:default}
+  .opt:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .opt .key{
+    flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line);
+    display:grid; place-items:center; font-family:var(--mono); font-size:11px; font-weight:700;
+    color:var(--muted); background:var(--bg); margin-top:1px;
+  }
+  .opt.correct{border-color:var(--green); background:var(--green-tint)}
+  .opt.correct .key{background:var(--green); border-color:var(--green); color:#fff}
+  .opt.wrong{border-color:var(--red); background:var(--red-tint)}
+  .opt.wrong .key{background:var(--red); border-color:var(--red); color:#fff}
+  .opt.dim{opacity:.55}
+
+  .why{
+    border:1px solid var(--line); border-left:1px solid var(--line);
+    border-radius:var(--radius); background:var(--card); padding:15px 18px; margin-bottom:20px;
+  }
+  .why.hit{background:var(--green-tint); border-color:#ceead6}
+  .why.miss{background:var(--red-tint); border-color:#f6aea9}
+  .why .verdict{font-weight:700; font-size:14px; margin-bottom:5px}
+  .why.hit .verdict{color:#0d652d}
+  .why.miss .verdict{color:#a50e0e}
+  .why p{margin:0; font-size:15px; color:var(--text)}
+
+  .foot{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap}
+  .hint{font-size:12px; color:var(--faint); font-family:var(--mono)}
+
+  /* ---------- results ---------- */
+  .score{display:flex; gap:28px; flex-wrap:wrap; align-items:flex-end; margin:10px 0 20px}
+  .score .big{font-size:64px; font-weight:700; line-height:1; letter-spacing:-.02em}
+  .score .sub{color:var(--muted); font-size:14px; padding-bottom:8px}
+  .breakdown{width:100%; border-collapse:collapse; margin:14px 0 22px; font-size:14px}
+  .breakdown th,.breakdown td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line)}
+  .breakdown th{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  .breakdown td.num{font-family:var(--mono); text-align:right; white-space:nowrap}
+  .rev{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px}
+  .rev .rq{font-weight:700; margin-bottom:6px}
+  .rev .ra{font-size:14px; margin:2px 0}
+  .rev .ra b{font-family:var(--mono)}
+  .ok-t{color:#0d652d} .no-t{color:#a50e0e}
+  .rev .re{font-size:14px; color:var(--muted); margin-top:7px}
+
+  .hidden{display:none !important}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
+  @media print{ .btn,.seg,.bar{display:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= SETUP ================= -->
+  <section id="setup">
+    <div class="mast"><span class="eyebrow">Unit I · self-test</span></div>
+    <h1>Overview of Biological Data</h1>
+    <p class="lede">Six question banks, one per section of the unit. Answer, read why, move on.
+       Pick a bank below or run the full set of <b id="totalq">0</b> questions.</p>
+
+    <div class="panel">
+      <h2>How the timer works</h2>
+      <p>Each question gets a countdown — the pace you should be working at. Answer any time
+         before it runs out; the explanation appears as soon as you answer, and only then does
+         <b>Next</b> unlock. If the countdown reaches zero first, the answer is revealed and the
+         question is scored as missed.</p>
+      <div class="rowctl">
+        <span class="lbl">Seconds per question</span>
+        <span class="seg" id="segTime" role="group" aria-label="Seconds per question">
+          <button data-t="30" aria-pressed="true">30</button>
+          <button data-t="45" aria-pressed="false">45</button>
+          <button data-t="60" aria-pressed="false">60</button>
+          <button data-t="0"  aria-pressed="false">No limit</button>
+        </span>
+      </div>
+      <div class="rowctl">
+        <span class="lbl">Question order</span>
+        <span class="seg" id="segOrder" role="group" aria-label="Question order">
+          <button data-o="fixed" aria-pressed="true">As taught</button>
+          <button data-o="shuffle" aria-pressed="false">Shuffled</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="topics" id="topics"></div>
+
+    <div class="rowctl" style="margin-top:20px">
+      <button class="btn" id="startAll">Start the full set</button>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="quiz" class="hidden">
+    <div class="strip" id="strip" aria-hidden="true"></div>
+    <div class="qhead">
+      <div>
+        <div class="qtopic" id="qTopic"></div>
+        <div class="qcount" id="qCount"></div>
+      </div>
+      <div class="clock" id="clock">30s</div>
+    </div>
+    <div class="bar"><span id="barFill"></span></div>
+
+    <h2 class="qtext" id="qText"></h2>
+    <div class="opts" id="opts"></div>
+
+    <div class="why hidden" id="why">
+      <div class="verdict" id="verdict"></div>
+      <p id="whyText"></p>
+    </div>
+
+    <div class="foot">
+      <span class="hint" id="hint">keys 1–4 to answer · Enter for next</span>
+      <span style="display:flex; gap:10px">
+        <button class="btn ghost" id="quitBtn">End and score</button>
+        <button class="btn" id="nextBtn" disabled>Next</button>
+      </span>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section id="results" class="hidden">
+    <div class="mast"><span class="eyebrow">Result</span></div>
+    <h1 id="resTitle">Your score</h1>
+    <div class="score">
+      <div><div class="big" id="resPct">0%</div></div>
+      <div class="sub" id="resLine"></div>
+    </div>
+
+    <table class="breakdown" id="resTable">
+      <thead><tr><th>Section</th><th class="num">Correct</th><th class="num">Asked</th><th class="num">%</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h2 style="font-size:17px; margin:0 0 4px">Question map</h2>
+    <p class="lede" style="margin-bottom:10px">Green is right, red is wrong. Select any block to jump to that question below.</p>
+    <div class="strip review" id="revStrip"></div>
+
+    <div id="reviewList" style="margin-top:22px"></div>
+
+    <div class="rowctl" style="margin-top:8px">
+      <button class="btn" id="againWrong">Retry the ones I missed</button>
+      <button class="btn ghost" id="restart">Back to the banks</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   Question banks — Unit I: Overview of Biological Data
+   ===================================================================== */
+const BANKS = [
+{
+ id:"data", name:"Biological data & sequences", colour:"#1a73e8",
+ blurb:"Scope of bioinformatics, data types, DNA/RNA/protein, file formats",
+ qs:[
+ {q:"Bioinformatics is best described as:",
+  o:["The laboratory automation of DNA sequencing",
+     "The application of computational tools to collect, store, analyse and interpret biological data",
+     "The study of biological molecules using statistics alone",
+     "A branch of clinical medicine concerned with genetic counselling"],
+  a:1,
+  e:"Biology supplies the question, computer science the method, statistics the confidence. Automating a sequencer is instrumentation, not bioinformatics."},
+ {q:"Which of these is a primary (archival) database?",
+  o:["InterPro","STRING","GenBank","RefSeq"],
+  a:2,
+  e:"GenBank stores author submissions essentially as received. InterPro and STRING are derived resources, and RefSeq is NCBI's curated non-redundant derivative of GenBank — all three are secondary."},
+ {q:"RNA-seq expression data from a published study should be deposited in:",
+  o:["the PDB","GEO or ArrayExpress","UniProtKB","InterPro"],
+  a:1,
+  e:"Choose the archive by data type. GEO (NCBI) and ArrayExpress/BioStudies (EMBL-EBI) take expression data; raw reads go to SRA/ENA."},
+ {q:"By convention, a DNA sequence in a database is written:",
+  o:["3' to 5'","5' to 3'","N-terminus to C-terminus","either way — it is not specified"],
+  a:1,
+  e:"Always 5'→3'. Because the strands are antiparallel and complementary, storing one strand fully determines the other."},
+ {q:"The reverse complement of <code>5'-ATGCCGTAAG-3'</code> is:",
+  o:["5'-CTTACGGCAT-3'","5'-TACGGCATTC-3'","5'-GAATGCCGTA-3'","5'-CAUGGCAUUC-3'"],
+  a:0,
+  e:"The complement is TACGGCATTC read 3'→5'; reversing it to the standard 5'→3' orientation gives CTTACGGCAT. The tempting wrong answer, TACGGCATTC, is the complement left unreversed."},
+ {q:"In IUPAC nucleotide notation, R stands for:",
+  o:["any base","A or G","C or T","a gap"],
+  a:1,
+  e:"R = purine (A/G), Y = pyrimidine (C/T), N = any base. The gap character '-' is not an ambiguity code and belongs only in alignments."},
+ {q:"You convert a GenBank record to FASTA. What is lost?",
+  o:["the sequence itself","the accession number","every feature and annotation","nothing"],
+  a:2,
+  e:"FASTA carries one description line and the residues. Genes, CDS boundaries, qualifiers and references all disappear — which is why you never treat a FASTA file as an annotated record."},
+ {q:"FASTQ differs from FASTA because it additionally stores:",
+  o:["3D atomic coordinates","a per-base quality score","a feature table","the full taxonomic lineage"],
+  a:1,
+  e:"Four lines per record: identifier, sequence, '+', and Phred quality characters. That is what makes it the format for raw sequencing reads."},
+ {q:"Protein sequences are conventionally written:",
+  o:["C-terminus to N-terminus","N-terminus to C-terminus","5' to 3'","in order of residue mass"],
+  a:1,
+  e:"N→C, which corresponds to 5'→3' along the coding strand. 5'/3' terminology applies to nucleic acids only."},
+ {q:"Why does a protein-level search detect more distant homology than a DNA search?",
+  o:["proteins evolve faster than DNA",
+     "the larger alphabet and the degenerate code mean synonymous changes do not erode the signal",
+     "protein databases are simply bigger",
+     "DNA searches cannot search the reverse strand"],
+  a:1,
+  e:"Twenty letters plus a substitution matrix (BLOSUM/PAM) carry far more information than four letters. Synonymous substitutions destroy DNA identity while leaving the protein untouched — hence blastx and tblastn."},
+ {q:"Which statement about RNA is correct?",
+  o:["RNA contains thymine in place of uracil",
+     "RNA is always double-stranded",
+     "The 2'-OH of ribose makes RNA more reactive and less stable than DNA",
+     "Sequence databases always store RNA written with U"],
+  a:2,
+  e:"Uracil replaces thymine, not the other way round; RNA is usually single-stranded and folds back on itself; and databases normally store the DNA equivalent, written with T."},
+ {q:"In a sequence file, '-' and 'N' mean:",
+  o:["the same thing",
+     "'-' is a gap introduced by alignment; 'N' is an unknown base in the sequence itself",
+     "'-' is an unknown base; 'N' is an alignment gap",
+     "both are ambiguity codes for a purine"],
+  a:1,
+  e:"Confusing the two is a classic error: a gap is a statement about the alignment, an N is a statement about the sequence. GenBank rejects records with too many Ns, and gaps must be stripped before deposition."}
+ ]
+},
+{
+ id:"primary", name:"Primary databases", colour:"#d93025",
+ blurb:"GenBank and the INSDC, accessions, UniProt, PDB and the PDB format",
+ qs:[
+ {q:"GenBank is maintained by:",
+  o:["EMBL-EBI","NCBI, part of the NLM at the NIH","DDBJ","the wwPDB"],
+  a:1,
+  e:"NCBI has maintained GenBank since 1982. ENA is the EMBL-EBI equivalent and DDBJ the Japanese one; all three are INSDC members."},
+ {q:"The INSDC comprises:",
+  o:["GenBank, UniProt and the PDB",
+     "GenBank, ENA and DDBJ",
+     "NCBI, EMBL-EBI and SIB",
+     "RefSeq, Ensembl and UniProt"],
+  a:1,
+  e:"The International Nucleotide Sequence Database Collaboration is the three nucleotide archives. They share a data model and a feature-table specification, and exchange records daily."},
+ {q:"You have one novel bacterial gene sequence to deposit. You should:",
+  o:["submit it to all three INSDC members for maximum coverage",
+     "submit it once, to whichever member is most convenient",
+     "submit it to GenBank and to UniProt",
+     "wait until the paper is accepted, then submit"],
+  a:1,
+  e:"The members exchange data daily, so one submission appears in all three under the same accession. Submitting twice creates duplicate accessions for a single experiment."},
+ {q:"A GenBank flat file record is terminated by:",
+  o:["END","//","ORIGIN","a blank line"],
+  a:1,
+  e:"'//' closes the record. ORIGIN introduces the sequence block, which is printed 60 bases to a line in groups of ten."},
+ {q:"The VERSION number of a GenBank record increases when:",
+  o:["any change at all is made to the record",
+     "the sequence itself is changed",
+     "a publication is added",
+     "the record is released from hold"],
+  a:1,
+  e:"Only sequence changes bump the version, e.g. U49845.1 → U49845.2. Annotation corrections revise the record without changing the version, and the accession never changes at all."},
+ {q:"Which statement about a GenBank accession number is true?",
+  o:["it is reused once a record is superseded",
+     "it changes when the sequence is corrected",
+     "it is permanent and never reused for another sequence",
+     "it is issued only after the paper is published"],
+  a:2,
+  e:"Permanence is the whole point: an accession you cite today resolves to the same record indefinitely, and superseded versions stay retrievable."},
+ {q:"NM_000518 is:",
+  o:["an original GenBank submission","a curated RefSeq mRNA","a UniProt accession","a PDB entry"],
+  a:1,
+  e:"The underscore marks a RefSeq record. NM_ = curated mRNA, NP_ = its protein, NC_ = complete genome, XM_/XP_ = predicted, WP_ = non-redundant bacterial protein."},
+ {q:"GenBank differs from RefSeq principally in that GenBank is:",
+  o:["curated and non-redundant",
+     "archival, author-owned and redundant",
+     "restricted to prokaryotic sequences",
+     "updated only once every two years"],
+  a:1,
+  e:"The same gene may appear in GenBank hundreds of times, and only the submitter can correct a record. RefSeq is NCBI-owned and gives one representative record per molecule per organism."},
+ {q:"UniProtKB/Swiss-Prot differs from UniProtKB/TrEMBL because Swiss-Prot entries are:",
+  o:["longer sequences","manually curated by expert biocurators","restricted to human proteins","generated automatically from RefSeq"],
+  a:1,
+  e:"TrEMBL is annotated automatically by rule systems such as UniRule and ARBA. Entries move from TrEMBL into Swiss-Prot when a curator works on them; the reverse never happens."},
+ {q:"More than 99% of UniProtKB sequences originate as:",
+  o:["direct protein sequencing",
+     "translations of INSDC coding sequences",
+     "sequences read off PDB structures",
+     "predictions from AlphaFold models"],
+  a:1,
+  e:"The value UniProt adds is the annotation, not the sequence. Directly sequenced proteins are the rare exception — the route for those is SPIN."},
+ {q:"UniParc is best described as:",
+  o:["sequence clusters at 100%, 90% and 50% identity",
+     "a non-redundant archive of every protein sequence ever seen, without annotation",
+     "the reviewed section of UniProtKB",
+     "the complete protein set of a reference organism"],
+  a:1,
+  e:"UniRef holds the identity clusters, Proteomes holds organism protein sets, and UniProtKB holds the annotation. UniParc is pure sequence history, and nothing is ever removed from it."},
+ {q:"In a PDB coordinate file, HETATM records hold:",
+  o:["standard polymer residues",
+     "ligands, ions, waters and modified residues",
+     "secondary-structure assignments",
+     "crystallographic symmetry operators"],
+  a:1,
+  e:"ATOM is for standard residues of the polymer, HETATM for everything else. Stripping all HETATM lines to 'clean' a file also deletes the ligand you are studying."},
+ {q:"In a PDB ATOM record, columns 61–66 contain:",
+  o:["the occupancy","the B-factor (temperature factor)","the z coordinate","the element symbol"],
+  a:1,
+  e:"Columns 55–60 hold occupancy, 61–66 the B-factor, 77–78 the element. Because the format is column-based you must slice by position — splitting on whitespace breaks as soon as two fields run together."},
+ {q:"The main reason PDBx/mmCIF replaced the legacy PDB format is that the old format:",
+  o:["produced files that were too large",
+     "could not exceed 99,999 atoms or 62 chains and could not be extended",
+     "was unable to store ligands",
+     "was needed only for cryo-EM entries"],
+  a:1,
+  e:"Fixed-column fields impose hard ceilings, four-character PDB IDs are nearly exhausted, and new metadata could only be bolted on as free-text REMARK lines. mmCIF is dictionary-governed and has no such limits."}
+ ]
+},
+{
+ id:"secondary", name:"Secondary databases", colour:"#e8a100",
+ blurb:"What 'derived' means; InterPro, UniGene, STRING",
+ qs:[
+ {q:"A secondary database is one that:",
+  o:["stores submissions exactly as received",
+     "is produced by analysing or curating primary data",
+     "is simply smaller than a primary database",
+     "is hosted outside the USA and Europe"],
+  a:1,
+  e:"Clustering, model building and literature curation turn primary records into families, signatures and scores. The trade is added interpretation in exchange for dependence on the archive beneath."},
+ {q:"InterPro's role is to:",
+  o:["archive 3D structures",
+     "integrate protein signature databases into one non-redundant classification",
+     "store raw sequencing reads",
+     "cluster ESTs into genes"],
+  a:1,
+  e:"Equivalent signatures from different member databases are merged into a single InterPro entry with a stable IPR accession."},
+ {q:"Which of these is an InterPro member database?",
+  o:["GEO","Pfam","dbSNP","Rfam"],
+  a:1,
+  e:"Members include Pfam, PROSITE, PRINTS, SMART, PANTHER, CDD, PIRSF, NCBIfam, HAMAP, CATH-Gene3D and SUPERFAMILY. Rfam covers RNA families and is not part of InterPro."},
+ {q:"Which is NOT an InterPro entry type?",
+  o:["homologous superfamily","domain","repeat","pathway"],
+  a:3,
+  e:"Entry types are family, domain, homologous superfamily, repeat and site. Pathways appear as cross-references, and GO terms are mapped through InterPro2GO — neither is an entry type."},
+ {q:"InterProScan is used to:",
+  o:["predict the 3D structure of a protein",
+     "scan a protein against all member-database signatures and report matches and inferred GO terms",
+     "align two whole genomes",
+     "submit protein sequences to UniProt"],
+  a:1,
+  e:"It is the standard functional-annotation step in a genome annotation pipeline: one sequence or a whole proteome in, signatures and GO terms out."},
+ {q:"UniGene was:",
+  o:["a structural classification of proteins",
+     "an automatic partitioning of GenBank transcript sequences into clusters, one per transcription locus",
+     "a protein family database",
+     "a catalogue of human genetic variants"],
+  a:1,
+  e:"Each cluster gathered the ESTs and mRNAs believed to come from a single gene, together with tissue expression profiles and cDNA clone availability."},
+ {q:"The current status of UniGene is:",
+  o:["updated monthly by NCBI",
+     "retired in July 2019; the web interface was withdrawn and final builds remain on the FTP site",
+     "merged into UniProt",
+     "renamed Ensembl"],
+  a:1,
+  e:"Old cluster numbers can still be matched to NCBI Gene records by searching the UniGene Cluster Number field, but nothing new is being built."},
+ {q:"A UniGene cluster identifier looked like:",
+  o:["IPR000719","Hs.1288","P69905","NM_000518"],
+  a:1,
+  e:"Clusters were organism-prefixed: Hs. for human, Mm. for mouse. IPR is InterPro, P69905 is UniProt, NM_ is RefSeq."},
+ {q:"UniGene became obsolete mainly because:",
+  o:["EST data was shown to be unreliable",
+     "short-read RNA-seq replaced EST submission and reference genomes became available for most organisms",
+     "NCBI lost the funding for it",
+     "the clustering algorithm was found to be incorrect"],
+  a:1,
+  e:"Clustering was the only way to group transcripts by gene when there was no reference genome. Once genomes existed, genome-based grouping was simply better, and usage collapsed."},
+ {q:"An edge in a STRING network means the two proteins:",
+  o:["physically bind one another",
+     "are functionally associated on the available evidence",
+     "are encoded by adjacent genes",
+     "have similar sequences"],
+  a:1,
+  e:"Association is deliberately broader than physical binding — it means the proteins contribute to a shared function. Presenting a STRING edge as proof of complex formation is the classic misuse."},
+ {q:"Which of these is NOT a STRING evidence channel?",
+  o:["text mining","co-expression","gene fusion","crystallographic contact"],
+  a:3,
+  e:"The channels are neighbourhood, gene fusion, co-occurrence, co-expression, experiments, databases and text mining. Text mining is the one to treat most sceptically."},
+ {q:"In STRING, a combined score of 0.9 indicates:",
+  o:["90% sequence identity between the partners",
+     "the highest confidence threshold",
+     "ninety supporting publications",
+     "a p-value of 0.9"],
+  a:1,
+  e:"Scores run 0 to 1, benchmarked against KEGG pathway membership: 0.4 medium, 0.7 high, 0.9 highest. Always report which cut-off you used."}
+ ]
+},
+{
+ id:"pattern", name:"Pattern matching & sequence features", colour:"#188038",
+ blurb:"String algorithms, motif models, promoters, codons, ORFs, translation",
+ qs:[
+ {q:"The worst-case running time of naive string search for a pattern of length m in a text of length n is:",
+  o:["O(n)","O(n + m)","O(n · m)","O(log n)"],
+  a:2,
+  e:"The pattern slides one position at a time and may compare up to m characters at each of ~n positions. On a 3 Gb genome searched for thousands of patterns, that is unusable."},
+ {q:"Knuth–Morris–Pratt achieves O(n + m) by:",
+  o:["comparing characters from right to left",
+     "using a prefix (failure) function so the text pointer never backtracks",
+     "hashing each window of the text",
+     "pre-indexing every suffix of the text"],
+  a:1,
+  e:"Information from a failed comparison tells you how far the pattern may safely shift, so each text character is examined once."},
+ {q:"Boyer–Moore compares the pattern against the text:",
+  o:["left to right","right to left, using bad-character and good-suffix rules to skip ahead",
+     "in random order","in both directions at once"],
+  a:1,
+  e:"Skipping whole blocks makes it sublinear in practice, which is why it underlies grep and most general text search."},
+ {q:"To screen millions of reads against a fixed panel of adapter and contaminant sequences in a single pass, use:",
+  o:["Needleman–Wunsch","Aho–Corasick","naive search","Smith–Waterman"],
+  a:1,
+  e:"Aho–Corasick builds one automaton for all patterns and scans the text once, in O(n + m + z). The two dynamic-programming methods are alignment algorithms, not multi-pattern search."},
+ {q:"BWA and Bowtie2 align short reads to a genome using:",
+  o:["suffix trees","an FM-index built on the Burrows–Wheeler transform","Rabin–Karp hashing","profile HMMs"],
+  a:1,
+  e:"The genome is indexed once into a compressed self-index; each read is then queried in time proportional to its own length."},
+ {q:"Compared with a consensus sequence, a position weight matrix:",
+  o:["is faster to compute",
+     "gives a graded score that reflects how strongly each position is conserved",
+     "can model insertions and deletions",
+     "requires a solved 3D structure"],
+  a:1,
+  e:"A consensus throws away conservation strength and a regular expression gives only yes/no. Modelling indels needs the next step up — a profile HMM."},
+ {q:"The canonical E. coli sigma-70 promoter consists of:",
+  o:["TATAAA at −25 and a CAAT box at −80",
+     "TTGACA at −35 and TATAAT at −10, separated by about 17 bp",
+     "GGGCGG at −110 and an initiator at +1",
+     "AGGAGG at −10 followed immediately by ATG"],
+  a:1,
+  e:"The AT-rich −10 Pribnow box is where the duplex melts. The spacing matters as much as the sequence, because both boxes must face the same side of the helix."},
+ {q:"The Shine–Dalgarno sequence:",
+  o:["is recognised by the sigma factor",
+     "positions the ribosome so that the correct AUG is used",
+     "marks the transcription start site",
+     "is the prokaryotic version of the TATA box"],
+  a:1,
+  e:"It is a translational signal, roughly 5–10 bases upstream of the start codon — which is exactly why it helps you decide which ATG is the real one."},
+ {q:"A CpG island is conventionally defined as a region:",
+  o:["longer than 200 bp with GC content above 50% and observed/expected CpG above 0.6",
+     "longer than 1 kb with GC content below 30%",
+     "any run of CG dinucleotides longer than 10 bp",
+     "the 200 bp immediately upstream of every gene"],
+  a:0,
+  e:"CpG islands mark most vertebrate housekeeping promoters and are detected with a sliding window — EMBOSS cpgplot and newcpgreport implement exactly this definition."},
+ {q:"In the Kozak context, the positions that matter most are:",
+  o:["−10 and −35","−3 and +4","+1 and +2","−25 and −30"],
+  a:1,
+  e:"A purine at −3 and a G at +4 dominate initiation efficiency in the consensus gccRccAUGG. −10/−35 are prokaryotic promoter elements, and −25/−30 is where a TATA box sits."},
+ {q:"The three stop codons are:",
+  o:["TAA, TAG, TGA","ATG, GTG, TTG","TAA, TAC, TGA","TAA, TAG, TGG"],
+  a:0,
+  e:"Ochre, amber and opal. No tRNA reads them; release factors terminate translation. TGG is tryptophan, and ATG/GTG/TTG are start codons in bacteria."},
+ {q:"How many reading frames must be examined for a double-stranded DNA sequence?",
+  o:["3","6","2","9"],
+  a:1,
+  e:"Three offsets on the given strand and three on its reverse complement. Forgetting the reverse strand is one of the two most common assignment errors."},
+ {q:"Why is an uninterrupted run of 100 or more codons good evidence of a coding region?",
+  o:["genes are never shorter than 100 codons",
+     "in random sequence a stop codon turns up roughly every 21 codons",
+     "ribosomes cannot translate anything shorter",
+     "BLAST requires a minimum of 100 codons"],
+  a:1,
+  e:"Three of the 64 codons are stops, so ~1 in 21 by chance. A long open stretch is therefore unlikely to be random — but it is still a hypothesis until homology or transcript evidence confirms it."},
+ {q:"Translating a bacterial CDS with NCBI translation table 1 instead of table 11 will:",
+  o:["make no difference at all",
+     "fail to treat alternative initiators such as GTG and TTG as starting methionine",
+     "turn every TGA into tryptophan",
+     "shift the reading frame by one base"],
+  a:1,
+  e:"Tables 1 and 11 assign the same amino acids to internal codons; table 11 additionally recognises GTG, TTG and ATT as initiators. TGA→Trp is the mycoplasma code (table 4), not table 11."},
+ {q:"An ORF predicted by ORFfinder should be treated as:",
+  o:["a confirmed gene",
+     "a hypothesis, to be checked against homology, domains or transcript evidence",
+     "proof that the region is transcribed",
+     "evidence that the protein is expressed"],
+  a:1,
+  e:"Prediction gives you a candidate. BLASTP, InterProScan or RNA-seq coverage is what converts it into a claim you can defend."}
+ ]
+},
+{
+ id:"resources", name:"NCBI, EBI and public tools", colour:"#1a73e8",
+ blurb:"Entrez and E-utilities, BLAST flavours, EBI resources, EMBOSS",
+ qs:[
+ {q:"NCBI was established in 1988 as part of:",
+  o:["the National Science Foundation",
+     "the National Library of Medicine at the NIH",
+     "EMBL",
+     "the Wellcome Trust"],
+  a:1,
+  e:"Its remit is to build public databases, develop analysis software and disseminate biomedical information."},
+ {q:"Entrez is:",
+  o:["a sequence alignment program",
+     "NCBI's integrated search and retrieval system spanning its databases",
+     "a data submission tool",
+     "a genome browser"],
+  a:1,
+  e:"Records are hard-linked across databases, so a paper leads to its sequences, then to the gene, then to the structure. That linkage is what distinguishes Entrez from a plain search engine."},
+ {q:"Which E-utility retrieves the actual records for a set of identifiers?",
+  o:["esearch","efetch","elink","esummary"],
+  a:1,
+  e:"esearch returns matching IDs, efetch returns the records, elink follows cross-database links and esummary returns brief document summaries."},
+ {q:"You have a protein sequence and want to search a nucleotide database translated in six frames. The correct program is:",
+  o:["blastp","blastx","tblastn","blastn"],
+  a:2,
+  e:"tblastn = protein query against a translated nucleotide database. It is the standard way to find an unannotated homologue in a raw genome or transcriptome."},
+ {q:"You have a nucleotide query and want to search a protein database. The correct program is:",
+  o:["blastx","tblastn","blastn","blastp"],
+  a:0,
+  e:"blastx translates the query in six frames and searches it against proteins — the usual first move for an anonymous DNA fragment."},
+ {q:"VecScreen is run before submission in order to:",
+  o:["verify organism names against Taxonomy",
+     "detect vector and adaptor contamination",
+     "predict open reading frames",
+     "design PCR primers"],
+  a:1,
+  e:"Leftover cloning vector is one of the most common reasons a GenBank submission is bounced back by a curator."},
+ {q:"NCBI ORFfinder reports:",
+  o:["restriction enzyme sites",
+     "open reading frames in all six frames under a chosen genetic code",
+     "conserved protein domains",
+     "predicted promoter positions"],
+  a:1,
+  e:"You pick the translation table and the minimum length; it returns the ORFs and their conceptual translations, which you can send straight to BLAST."},
+ {q:"EMBL-EBI is located at:",
+  o:["Bethesda, USA","the Wellcome Genome Campus, Hinxton, UK","Geneva, Switzerland","Mishima, Japan"],
+  a:1,
+  e:"It is an outstation of the European Molecular Biology Laboratory. Bethesda is NCBI, Geneva is SIB and Mishima is DDBJ's home institute."},
+ {q:"The European node of the INSDC is:",
+  o:["Ensembl","the European Nucleotide Archive (ENA)","UniProt","PDBe"],
+  a:1,
+  e:"ENA is the former EMBL-Bank. Ensembl is a genome browser and annotation resource, and PDBe is the European wwPDB partner."},
+ {q:"EMBOSS is:",
+  o:["a database of protein structures",
+     "an open suite of around 200 command-line sequence analysis programs",
+     "a web submission portal",
+     "a genome browser"],
+  a:1,
+  e:"It bundles small, composable tools — getorf, transeq, needle, water, cpgplot, revseq — which is why it is ideal for scripted teaching exercises."},
+ {q:"Which EMBOSS program translates a nucleotide sequence into protein?",
+  o:["getorf","transeq","needle","cpgplot"],
+  a:1,
+  e:"transeq translates, getorf finds and extracts ORFs, needle does global pairwise alignment, and cpgplot detects CpG islands."},
+ {q:"Clustal Omega is used for:",
+  o:["multiple sequence alignment","protein structure prediction","short-read mapping","de novo motif discovery"],
+  a:0,
+  e:"It is one of the EMBL-EBI Job Dispatcher tools, alongside MUSCLE, MAFFT and T-Coffee. Motif discovery is the MEME suite's job."}
+ ]
+},
+{
+ id:"submission", name:"Sequence submission", colour:"#d93025",
+ blurb:"BankIt, Sequin, SPIN, aligned sets, updates and versioning",
+ qs:[
+ {q:"The main practical reason to deposit a sequence before publication is that:",
+  o:["deposition improves the quality of the sequence",
+     "journals require an accession number, which makes the data citable and accessible",
+     "depositing transfers copyright to the archive",
+     "an accession is needed in order to run BLAST"],
+  a:1,
+  e:"Submit early and set 'hold until published' — the record stays confidential until you release it, and you are not left waiting at proof stage."},
+ {q:"BankIt is:",
+  o:["a stand-alone desktop program",
+     "NCBI's web-based submission tool for GenBank",
+     "the ENA submission system",
+     "a tool for depositing protein sequences"],
+  a:1,
+  e:"Nothing to install: a guided wizard covering contact details, release date, source organism, sequence, features and reference, with validation built in."},
+ {q:"Which of these can NOT be submitted through BankIt?",
+  o:["a single annotated gene",
+     "a set of aligned sequences",
+     "an mRNA sequence",
+     "a short amplicon"],
+  a:1,
+  e:"BankIt also refuses raw reads, transcriptome assemblies and whole genomes; those go through the Submission Portal, and aligned sets through the Portal or table2asn."},
+ {q:"Sequin was:",
+  o:["a web form",
+     "a stand-alone desktop application that produced an ASN.1 (.sqn) file",
+     "a command-line tool for genomes only",
+     "the EMBL-EBI submission system"],
+  a:1,
+  e:"It ran on Windows, Mac and UNIX, could operate network-aware, and included a sequence editor, an alignment viewer and a validator."},
+ {q:"Complex or batch GenBank submissions that Sequin once handled are today prepared with:",
+  o:["BankIt only",
+     "table2asn together with the Submission Portal",
+     "SPIN",
+     "Webin"],
+  a:1,
+  e:"Sequin has been retired — genome submissions moved to the Genome Workbench Submission Wizard in January 2021, and table2asn replaced the older tbl2asn for batches and annotated records."},
+ {q:"SPIN is used to submit:",
+  o:["nucleotide sequences to ENA",
+     "sequences determined at the protein level to UniProtKB",
+     "structures to the PDB",
+     "raw sequencing reads to the SRA"],
+  a:1,
+  e:"SPIN — Submission of Protein INformation — is an EMBL-EBI web tool feeding UniProtKB/Swiss-Prot, and it returns an accession you can cite."},
+ {q:"Which of these qualifies for submission through SPIN?",
+  o:["a CDS translation from your genome assembly",
+     "a peptide sequenced by Edman degradation",
+     "an AlphaFold model",
+     "a protein predicted by Prodigal"],
+  a:1,
+  e:"SPIN takes sequences determined at the protein level — Edman degradation or manual de novo interpretation of MS/MS spectra. Anything translated from DNA goes to ENA or GenBank instead, and UniProt imports it automatically."},
+ {q:"You have a novel neuropeptide sequence obtained by manual de novo interpretation of MS/MS spectra. It should go to:",
+  o:["GenBank via BankIt",
+     "UniProtKB via SPIN",
+     "the PDB via OneDep",
+     "GEO"],
+  a:1,
+  e:"There is no nucleotide record behind it, so the INSDC route does not apply. Without SPIN the sequence would exist only inside the paper, invisible to every database search."},
+ {q:"Webin is the submission system of:",
+  o:["GenBank","the European Nucleotide Archive","UniProt","DDBJ"],
+  a:1,
+  e:"Webin serves ENA and is the European counterpart of BankIt and the NCBI Submission Portal. DDBJ uses D-way."},
+ {q:"The same gene sequenced from forty individuals of one species is submitted as a:",
+  o:["phylogenetic set","population set","mutation set","environmental set"],
+  a:1,
+  e:"A phylogenetic set spans different species or strains, a mutation set holds laboratory-generated variants, and an environmental set comes from uncultured organisms."},
+ {q:"Sequences obtained from uncultured organisms sampled directly from soil form a:",
+  o:["population set","environmental set","segmented set","mutation set"],
+  a:1,
+  e:"The source organism is unknown or unnamed, which is exactly the case the environmental set category exists for."},
+ {q:"Which format is NOT accepted for submitting an aligned set?",
+  o:["FASTA + gap","NEXUS","PHYLIP","BAM"],
+  a:3,
+  e:"Accepted alignment formats are FASTA+gap, NEXUS, PHYLIP and Clustal — the export formats of MEGA, MAFFT, MUSCLE and Clustal Omega. BAM holds read alignments against a reference, which is a different thing entirely."},
+ {q:"When you correct the sequence of an already-released GenBank record:",
+  o:["the accession number changes",
+     "the version number increments and the superseded version stays retrievable",
+     "the record is deleted and must be resubmitted",
+     "nothing changes, because released records are frozen"],
+  a:1,
+  e:"Records are never deleted. Because the old version remains available, an analysis published against the earlier version is still reproducible — which is why you cite accession.version."},
+ {q:"Adding a PubMed ID to a released record:",
+  o:["increments the sequence version",
+     "revises the record without changing the sequence version",
+     "requires a new accession number",
+     "is not permitted after release"],
+  a:1,
+  e:"Only sequence changes bump the version. Submitters can update annotation, references, contact details and the release date at any time."}
+ ]
+}
+];
+
+/* =====================================================================
+   State + helpers
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+let secs = 30, order = "fixed";
+let run = null;      // {items:[{b,qi,q}], i, answers:[], scored:[]}
+let ticker = null;
+
+const TOTAL = BANKS.reduce((n,b)=>n+b.qs.length,0);
+$("totalq").textContent = TOTAL;
+
+/* topic cards */
+const tHost = $("topics");
+BANKS.forEach((b,bi)=>{
+  const el = document.createElement("button");
+  el.className = "topic"; el.type = "button";
+  el.innerHTML =
+    `<span class="dot" style="background:${b.colour}">${String(bi+1).padStart(2,"0")}</span>
+     <span><span class="tt">${b.name}</span>
+     <span class="ts">${b.blurb}</span>
+     <span class="tn">${b.qs.length} questions</span></span>`;
+  el.addEventListener("click", ()=>start([bi]));
+  tHost.appendChild(el);
+});
+
+/* segmented controls */
+function seg(hostId, attr, fn){
+  const host = $(hostId);
+  host.addEventListener("click", e=>{
+    const b = e.target.closest("button"); if(!b) return;
+    [...host.querySelectorAll("button")].forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+    fn(b.dataset[attr]);
+  });
+}
+seg("segTime","t", v => secs = parseInt(v,10));
+seg("segOrder","o", v => order = v);
+
+$("startAll").addEventListener("click", ()=> start(BANKS.map((_,i)=>i)));
+$("restart").addEventListener("click", ()=> show("setup"));
+$("quitBtn").addEventListener("click", finish);
+$("nextBtn").addEventListener("click", next);
+
+function show(which){
+  ["setup","quiz","results"].forEach(s => $(s).classList.toggle("hidden", s!==which));
+  window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* =====================================================================
+   Run a quiz
+   ===================================================================== */
+function start(bankIdx, only){
+  const items = [];
+  bankIdx.forEach(bi => BANKS[bi].qs.forEach((q,qi)=>{
+    if(only && !only.some(k=>k.b===bi && k.qi===qi)) return;
+    // options are shuffled per attempt: the key must not sit in a fixed position
+    const perm = shuffle(q.o.map((_,k)=>k));
+    items.push({b:bi, qi, q, opts:perm.map(k=>q.o[k]), ans:perm.indexOf(q.a)});
+  }));
+  if(order === "shuffle") shuffle(items);
+  run = {items, i:0, given:new Array(items.length).fill(null)};
+  buildStrip();
+  show("quiz");
+  render();
+}
+
+function buildStrip(){
+  const s = $("strip"); s.innerHTML = "";
+  run.items.forEach(()=> s.appendChild(document.createElement("i")));
+}
+function paintStrip(){
+  const kids = $("strip").children;
+  run.items.forEach((_,k)=>{
+    const el = kids[k]; el.className = "";
+    const g = run.given[k];
+    if(g !== null) el.classList.add(g.correct ? "ok" : "no");
+    if(k === run.i) el.classList.add("now");
+  });
+}
+
+function render(){
+  const it = run.items[run.i], bank = BANKS[it.b];
+  $("qTopic").textContent = bank.name;
+  $("qCount").textContent = `Question ${String(run.i+1).padStart(2,"0")} of ${String(run.items.length).padStart(2,"0")}`;
+  $("qText").innerHTML = it.q.q;
+  $("why").classList.add("hidden");
+  $("nextBtn").disabled = true;
+  $("nextBtn").textContent = (run.i === run.items.length-1) ? "See result" : "Next";
+  paintStrip();
+
+  const host = $("opts"); host.innerHTML = "";
+  it.opts.forEach((text,k)=>{
+    const b = document.createElement("button");
+    b.className = "opt"; b.type = "button";
+    b.innerHTML = `<span class="key">${k+1}</span><span>${text}</span>`;
+    b.addEventListener("click", ()=> answer(k));
+    host.appendChild(b);
+  });
+
+  startClock();
+}
+
+function startClock(){
+  clearInterval(ticker);
+  const fill = $("barFill"), clock = $("clock");
+  if(!secs){ clock.textContent = "no limit"; clock.className="clock"; fill.style.width="100%"; fill.className=""; return; }
+  let left = secs;
+  const paint = ()=>{
+    clock.textContent = left + "s";
+    const pct = Math.max(0, left/secs*100);
+    fill.style.width = pct + "%";
+    const state = left<=5 ? "crit" : left<=10 ? "warn" : "";
+    fill.className = state; clock.className = "clock " + state;
+  };
+  paint();
+  ticker = setInterval(()=>{
+    left--; paint();
+    if(left <= 0){ clearInterval(ticker); answer(null); }
+  }, 1000);
+}
+
+function answer(choice){
+  if(run.given[run.i] !== null) return;
+  clearInterval(ticker);
+  const it = run.items[run.i], right = it.ans;
+  const correct = choice === right;
+  run.given[run.i] = {choice, correct};
+
+  [...$("opts").children].forEach((b,k)=>{
+    b.disabled = true;
+    if(k === right) b.classList.add("correct");
+    else if(k === choice) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+
+  const why = $("why");
+  why.classList.remove("hidden","hit","miss");
+  why.classList.add(correct ? "hit" : "miss");
+  $("verdict").textContent = correct ? "Correct"
+      : (choice === null ? "Time up — scored as missed" : "Not quite");
+  $("whyText").innerHTML = it.q.e;
+  $("nextBtn").disabled = false;
+  $("nextBtn").focus();
+  paintStrip();
+}
+
+function next(){
+  if(run.i < run.items.length-1){ run.i++; render(); }
+  else finish();
+}
+
+/* =====================================================================
+   Results
+   ===================================================================== */
+function finish(){
+  clearInterval(ticker);
+  const done = run.given.filter(g=>g!==null).length;
+  const got  = run.given.filter(g=>g && g.correct).length;
+  const pct  = done ? Math.round(got/done*100) : 0;
+
+  $("resPct").textContent = pct + "%";
+  $("resPct").style.color = pct>=75 ? "var(--green)" : pct>=50 ? "var(--yellow)" : "var(--red)";
+  $("resLine").innerHTML = `<b>${got}</b> correct out of <b>${done}</b> answered` +
+      (done < run.items.length ? ` &nbsp;·&nbsp; ${run.items.length-done} not reached` : "");
+
+  // per-section breakdown
+  const agg = {};
+  run.items.forEach((it,k)=>{
+    const g = run.given[k]; if(g === null) return;
+    const key = it.b; agg[key] = agg[key] || {n:0, ok:0};
+    agg[key].n++; if(g.correct) agg[key].ok++;
+  });
+  const tb = $("resTable").querySelector("tbody"); tb.innerHTML = "";
+  Object.keys(agg).forEach(k=>{
+    const a = agg[k], tr = document.createElement("tr");
+    tr.innerHTML = `<td>${BANKS[k].name}</td><td class="num">${a.ok}</td>
+                    <td class="num">${a.n}</td><td class="num">${Math.round(a.ok/a.n*100)}%</td>`;
+    tb.appendChild(tr);
+  });
+
+  // question map
+  const rs = $("revStrip"); rs.innerHTML = "";
+  run.items.forEach((it,k)=>{
+    const g = run.given[k];
+    const el = document.createElement("i");
+    el.textContent = k+1;
+    if(g) el.classList.add(g.correct ? "ok" : "no");
+    el.title = BANKS[it.b].name;
+    el.addEventListener("click", ()=> {
+      const t = document.getElementById("rev"+k);
+      if(t) t.scrollIntoView({behavior:"smooth", block:"center"});
+    });
+    rs.appendChild(el);
+  });
+
+  // full review
+  const rl = $("reviewList"); rl.innerHTML = "";
+  run.items.forEach((it,k)=>{
+    const g = run.given[k];
+    const d = document.createElement("div");
+    d.className = "rev"; d.id = "rev"+k;
+    const yours = g && g.choice !== null ? it.opts[g.choice] : "not answered";
+    d.innerHTML =
+      `<div class="rq">${k+1}. ${it.q.q}</div>
+       <div class="ra ${g && g.correct ? "ok-t":"no-t"}"><b>Your answer:</b> ${yours}</div>
+       ${g && g.correct ? "" : `<div class="ra ok-t"><b>Correct answer:</b> ${it.opts[it.ans]}</div>`}
+       <div class="re">${it.q.e}</div>`;
+    rl.appendChild(d);
+  });
+
+  const missed = run.items.map((it,k)=>({it,k}))
+    .filter(x => !run.given[x.k] || !run.given[x.k].correct)
+    .map(x => ({b:x.it.b, qi:x.it.qi}));
+  const btn = $("againWrong");
+  btn.classList.toggle("hidden", missed.length === 0);
+  btn.onclick = ()=> start(BANKS.map((_,i)=>i), missed);
+
+  show("results");
+}
+
+/* keyboard */
+document.addEventListener("keydown", e=>{
+  if($("quiz").classList.contains("hidden")) return;
+  if(e.key >= "1" && e.key <= "9"){
+    const k = parseInt(e.key,10)-1;
+    const b = $("opts").children[k];
+    if(b && !b.disabled){ e.preventDefault(); b.click(); }
+  }
+  if((e.key === "Enter" || e.key === " ") && !$("nextBtn").disabled){
+    e.preventDefault(); next();
+  }
+});
+</script>
+</body>
+</html>
