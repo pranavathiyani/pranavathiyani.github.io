@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central Dogma Playground</title>
+<style>
+  :root{
+    --ink:#0B3B3C; --teal:#0E7C7B; --seafoam:#5EEAD4; --mint:#F0FAF8;
+    --coral:#E9724C; --amber:#E8A33A; --text:#12312F; --muted:#5B7373;
+    --line:#D9EAE7; --good:#0E9F6E; --bad:#DC4A2B; --card:#FFFFFF;
+    --A:#2E9E6B; --C:#2F6FB0; --G:#D9902B; --T:#DC4A2B; --U:#8E5AB0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#0B3B3C 0%,#0E5654 55%,#0E7C7B 100%);
+    color:var(--text); min-height:100dvh; padding:18px 14px;
+    display:flex; justify-content:center;
+  }
+  .wrap{width:100%; max-width:940px;}
+  .card{background:var(--card); border-radius:20px; box-shadow:0 18px 50px rgba(0,0,0,.28); padding:22px 22px 24px;}
+  h1{font-size:24px; color:var(--ink); margin-bottom:2px;}
+  .tag{color:var(--teal); font-weight:700; font-size:12.5px; letter-spacing:.5px; margin-bottom:14px;}
+  .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .controls{gap:8px; margin-bottom:16px;}
+  .seg{display:inline-flex; border:2px solid var(--line); border-radius:11px; overflow:hidden;}
+  .seg button{border:none; background:#fff; padding:9px 13px; font-size:13px; font-weight:700; color:var(--muted); cursor:pointer;}
+  .seg button.on{background:var(--teal); color:#fff;}
+  .btn{border:none; border-radius:11px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; background:var(--mint); color:var(--teal); border:2px solid #E1F1EE;}
+  .btn:hover{border-color:var(--seafoam);}
+  .btn.solid{background:var(--coral); color:#fff; border-color:var(--coral);}
+  .btn.ink{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .hint{font-size:12px; color:var(--muted); margin:2px 0 14px;}
+  .sectlabel{font-size:11.5px; font-weight:800; letter-spacing:.6px; color:var(--teal); text-transform:uppercase; margin:14px 0 7px;}
+
+  .strand{display:flex; flex-wrap:wrap; gap:4px; align-items:flex-start;}
+  .base{
+    width:30px; height:38px; border-radius:8px; color:#fff; font-weight:800; font-family:"Courier New",monospace;
+    font-size:17px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
+    user-select:none; position:relative; transition:transform .05s;
+  }
+  .base small{font-size:9px; opacity:.85; font-weight:600; line-height:1;}
+  .base:active{transform:scale(.9);}
+  .base.dim{opacity:.32;}
+  .base.A{background:var(--A);} .base.C{background:var(--C);} .base.G{background:var(--G);} .base.T{background:var(--T);}
+  .idxlbl{width:100%; font-size:10px; color:var(--muted); text-align:center;}
+
+  .blocks{display:flex; flex-wrap:wrap; gap:7px;}
+  .codon{
+    border:2px solid var(--line); border-radius:10px; padding:6px 4px 5px; min-width:60px; text-align:center; background:#fff;
+  }
+  .codon.start{border-color:var(--good); background:#E9F8F1;}
+  .codon.stop{border-color:var(--bad); background:#FCEBE6;}
+  .codon.changed{border-color:var(--amber); box-shadow:0 0 0 2px rgba(232,163,42,.35);}
+  .codon .dna{font-family:"Courier New",monospace; font-weight:800; font-size:14px; color:var(--ink); letter-spacing:1px;}
+  .codon .rna{font-family:"Courier New",monospace; font-size:12px; color:var(--U); letter-spacing:1px;}
+  .codon .aa{font-size:13px; font-weight:800; margin-top:3px; color:var(--teal);}
+  .codon.stop .aa{color:var(--bad);} .codon.start .aa{color:var(--good);}
+  .codon .pos{font-size:9.5px; color:var(--muted);}
+
+  .report{margin-top:14px; border-radius:12px; padding:13px 15px; font-size:14.5px; background:var(--mint); border-left:5px solid var(--teal);}
+  .report b{color:var(--ink);}
+  .report.silent{border-color:#6b7280;} .report.missense{border-color:var(--amber);}
+  .report.nonsense{border-color:var(--bad);} .report.frameshift{border-color:var(--bad);}
+  .report.nostart{border-color:var(--bad);} .report.none{border-color:var(--teal);}
+  .sickle{color:var(--bad); font-weight:800;}
+
+  .quest{margin-top:16px; background:#F7FBFA; border:1px solid var(--line); border-radius:14px; padding:14px 16px;}
+  .quest h3{font-size:13px; color:var(--ink); margin-bottom:9px;}
+  .goals{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .goal{display:flex; gap:9px; align-items:center; font-size:13px; color:var(--muted);}
+  .goal .box{flex:0 0 22px; height:22px; border-radius:6px; border:2px solid var(--line); background:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff;}
+  .goal.done{color:var(--ink); font-weight:700;}
+  .goal.done .box{background:var(--good); border-color:var(--good);}
+  .win{margin-top:10px; font-weight:800; color:var(--good); font-size:14px; display:none;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; font-size:11.5px; color:var(--muted);}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .chip{width:13px; height:13px; border-radius:4px; display:inline-block;}
+  @media(max-width:560px){ .goals{grid-template-columns:1fr;} .base{width:26px;height:34px;font-size:15px;} }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+  <h1>Central Dogma Playground</h1>
+  <div class="tag">CLICK A BASE TO MUTATE · WATCH THE PROTEIN CHANGE</div>
+
+  <div class="row controls">
+    <div class="seg" id="modeseg">
+      <button data-m="sub" class="on">Substitute</button>
+      <button data-m="ins">Insert</button>
+      <button data-m="del">Delete</button>
+    </div>
+    <button class="btn" id="randbtn">🎲 Random mutation</button>
+    <button class="btn solid" id="sicklebtn">🩸 Sickle-cell mutation</button>
+    <button class="btn ink" id="resetbtn">↻ Reset</button>
+  </div>
+  <div class="hint" id="modehint">Substitute mode: click any base to cycle it A → C → G → T.</div>
+
+  <div class="sectlabel">DNA — coding strand (edit me)</div>
+  <div class="strand" id="strand"></div>
+  <div class="sectlabel" style="margin-top:12px;">Reading the code (translation begins at the first ATG)</div>
+  <div class="blocks" id="blocks"></div>
+
+  <div class="report none" id="report"></div>
+
+  <div class="quest">
+    <h3>Challenges — can you trigger all four kinds of mutation?</h3>
+    <div class="goals" id="goals"></div>
+    <div class="win" id="win">🏆 All four unlocked. You now know every basic mutation type by making them yourself.</div>
+  </div>
+
+  <div class="legend">
+    <span><i class="chip" style="background:var(--A)"></i>A</span>
+    <span><i class="chip" style="background:var(--C)"></i>C</span>
+    <span><i class="chip" style="background:var(--G)"></i>G</span>
+    <span><i class="chip" style="background:var(--T)"></i>T</span>
+    <span><i class="chip" style="background:var(--good)"></i>start (ATG)</span>
+    <span><i class="chip" style="background:var(--bad)"></i>stop</span>
+    <span><i class="chip" style="background:var(--amber)"></i>changed vs original</span>
+  </div>
+</div></div>
+
+<script>
+// ---------- genetic code (standard table 1, DNA letters) ----------
+const B=['T','C','A','G'];
+const AAS="FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
+const THREE={F:'Phe',L:'Leu',I:'Ile',M:'Met',V:'Val',S:'Ser',P:'Pro',T:'Thr',A:'Ala',Y:'Tyr',H:'His',Q:'Gln',N:'Asn',K:'Lys',D:'Asp',E:'Glu',C:'Cys',W:'Trp',R:'Arg',G:'Gly','*':'Stop'};
+const CODON={}; { let k=0; for(const a of B)for(const b of B)for(const c of B){CODON[a+b+c]=AAS[k++];} }
+const COMP={A:'T',T:'A',G:'C',C:'G'};
+
+// initial: 5'UTR + human HBB coding start ... + stop  (GAG at codon 7 = sickle position)
+const INITIAL = "GCAATGGTGCACCTGACTCCTGAGGAGAAGTCTGCCGTTACTTAA";
+let seq = INITIAL, mode="sub", ref=null, achieved={silent:false,missense:false,nonsense:false,frameshift:false};
+
+const $ = id => document.getElementById(id);
+
+function translate(s){
+  const start = s.indexOf("ATG");
+  const res=[];
+  let stopIdx=null, endIdx=s.length;
+  if(start<0) return {start:-1, res, stopIdx:null, hasStart:false, endIdx};
+  for(let i=start;i+3<=s.length;i+=3){
+    const cod=s.substr(i,3); const aa=CODON[cod]||'?';
+    if(aa==='*'){ res.push({cod,aa1:'*',aa3:'Stop',isStop:true,isStart:false,i}); stopIdx=i; endIdx=i+3; break; }
+    res.push({cod,aa1:aa,aa3:THREE[aa]||'?',isStop:false,isStart:(i===start),i});
+  }
+  return {start, res, stopIdx, hasStart:true, endIdx};
+}
+const protStr = tr => tr.res.filter(r=>!r.isStop).map(r=>r.aa1).join('');
+
+function setRef(){ ref = { seq, tr:translate(seq) }; ref.prot=protStr(ref.tr); }
+
+function classify(){
+  const tr=translate(seq); const rep=$("report");
+  let cls="none", html="";
+  if(!tr.hasStart){
+    cls="nostart"; html="<b>Start codon lost.</b> There is no ATG, so the ribosome has nowhere to begin and no protein is made.";
+    rep.className="report "+cls; rep.innerHTML=html; return tr;
+  }
+  const dl = seq.length - ref.seq.length;
+  const curP = protStr(tr), refP = ref.prot;
+  if(dl!==0 && (Math.abs(dl)%3)!==0){
+    cls="frameshift"; achieved.frameshift=true;
+    html=`<b>Frameshift.</b> You ${dl>0?'inserted':'deleted'} ${Math.abs(dl)} base(s), not a multiple of 3. Every codon downstream is regrouped, so almost the whole protein changes. This is why indels are so damaging.`;
+  } else if(dl!==0){
+    cls="missense";
+    html=`<b>In-frame ${dl>0?'insertion':'deletion'}.</b> You changed the length by ${Math.abs(dl)/3} whole codon(s), so residues are added or removed but the reading frame survives.`;
+  } else if(curP===refP){
+    if(seq===ref.seq){ cls="none"; html="Original sequence. Mutate a base and watch what happens."; }
+    else { cls="silent"; achieved.silent=true; html="<b>Silent mutation.</b> The DNA changed but the protein is identical. The genetic code is redundant: several codons spell the same amino acid."; }
+  } else if(curP.length < refP.length){
+    cls="nonsense"; achieved.nonsense=true;
+    html=`<b>Nonsense mutation.</b> A codon became a STOP, so translation halts early and the protein is truncated (${curP.length} residues instead of ${refP.length}).`;
+  } else if(curP.length > refP.length){
+    cls="missense";
+    html="<b>Stop lost (read-through).</b> A stop codon was destroyed, so translation runs past where it should end.";
+  } else {
+    cls="missense"; achieved.missense=true;
+    let p=-1; for(let i=0;i<curP.length;i++){ if(curP[i]!==refP[i]){p=i;break;} }
+    const from=THREE[refP[p]], to=THREE[curP[p]];
+    html=`<b>Missense mutation.</b> One amino acid changed: position ${p+1}, ${from} → ${to}. The protein is full length but altered.`;
+    if(from==='Glu'&&to==='Val'){ html+=` <span class="sickle">That exact change (Glu → Val) is the sickle-cell mutation in beta-globin.</span>`; }
+  }
+  rep.className="report "+cls; rep.innerHTML=html;
+  renderGoals(); return tr;
+}
+
+function render(){
+  const tr=translate(seq);
+  const inORF = i => tr.hasStart && i>=tr.start && i<tr.endIdx;
+  // strand
+  const st=$("strand"); st.innerHTML="";
+  for(let i=0;i<seq.length;i++){
+    const b=seq[i];
+    const el=document.createElement("div");
+    el.className="base "+b+(inORF(i)?"":" dim");
+    el.innerHTML=`${b}<small>${COMP[b]}</small>`;
+    el.title="click to "+(mode==="sub"?"change":mode==="ins"?"insert before":"delete");
+    el.onclick=()=>edit(i);
+    st.appendChild(el);
+  }
+  // codon blocks
+  const bl=$("blocks"); bl.innerHTML="";
+  if(!tr.hasStart){ bl.innerHTML='<div style="color:var(--muted);font-size:13px;padding:6px">No ATG found — nothing to translate.</div>'; }
+  tr.res.forEach((r,n)=>{
+    const c=document.createElement("div");
+    let cn="codon"+(r.isStart?" start":"")+(r.isStop?" stop":"");
+    if(ref && !r.isStop){ const rr=ref.tr.res[n]; if(!rr || (rr && !rr.isStop && rr.aa1!==r.aa1) || (rr&&rr.isStop)) cn+=" changed"; }
+    c.className=cn;
+    c.innerHTML=`<div class="dna">${r.cod}</div><div class="rna">${r.cod.replace(/T/g,'U')}</div>`+
+                `<div class="aa">${r.aa3}</div><div class="pos">${r.isStop?'—':n+1}</div>`;
+    bl.appendChild(c);
+  });
+}
+
+function edit(i){
+  if(mode==="sub"){ const order="ACGT"; const cur=seq[i]; const nx=order[(order.indexOf(cur)+1)%4]; seq=seq.slice(0,i)+nx+seq.slice(i+1); }
+  else if(mode==="ins"){ seq=seq.slice(0,i)+"A"+seq.slice(i); }
+  else if(mode==="del"){ if(seq.length>3) seq=seq.slice(0,i)+seq.slice(i+1); }
+  render(); classify();
+}
+
+function renderGoals(){
+  const defs=[["silent","Silent","same protein"],["missense","Missense","one amino acid swap"],
+              ["nonsense","Nonsense","an early stop"],["frameshift","Frameshift","insert/delete 1 base"]];
+  $("goals").innerHTML="";
+  defs.forEach(([k,name,desc])=>{
+    const g=document.createElement("div"); g.className="goal"+(achieved[k]?" done":"");
+    g.innerHTML=`<span class="box">${achieved[k]?'✓':''}</span><span>${name} <span style="color:var(--muted);font-weight:400">— ${desc}</span></span>`;
+    $("goals").appendChild(g);
+  });
+  $("win").style.display = Object.values(achieved).every(Boolean) ? "block":"none";
+}
+
+// ---------- controls ----------
+$("modeseg").onclick=e=>{ const b=e.target.closest("button"); if(!b)return;
+  mode=b.dataset.m;
+  [...$("modeseg").children].forEach(x=>x.classList.toggle("on",x===b));
+  $("modehint").textContent = mode==="sub" ? "Substitute mode: click any base to cycle it A → C → G → T."
+    : mode==="ins" ? "Insert mode: click a base to insert a new A just before it (try this inside the gene to cause a frameshift)."
+    : "Delete mode: click a base to remove it (delete one base inside the gene to cause a frameshift).";
+};
+$("resetbtn").onclick=()=>{ seq=INITIAL; achieved={silent:false,missense:false,nonsense:false,frameshift:false}; setRef(); render(); classify(); };
+$("randbtn").onclick=()=>{ const i=Math.floor(Math.random()*seq.length); const order="ACGT".replace(seq[i],""); const nx=order[Math.floor(Math.random()*3)]; seq=seq.slice(0,i)+nx+seq.slice(i+1); render(); classify(); };
+$("sicklebtn").onclick=()=>{ // reset then flip the 7th codon's middle base (GAG -> GTG)
+  seq=INITIAL; achieved.missense=achieved.missense; const start=seq.indexOf("ATG"); const mid=start+6*3+1; seq=seq.slice(0,mid)+"T"+seq.slice(mid+1); render(); classify(); };
+
+setRef(); render(); classify(); renderGoals();
+</script>
+</body>
+</html>
