@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classroom Workbook - Big Data & Bioinformatics Computing</title>
+<style>
+    /* ------------------------------------------------------------------
+       CSS STYLES & PRINT MEDIA SETUP
+       ------------------------------------------------------------------ */
+    :root {
+        --primary: #1e3a8a;
+        --primary-light: #eff6ff;
+        --accent: #0284c7;
+        --text-main: #1f2937;
+        --border-color: #cbd5e1;
+        --box-bg: #f8fafc;
+        --box-note: #f0fdf4;
+        --border-note: #16a34a;
+        --box-warning: #fef2f2;
+        --border-warning: #dc2626;
+        --box-didyouknow: #fefce8;
+        --border-didyouknow: #ca8a04;
+        --box-bio: #f0f9ff;
+        --border-bio: #0284c7;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        color: var(--text-main);
+        line-height: 1.5;
+        background-color: #f1f5f9;
+    }
+
+    /* Page Setup */
+    .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 20mm;
+        margin: 10mm auto;
+        background: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        page-break-after: always;
+    }
+
+    /* Header & Footer Rules */
+    .header {
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .header h1 {
+        font-size: 20px;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .header .subtitle {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .footer {
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #64748b;
+    }
+
+    .content {
+        flex: 1;
+    }
+
+    /* Section Headers */
+    h2 {
+        font-size: 16px;
+        color: var(--primary);
+        border-left: 4px solid var(--accent);
+        padding-left: 8px;
+        margin: 14px 0 10px 0;
+        text-transform: uppercase;
+    }
+
+    h3 {
+        font-size: 13px;
+        color: var(--text-main);
+        margin: 10px 0 6px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    p, li {
+        font-size: 11.5px;
+        margin-bottom: 8px;
+    }
+
+    ul, ol {
+        margin-left: 18px;
+        margin-bottom: 10px;
+    }
+
+    /* Layout Elements & Boxes */
+    .think-box {
+        background-color: var(--primary-light);
+        border: 1px solid var(--accent);
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+    }
+
+    .think-box h3 {
+        color: var(--accent);
+        margin-top: 0;
+    }
+
+    .box-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 12px 0;
+    }
+
+    .info-box {
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 10.5px;
+    }
+
+    .info-box strong {
+        display: block;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        font-size: 10px;
+    }
+
+    .box-note {
+        background-color: var(--box-note);
+        border-left: 3px solid var(--border-note);
+    }
+    .box-note strong { color: var(--border-note); }
+
+    .box-warning {
+        background-color: var(--box-warning);
+        border-left: 3px solid var(--border-warning);
+    }
+    .box-warning strong { color: var(--border-warning); }
+
+    .box-didyouknow {
+        background-color: var(--box-didyouknow);
+        border-left: 3px solid var(--border-didyouknow);
+    }
+    .box-didyouknow strong { color: var(--border-didyouknow); }
+
+    .box-bio {
+        background-color: var(--box-bio);
+        border-left: 3px solid var(--border-bio);
+    }
+    .box-bio strong { color: var(--border-bio); }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 10.5px;
+    }
+
+    th, td {
+        border: 1px solid var(--border-color);
+        padding: 5px 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: var(--primary);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 9.5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    /* Code & Trace Output */
+    pre, code {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 10px;
+    }
+
+    pre {
+        background-color: #0f172a;
+        color: #f8fafc;
+        padding: 10px;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        margin: 8px 0;
+    }
+
+    .diagram-container {
+        text-align: center;
+        margin: 12px 0;
+    }
+
+    .diagram-container svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Print Optimization */
+    @media print {
+        body {
+            background-color: #ffffff;
+        }
+        .page {
+            margin: 0;
+            box-shadow: none;
+            page-break-after: always;
+            width: 100%;
+            height: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 1 — Big Data & The 5 Vs in Genomics</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>A regional medical center sequences whole human genomes from <strong>250 cancer patients</strong> every week. Each high-coverage genome generates: Raw sequence reads (<code>.fastq</code>) ~100 GB, Alignments (<code>.bam</code>) ~60 GB, and Variants (<code>.vcf</code>) ~1 GB. Total raw yield per week exceeds <strong>40 Terabytes (TB)</strong>.</p>
+            <p><em>Pause & Reflect: Can a clinical scientist load and compute this weekly workload inside Microsoft Excel or a standard desktop database? Write down three distinct hardware or software bottlenecks that would crash a standard computer when attempting this task in your notebook.</em></p>
+        </div>
+
+        <h2>SECTION 1.1: UNDERSTANDING DATA AT SCALE</h2>
+        <p>Data is no longer just information saved on a local disk. It exists across a multi-tier scale continuum:</p>
+        <p style="text-align:center; font-weight:bold; color:var(--accent);">Gigabyte (GB) &rarr; Terabyte (TB) &rarr; Petabyte (PB) &rarr; Exabyte (EB)</p>
+        <ul>
+            <li><strong>1 GB (10<sup>9</sup> bytes):</strong> Single high-resolution MRI scan.</li>
+            <li><strong>1 TB (10<sup>12</sup> bytes):</strong> ~1,000 human genome raw sequence files (compressed).</li>
+            <li><strong>1 PB (10<sup>15</sup> bytes):</strong> Entire sequence repository of the European Nucleotide Archive (ENA).</li>
+            <li><strong>1 EB (10<sup>18</sup> bytes):</strong> Estimated global genomic data output generated by healthcare labs annually.</li>
+        </ul>
+
+        <h3>THE 5 Vs OF BIG DATA</h3>
+        <p>Big Data is defined by five distinct operational dimensions:</p>
+        <ol>
+            <li><strong>Volume:</strong> The sheer mass of data. <em>Bio:</em> INSDC sequencing archives. <em>Non-Bio:</em> YouTube 500 hours/min uploads.</li>
+            <li><strong>Velocity:</strong> Stream rate of data incoming. <em>Bio:</em> Oxford Nanopore real-time current streaming. <em>Non-Bio:</em> Stock market transactions.</li>
+            <li><strong>Variety:</strong> Structural diversity. <em>Bio:</em> FASTQ, BAM, VCF, and image files. <em>Non-Bio:</em> Smart city video, GPS, and tweet streams.</li>
+            <li><strong>Veracity:</strong> Data noise & uncertainty. <em>Bio:</em> Long-read base-calling error rates. <em>Non-Bio:</em> IoT sensor calibration drift.</li>
+            <li><strong>Value:</strong> Actionable insights extracted. <em>Bio:</em> Identifying a single actionable <em>BRCA1</em> mutation. <em>Non-Bio:</em> Predictive traffic routing.</li>
+        </ol>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                Big Data is defined by the operational threshold where data processing exceeds local memory and single-processor execution limits.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                A single human genome is 3.2 billion base pairs (~3.2 GB raw text). But standard 30x coverage sequencing yields nearly 100 GB per patient!
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Confusing Velocity with CPU clock speed. Velocity refers to the incoming rate of external data streams, not CPU processing cycles.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                The NCBI Sequence Read Archive (SRA) holds over 50 Petabytes of public sequencing data—one of the world's fastest growing datasets.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>Complete the following table in your student notebook:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Big Data V</th>
+                    <th>Primary Characteristic</th>
+                    <th>Biological Challenge</th>
+                    <th>Non-Biological Challenge</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Volume</strong></td>
+                    <td>Data scale / mass</td>
+                    <td>Storing 10,000 whole genomes</td>
+                    <td>Storing global satellite imagery</td>
+                </tr>
+                <tr>
+                    <td><strong>Velocity</strong></td>
+                    <td>Streaming rate</td>
+                    <td><em>(Fill in notebook)</em></td>
+                    <td>High-frequency stock trading</td>
+                </tr>
+                <tr>
+                    <td><strong>Variety</strong></td>
+                    <td>Structural formats</td>
+                    <td>FASTQ, BAM, VCF, PDB files</td>
+                    <td><em>(Fill in notebook)</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Veracity</strong></td>
+                    <td>Noise & reliability</td>
+                    <td><em>(Fill in notebook)</em></td>
+                    <td>Fake news & click fraud</td>
+                </tr>
+                <tr>
+                    <td><strong>Value</strong></td>
+                    <td>Useful insights</td>
+                    <td>Discovering novel drug targets</td>
+                    <td><em>(Fill in notebook)</em></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>Suppose a lab updates its sequencer to output data 10x faster, but the error rate rises from 0.1% to 5%. Which two "Vs" are directly impacted, and what trade-offs must bioinformaticians make?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 1</span>
+    </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 2 — Types of Big Data & Architecture</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>A clinical trial collects (1) Patient demographics in SQL tables, (2) Gene expression profiles in annotated XML/JSON files, and (3) Histology slides in TIFF images. Why can't a database administrator store all three data types inside a single SQL relational table with standard fixed columns?</p>
+        </div>
+
+        <h2>SECTION 2.1: DATA STRUCTURE CATEGORIZATION</h2>
+        <p>Data exists along a structural spectrum based on its schema rigidity:</p>
+        <ul>
+            <li><strong>Structured Data:</strong> Strict, pre-defined schema with rigid rows and columns. (e.g., SQL tables, CSV files).</li>
+            <li><strong>Semi-Structured Data:</strong> Lacks rigid tabular schema, but contains tags or key-value markers to separate fields. (e.g., JSON, XML, FASTQ, VCF).</li>
+            <li><strong>Unstructured Data:</strong> No predefined data model or internal organizational structure. (e.g., Cryo-EM images, raw audio, BAM files).</li>
+        </ul>
+
+        <h3>WORKED EXAMPLE 2.1: OPERATIONAL DB VS. BIG DATA PLATFORM</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>Operational RDBMS (MySQL)</th>
+                    <th>Big Data Platform (Hadoop / Spark)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Primary Goal</strong></td>
+                    <td>Online Transactional Processing (OLTP)</td>
+                    <td>High-throughput Batch Analytics (OLAP)</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Schema</strong></td>
+                    <td><strong>Schema-on-Write</strong> (Must define schema first)</td>
+                    <td><strong>Schema-on-Read</strong> (Store raw, parse upon query)</td>
+                </tr>
+                <tr>
+                    <td><strong>Scaling Strategy</strong></td>
+                    <td><strong>Vertical Scaling</strong> (Bigger single server)</td>
+                    <td><strong>Horizontal Scaling</strong> (Add commodity nodes)</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Types</strong></td>
+                    <td>Structured tabular data</td>
+                    <td>Structured, Semi-Structured, Unstructured</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                Over 80% of modern biological data is semi-structured or unstructured. Traditional SQL engines cannot scale to these dynamic formats.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                The standard <code>.fastq</code> sequencing file is semi-structured: every read block consists of exactly 4 repeating metadata/sequence lines.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Assuming semi-structured data is unorganized. It is structured, but its schema is dynamic and self-describing per record.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                Variant Call Format (<code>.vcf</code>) uses flexible key-value headers to report complex genomic mutations without sparse empty columns.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>Classify the following 15 datasets into <strong>Structured (S)</strong>, <strong>Semi-Structured (SS)</strong>, or <strong>Unstructured (U)</strong> in your notebook:</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; font-size:10.5px;">
+            <ol>
+                <li>SQL table of patient billing</li>
+                <li>Raw Illumina read in <code>.fastq</code></li>
+                <li>Amino acid sequences in <code>.fasta</code></li>
+                <li>Histopathology slide <code>.tiff</code></li>
+                <li>Genomic variants in <code>.vcf</code></li>
+                <li>CSV table of blood pressures</li>
+                <li>Aligned reads in <code>.bam</code> file</li>
+                <li>Doctor notes saved as <code>.pdf</code></li>
+            </ol>
+            <ol start="9">
+                <li>Protein 3D atomic coordinates (<code>.pdb</code>)</li>
+                <li>Excel spreadsheet of lab samples</li>
+                <li>Gene annotations in <code>.xml</code></li>
+                <li>Single-cell RNA matrix in <code>.json</code></li>
+                <li>Cryo-EM video recordings</li>
+                <li>Echocardiogram ultrasound stream</li>
+                <li>TSV table of Gene ID lookups</li>
+            </ol>
+        </div>
+
+        <h3 style="margin-top:12px;">THINK DEEPER</h3>
+        <p><em>Why does "Schema-on-Read" enable genomics labs to store raw DNA outputs instantly, whereas "Schema-on-Write" stalls automated ingestion?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 2</span>
+    </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 3 — Why Hadoop? Distributed Computing</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>You need to search for a target sequence (<code>ATGCGATCGATCGATCGATC</code>) inside a 500 GB file of 50 million raw reads. What happens when your Python script loads 500 GB into a desktop with 32 GB RAM? Why does disk I/O limit processing?</p>
+        </div>
+
+        <h2>SECTION 3.1: SINGLE-NODE LIMITATIONS & HADOOP ARCHITECTURE</h2>
+        <p>Single computers hit four physical computing bottlenecks at scale:</p>
+        <ul>
+            <li><strong>Memory Wall:</strong> Datasets larger than physical RAM force severe disk swapping.</li>
+            <li><strong>Storage Wall:</strong> Individual hard drives cannot store petabytes of expanding genomic files.</li>
+            <li><strong>Processing Wall:</strong> A single CPU core requires weeks to scan billions of sequence lines sequentially.</li>
+            <li><strong>Failure Wall:</strong> Hardware fails. If a node crashes during a 48-hour run, all execution state is lost.</li>
+        </ul>
+
+        <h3>THE HADOOP CORE PHILOSOPHY</h3>
+        <p>Hadoop uses clusters of commodity hardware nodes built on three core concepts:</p>
+        <ol>
+            <li><strong>Distributed Storage (HDFS):</strong> Splitting large files into uniform blocks (128 MB) across nodes.</li>
+            <li><strong>Fault Tolerance via Replication:</strong> Automatically copying blocks across nodes (Replication Factor = 3).</li>
+            <li><strong>Data Locality:</strong> Shipping application code (~1 MB) to the node where data lives, avoiding huge network moves.</li>
+        </ol>
+
+        <div class="diagram-container">
+            <svg width="500" height="170" viewBox="0 0 500 170">
+                <!-- NameNode -->
+                <rect x="175" y="10" width="150" height="40" rx="5" fill="#1e3a8a" stroke="#0284c7" stroke-width="2"/>
+                <text x="250" y="30" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">NameNode (Master)</text>
+                <text x="250" y="42" fill="#93c5fd" font-size="8" text-anchor="middle">Metadata Directory</text>
+                
+                <!-- Lines -->
+                <line x1="250" y1="50" x2="80" y2="90" stroke="#64748b" stroke-width="2"/>
+                <line x1="250" y1="50" x2="250" y2="90" stroke="#64748b" stroke-width="2"/>
+                <line x1="250" y1="50" x2="420" y2="90" stroke="#64748b" stroke-width="2"/>
+
+                <!-- DataNodes -->
+                <rect x="20" y="90" width="120" height="65" rx="5" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.5"/>
+                <text x="80" y="105" fill="#1e3a8a" font-size="10" font-weight="bold" text-anchor="middle">DataNode 1</text>
+                <rect x="30" y="112" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="80" y="123" fill="#1f2937" font-size="8" text-anchor="middle">Block 1 (A.fastq)</text>
+                <rect x="30" y="132" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="80" y="143" fill="#1f2937" font-size="8" text-anchor="middle">Block 2 (B.fastq)</text>
+
+                <rect x="190" y="90" width="120" height="65" rx="5" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.5"/>
+                <text x="250" y="105" fill="#1e3a8a" font-size="10" font-weight="bold" text-anchor="middle">DataNode 2</text>
+                <rect x="200" y="112" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="250" y="123" fill="#1f2937" font-size="8" text-anchor="middle">Block 1 (A.fastq)</text>
+                <rect x="200" y="132" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="250" y="143" fill="#1f2937" font-size="8" text-anchor="middle">Block 3 (C.fastq)</text>
+
+                <rect x="360" y="90" width="120" height="65" rx="5" fill="#f8fafc" stroke="#1e3a8a" stroke-width="1.5"/>
+                <text x="420" y="105" fill="#1e3a8a" font-size="10" font-weight="bold" text-anchor="middle">DataNode 3</text>
+                <rect x="370" y="112" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="420" y="123" fill="#1f2937" font-size="8" text-anchor="middle">Block 2 (B.fastq)</text>
+                <rect x="370" y="132" width="100" height="15" rx="3" fill="#eff6ff" stroke="#0284c7" stroke-width="1"/>
+                <text x="420" y="143" fill="#1f2937" font-size="8" text-anchor="middle">Block 3 (C.fastq)</text>
+            </svg>
+        </div>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                HDFS files are Write Once, Read Many (WORM). Files cannot be edited in-place; they can only be appended or replaced.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                If a DataNode misses its 3-second heartbeat signal, NameNode marks it offline and orders re-replication of its missing blocks.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Assuming NameNode processes computational data. NameNode manages metadata only; if its RAM fills up, the cluster fails.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                A 300 GB BAM file split into HDFS is automatically stored across 2,400 distinct 128 MB blocks for parallel alignment scanning.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>A sequencing dataset is <strong>384 GB</strong>. HDFS block size = <strong>128 MB</strong> (1 GB = 1024 MB). Replication Factor = <strong>3</strong>.</p>
+        <ol>
+            <li>Calculate the total number of blocks HDFS splits this file into in your notebook.</li>
+            <li>Calculate total physical storage consumed across the Hadoop cluster.</li>
+            <li>Draw a block distribution layout showing 3 blocks across 4 DataNodes (Replication Factor = 2).</li>
+        </ol>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>What happens if an entire rack containing DataNode 1 and DataNode 2 loses power? How does HDFS rack awareness ensure data safety?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 3</span>
+    </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 4 — The Hadoop Ecosystem</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>Core Hadoop (HDFS + MapReduce) handles basic distributed storage and processing. But how do you handle low-latency database lookups, real-time log ingestion, or standard SQL queries over petabyte files without writing complex low-level Java code?</p>
+        </div>
+
+        <h2>SECTION 4.1: ECOSYSTEM TAXONOMY AND ROLES</h2>
+        <p>The Hadoop ecosystem consists of specialized tools built around HDFS storage and YARN scheduling:</p>
+        <ul>
+            <li><strong>HDFS:</strong> Distributed file system providing high-throughput storage access across commodity hardware.</li>
+            <li><strong>MapReduce:</strong> Batch processing framework mapping data into key-value pairs for parallel reduction.</li>
+            <li><strong>YARN:</strong> Cluster resource manager allocating CPU, RAM, and tasks across computing frameworks.</li>
+            <li><strong>Hive:</strong> Data warehouse architecture translating SQL queries (HiveQL) into distributed execution jobs.</li>
+            <li><strong>Pig:</strong> Procedural dataflow platform and language (Pig Latin) for transforming massive unparsed data streams.</li>
+            <li><strong>HBase:</strong> Column-oriented NoSQL database providing real-time random read/write access to billions of rows.</li>
+            <li><strong>Sqoop:</strong> Bulk transfer tool import/exporting structured data between relational databases and HDFS.</li>
+            <li><strong>Flume:</strong> Distributed system for collecting and streaming high-volume operational event and log data into HDFS.</li>
+            <li><strong>Apache Spark:</strong> In-memory compute engine executing data tasks up to 100x faster than traditional MapReduce.</li>
+        </ul>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                YARN decouples resource management from computation, allowing Spark and MapReduce to run simultaneously over HDFS.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                Hive was created by Facebook to enable analysts with SQL knowledge to query petabytes of data without writing raw Java MapReduce.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Confusing Hive with HBase. Hive is a batch data warehousing SQL system; HBase is a low-latency NoSQL database for instant record lookups.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                Broad Institute's HAIL platform runs on Apache Spark to execute real-time genome-wide association queries over millions of samples.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>Match each Bioinformatics Task to the correct Hadoop Ecosystem component in your notebook:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task #</th>
+                    <th>Bioinformatics Task Description</th>
+                    <th>Target Tool</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>Real-time millisecond web lookup of SNP variant record <code>rs12345</code></td>
+                    <td><strong>A.</strong> Sqoop</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>Importing clinical diagnostic tables from a hospital MySQL database</td>
+                    <td><strong>B.</strong> Apache Spark</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Iterative machine learning training on protein structural matrices in RAM</td>
+                    <td><strong>C.</strong> Hive</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Querying clinical tables using standard relational SQL statements</td>
+                    <td><strong>D.</strong> HBase</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>Streaming continuous log output from 50 sequencers into central storage</td>
+                    <td><strong>E.</strong> Flume</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>If Apache Spark is up to 100x faster than MapReduce by running in RAM, why have MapReduce jobs not been completely retired in massive batch storage settings?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 4</span>
+    </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 5 — The MapReduce Architecture</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>You have 10,000 text files of DNA reads and need to count how many times the word <code>GENOME</code> appears. You divide the files among 10 students (Mappers). Each student counts local occurrences. How do you sort and aggregate their separate results into a single global total without data bottlenecks?</p>
+        </div>
+
+        <h2>SECTION 5.1: THE MAPREDUCE COMPUTATIONAL PIPELINE</h2>
+        <p>MapReduce processes parallel data streams in five distinct steps:</p>
+
+        <div class="diagram-container">
+            <svg width="500" height="150" viewBox="0 0 500 150">
+                <g font-size="9" font-weight="bold" text-anchor="middle">
+                    <!-- Stage 1 -->
+                    <rect x="10" y="55" width="75" height="40" rx="4" fill="#eff6ff" stroke="#1e3a8a"/>
+                    <text x="47" y="73" fill="#1e3a8a">1. Input Splits</text>
+                    <text x="47" y="85" fill="#64748b" font-weight="normal">Parse Line Text</text>
+                    
+                    <line x1="85" y1="75" x2="105" y2="75" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+                    
+                    <!-- Stage 2 -->
+                    <rect x="110" y="55" width="75" height="40" rx="4" fill="#eff6ff" stroke="#1e3a8a"/>
+                    <text x="147" y="73" fill="#1e3a8a">2. Map Stage</text>
+                    <text x="147" y="85" fill="#64748b" font-weight="normal">Emit &lt;k1, v1&gt;</text>
+                    
+                    <line x1="185" y1="75" x2="205" y2="75" stroke="#0284c7" stroke-width="2"/>
+
+                    <!-- Stage 3 -->
+                    <rect x="210" y="45" width="90" height="60" rx="4" fill="#1e3a8a" stroke="#0284c7"/>
+                    <text x="255" y="68" fill="#ffffff">3. Shuffle & Sort</text>
+                    <text x="255" y="80" fill="#93c5fd" font-size="7.5" font-weight="normal">Group by Key</text>
+                    <text x="255" y="90" fill="#93c5fd" font-size="7.5" font-weight="normal">&lt;k1, List(v1)&gt;</text>
+
+                    <line x1="300" y1="75" x2="320" y2="75" stroke="#0284c7" stroke-width="2"/>
+
+                    <!-- Stage 4 -->
+                    <rect x="325" y="55" width="75" height="40" rx="4" fill="#eff6ff" stroke="#1e3a8a"/>
+                    <text x="362" y="73" fill="#1e3a8a">4. Reduce</text>
+                    <text x="362" y="85" fill="#64748b" font-weight="normal">Aggregate Values</text>
+
+                    <line x1="400" y1="75" x2="420" y2="75" stroke="#0284c7" stroke-width="2"/>
+
+                    <!-- Stage 5 -->
+                    <rect x="425" y="55" width="65" height="40" rx="4" fill="#eff6ff" stroke="#1e3a8a"/>
+                    <text x="457" y="73" fill="#1e3a8a">5. Output</text>
+                    <text x="457" y="85" fill="#64748b" font-weight="normal">HDFS Files</text>
+                </g>
+            </svg>
+        </div>
+
+        <ol>
+            <li><strong>Input Splits:</strong> Divides raw file datasets into logical chunks parsed by RecordReader into raw <code>&lt;offset, line&gt;</code> pairs.</li>
+            <li><strong>Mapper Stage:</strong> Applies user map logic to emit key-value pairs <code>&lt;k1, v1&gt;</code> based on target extraction logic.</li>
+            <li><strong>Shuffle & Sort:</strong> Routes intermediate outputs across the network so every identical key lands on the same Reducer node.</li>
+            <li><strong>Reducer Stage:</strong> Receives grouped keys <code>&lt;k1, List(v1, v2...)&gt;</code> and aggregates total counts or statistics.</li>
+            <li><strong>OutputFormat:</strong> Writes final reduced outputs directly back to persistent HDFS storage blocks.</li>
+        </ol>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                Shuffle & Sort is the most expensive phase because it generates intensive network I/O and disk write operations across nodes.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                Intermediate Map output pairs are written to local disk on worker nodes—only final Reducer outputs are written back to HDFS.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Assuming Reducer instances communicate with one another. Reducers operate in total isolation without shared global state.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                K-mer frequency spectrum calculation maps k-mer strings as keys, shuffling matching k-mers to single reducers for count analysis.
+            </div>
+        </div>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>Why must intermediate keys output by Mappers be immutable and comparable? What happens during Shuffle & Sort if keys cannot be sorted deterministically?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 5</span>
+    </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 6 — Worked Example 1: Genomic Word Count</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>How does MapReduce convert an unformatted line of sequence text into a clean key-value summary table? Let's trace a small execution dataset step-by-step through every phase of the pipeline.</p>
+        </div>
+
+        <h2>SECTION 6.1: STEP-BY-STEP MAPREDUCE TRACE</h2>
+        <p><strong>Input Dataset Line:</strong> <code>"Genome Genome Protein RNA Genome Protein"</code></p>
+
+        <h3>STEP 1: INPUT SPLIT & RECORD READER</h3>
+        <p>Input is converted into a raw Key-Value tuple: <code>&lt;0, "Genome Genome Protein RNA Genome Protein"&gt;</code></p>
+
+        <h3>STEP 2: MAPPER STAGE</h3>
+        <p>Mapper parses string tokens and emits key-value pairs <code>&lt;word, 1&gt;</code>:</p>
+        <pre>&lt;"Genome", 1&gt;, &lt;"Genome", 1&gt;, &lt;"Protein", 1&gt;, &lt;"RNA", 1&gt;, &lt;"Genome", 1&gt;, &lt;"Protein", 1&gt;</pre>
+
+        <h3>STEP 3: SHUFFLE & SORT STAGE</h3>
+        <p>Framework sorts keys alphabetically and groups values into single lists per key:</p>
+        <pre>&lt;"Genome",  [1, 1, 1]&gt;
+&lt;"Protein", [1, 1]&gt;
+&lt;"RNA",     [1]&gt;</pre>
+
+        <h3>STEP 4: REDUCER STAGE</h3>
+        <p>Reducer sums all numerical values in each key array:</p>
+        <pre>Key "Genome"  : 1 + 1 + 1 = 3  ==> Emit &lt;"Genome", 3&gt;
+Key "Protein" : 1 + 1     = 2  ==> Emit &lt;"Protein", 2&gt;
+Key "RNA"     : 1         = 1  ==> Emit &lt;"RNA", 1&gt;</pre>
+
+        <h3>STEP 5: FINAL HDFS OUTPUT</h3>
+        <pre>Genome   3
+Protein  2
+RNA      1</pre>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                Notice how Shuffle & Sort automatically transforms independent individual tuples into cleanly grouped list values.
+            </div>
+            <div class="info-box box-didyouknow">
+                <strong>Did You Know?</strong>
+                Combiner functions act as local mini-reducers on Mapper nodes to aggregate intermediate output before network shuffle.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>Perform complete step-by-step traces in your notebook (Input &rarr; Map &rarr; Shuffle &rarr; Reduce &rarr; Output) for:</p>
+        <ol>
+            <li><strong>Exercise 6.1 (Easy):</strong> Trace text line: <code>"Gene Variant Gene Mutation Gene Variant Mutation"</code></li>
+            <li><strong>Exercise 6.2 (Moderate):</strong> Trace parallel input splits:<br>
+                <em>Mapper 1 Split:</em> <code>"Exon Intron Exon"</code> | <em>Mapper 2 Split:</em> <code>"Intron Exon Promoter Exon"</code></li>
+            <li><strong>Exercise 6.3 (Application):</strong> Trace overlapping 3-mer spectrum for sequence: <code>"ATGCGAT"</code> (3-mers: <code>ATG</code>, <code>TGC</code>, <code>GCG</code>, <code>CGA</code>, <code>GAT</code>).</li>
+        </ol>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>If 99% of input words in a petabyte dataset are "Genome", what bottleneck forms during Shuffle and Reducer stages? How does adding a Combiner resolve this?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 6</span>
+    </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 7 — Worked Example 2: Mutation Calling</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>In cancer clinical genomics, variant calling counts mutation types—SNPs, Insertions, and Deletions—across patient BAM files to determine total tumor mutational burden (TMB). Let's design a trace pipeline to count genomic mutations.</p>
+        </div>
+
+        <h2>SECTION 7.1: GENOMIC VARIANT QUANTIFICATION</h2>
+        <p><strong>Input Dataset Line:</strong> <code>"SNP Insertion Deletion SNP SNP Deletion"</code></p>
+
+        <pre>================================================================================
+STAGE 1: MAPPER PROCESSING
+================================================================================
+Input Tuple: &lt;0, "SNP Insertion Deletion SNP SNP Deletion"&gt;
+
+Mapper Intermediate Output:
+  &lt;"SNP", 1&gt;
+  &lt;"Insertion", 1&gt;
+  &lt;"Deletion", 1&gt;
+  &lt;"SNP", 1&gt;
+  &lt;"SNP", 1&gt;
+  &lt;"Deletion", 1&gt;
+
+================================================================================
+STAGE 2: SHUFFLE & SORT
+================================================================================
+Grouping & Sorting Engine:
+  "Deletion"   ───> [1, 1]
+  "Insertion"  ───> [1]
+  "SNP"        ───> [1, 1, 1]
+
+================================================================================
+STAGE 3: REDUCER AGGREGATION & FINAL OUTPUT
+================================================================================
+Reducer Instance ("Deletion")  : Sum = 1 + 1 = 2     ──> &lt;"Deletion", 2&gt;
+Reducer Instance ("Insertion") : Sum = 1     = 1     ──> &lt;"Insertion", 1&gt;
+Reducer Instance ("SNP")       : Sum = 1 + 1 + 1 = 3 ──> &lt;"SNP", 3&gt;
+
+Final HDFS File Output:
+  Deletion    2
+  Insertion   1
+  SNP         3</pre>
+
+        <div class="box-grid">
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Poor intermediate key choices lead to Data Skew—where one Reducer node gets 95% of data workload while other cluster nodes sit idle.
+            </div>
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                GATK and SAMtools use this exact key-grouping logic across distributed alignment files to compute per-base variant coverage.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <p>Trace the patient mutation streams collected across three sequencing runs in your notebook:</p>
+        <ul>
+            <li><strong>Run A (Mapper 1):</strong> <code>"Missense Nonsense Missense Frameshift"</code></li>
+            <li><strong>Run B (Mapper 2):</strong> <code>"Nonsense Missense Silent Missense"</code></li>
+            <li><strong>Run C (Mapper 3):</strong> <code>"Frameshift Missense Silent Nonsense"</code></li>
+        </ul>
+        <ol>
+            <li>List intermediate outputs for Mapper 1, 2, and 3.</li>
+            <li>Show intermediate grouped lists after Shuffle & Sort.</li>
+            <li>Calculate final output counts emitted by Reducers.</li>
+        </ol>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>To rank mutations by frequency (highest count first), can a standard Reducer guarantee global sorting across output files? How would you chain a second MapReduce job to achieve global frequency sorting?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 7</span>
+    </div>
+</div>
+
+<!-- PAGE 8 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 8 — Worked Example 3: Average Expression</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>In single-cell RNA sequencing, we track gene expression values across cells. To determine if <code>Gene_A</code> is overexpressed, we calculate its average value. Can a Reducer simply calculate an average by taking the mean of pre-averaged sub-totals? <em>(Hint: Math Warning: Avg(20,25,30,35) &ne; Avg(Avg(20,25), Avg(30,35)) if counts differ!)</em></p>
+        </div>
+
+        <h2>SECTION 8.1: NUMERICAL AGGREGATION PIPELINES</h2>
+        <p><strong>Input Dataset Records:</strong> <code>"Gene_A 20"</code>, <code>"Gene_A 25"</code>, <code>"Gene_A 30"</code>, <code>"Gene_A 35"</code></p>
+
+        <h3>MATHEMATICAL ALGORITHM DESIGN</h3>
+        <p>To calculate a mathematically valid average, the Mapper must emit a tuple containing both value and unit count: <code>&lt;Gene_ID, (Expression_Value, Count=1)&gt;</code>.</p>
+
+        <pre>--------------------------------------------------------------------------------
+STEP 1: MAPPER PROCESSING
+--------------------------------------------------------------------------------
+Input Records  : "Gene_A 20", "Gene_A 25", "Gene_A 30", "Gene_A 35"
+Mapper Outputs : &lt;"Gene_A", (20, 1)&gt;
+                 &lt;"Gene_A", (25, 1)&gt;
+                 &lt;"Gene_A", (30, 1)&gt;
+                 &lt;"Gene_A", (35, 1)&gt;
+
+--------------------------------------------------------------------------------
+STEP 2: SHUFFLE & SORT
+--------------------------------------------------------------------------------
+Grouped Tuple List:
+  Key: "Gene_A" ===> [(20, 1), (25, 1), (30, 1), (35, 1)]
+
+--------------------------------------------------------------------------------
+STEP 3: REDUCER COMPUTATION
+--------------------------------------------------------------------------------
+total_sum   = 20 + 25 + 30 + 35 = 110
+total_count = 1 + 1 + 1 + 1 = 4
+
+average = total_sum / total_count = 110 / 4 = 27.5
+Reducer Output: &lt;"Gene_A", 27.5&gt;</pre>
+
+        <div class="box-grid">
+            <div class="info-box box-note">
+                <strong>Important Note</strong>
+                Calculating complex statistics (averages, variances) in MapReduce requires emitting custom object tuples holding state sums and counts.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Averaging pre-averaged numbers from different mappers leads to severe statistical bias when sample sizes per split differ.
+            </div>
+        </div>
+
+        <h3>TRY YOURSELF</h3>
+        <ol>
+            <li><strong>Exercise 8.1 (Moderate): Average Expression Calculation</strong><br>
+                Trace average expression calculation for <code>Gene_B</code> in your notebook:<br>
+                <em>Split 1:</em> <code>"Gene_B 10"</code>, <code>"Gene_B 50"</code> | <em>Split 2:</em> <code>"Gene_B 100"</code>, <code>"Gene_B 40"</code>, <code>"Gene_B 0"</code><br>
+                Write Mapper outputs, Shuffle grouped lists, and calculate <code>total_sum</code>, <code>total_count</code>, and final <code>average</code>.
+            </li>
+            <li style="margin-top:6px;"><strong>Exercise 8.2 (Application): Maximum Quality Score Calculation</strong><br>
+                Quality scores: <code>"Read_1 32"</code>, <code>"Read_1 40"</code>, <code>"Read_1 28"</code>, <code>"Read_1 38"</code>.<br>
+                Design Mapper and Reducer logic to find the <strong>Maximum Quality Score</strong> for <code>Read_1</code> and write the trace in your notebook.
+            </li>
+        </ol>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>Why is a standard Combiner function dangerous for calculating averages directly, but safe for Maximums or Minimums? How can you modify Combiner outputs to make averaging mathematically safe?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 8</span>
+    </div>
+</div>
+
+<!-- PAGE 9 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 9 — Bioinformatics Case Studies</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>You are now the Lead Bioinformatician. For each real-world case study below, design the <strong>Mapper Logic</strong>, <strong>Intermediate Key-Value Pairs</strong>, <strong>Shuffle Keys</strong>, and <strong>Reducer Logic</strong> in your student notebook.</p>
+        </div>
+
+        <h2>SECTION 9.1: ARCHITECTING REAL-WORLD PIPELINES</h2>
+
+        <h3>CASE STUDY 1: ANTIBIOTIC RESISTANCE GENE DETECTOR</h3>
+        <p><strong>Scenario:</strong> Metagenomics tracking of wastewater sequence reads: <code>[Read_ID, Resistance_Gene_Name, Depth]</code>.<br>
+        <strong>Goal:</strong> Calculate total coverage depth per resistance gene across millions of reads.</p>
+        <pre>MAPPER INPUT  : &lt;Byte_Offset, "Read_101  blaTEM-1  45"&gt;
+MAPPER LOGIC  : Extract Gene_Name and Coverage_Depth
+MAPPER OUTPUT : &lt; Key: Gene_Name , Value: Coverage_Depth &gt;
+SHUFFLE KEY   : Group entries by Gene_Name
+REDUCER LOGIC : Sum all coverage values per Gene_Name key
+FINAL OUTPUT  : &lt; Key: Gene_Name , Value: Total_Coverage_Depth &gt;</pre>
+
+        <h3>CASE STUDY 2: PROTEIN KINASE FAMILY CLASSIFIER</h3>
+        <p><strong>Scenario:</strong> UniProt sequence entries listing IDs and family domain: <code>[Protein_ID, Domain_Family]</code>.<br>
+        <strong>Goal:</strong> Count how many proteins belong to <code>Kinase</code> domain vs. <code>GPMC</code> domain.</p>
+        <p><em>In your notebook: Write Mapper key emission, domain filtering pseudo-code, and Reducer output format.</em></p>
+
+        <h3>CASE STUDY 3: METAGENOMIC SPECIES IDENTIFIER</h3>
+        <p><strong>Scenario:</strong> Microbiome taxonomic assignments: <code>[Sample_ID, Species_Taxonomy_ID]</code>.<br>
+        <strong>Goal:</strong> Calculate species abundance percentages per Sample_ID.</p>
+        <p><em>In your notebook: Should the Mapper emit composite key <code>(Sample_ID, Species_TaxID)</code> or single key <code>Sample_ID</code>? Trace how Reducer calculates total species counts.</em></p>
+
+        <h3>CASE STUDY 4: RNA-SEQ READ ALIGNMENT COUNTER</h3>
+        <p><strong>Scenario:</strong> RNA-Seq alignment regions: <code>[Chromosome, Exon_Start, Exon_End, Read_Count]</code>.<br>
+        <strong>Goal:</strong> Calculate total read counts mapped per chromosome (<code>chr1</code>, <code>chr2</code>, ..., <code>chrX</code>).</p>
+        <p><em>In your notebook: Draw the complete end-to-end MapReduce pipeline diagram for Case Study 4.</em></p>
+
+        <div class="box-grid">
+            <div class="info-box box-bio">
+                <strong>Bioinformatics Connection</strong>
+                Large-scale metagenomic profiling algorithms (like Kraken and Bracken) execute these exact composite key steps to classify billions of short reads.
+            </div>
+            <div class="info-box box-warning">
+                <strong>Common Mistake</strong>
+                Forgetting to filter missing values during Mapper execution. Unchecked invalid strings cause Reducer NullPointer exceptions.
+            </div>
+        </div>
+
+        <h3>THINK DEEPER</h3>
+        <p><em>In Case Study 3, if one sample contains 90% of all sequence reads, how does this create a "straggler node" during cluster execution? What architectural strategy balances the workload?</em></p>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 9</span>
+    </div>
+</div>
+
+<!-- PAGE 10 -->
+<div class="page">
+    <div class="header">
+        <h1>Classroom Workbook</h1>
+        <span class="subtitle">Page 10 — Classroom Evaluation & Activity</span>
+    </div>
+    <div class="content">
+        <div class="think-box">
+            <h3>THINK</h3>
+            <p>Complete all evaluation sections below in your student notebook during the remaining classroom time.</p>
+        </div>
+
+        <h2>SECTION 10.1: COMPREHENSIVE KNOWLEDGE EVALUATION</h2>
+
+        <h3>PART A: FILL-IN-THE-BLANKS</h3>
+        <p>Write the correct technical term in your notebook for each statement:</p>
+        <ol>
+            <li>The HDFS master node storing file directory metadata and block mappings is called the __________.</li>
+            <li>The MapReduce phase that routes intermediate keys across nodes over the network is called __________.</li>
+            <li>The data schema approach where dynamic data structure is parsed upon execution is Schema-on-__________.</li>
+            <li>The column-oriented NoSQL database providing low-latency real-time random access in Hadoop is __________.</li>
+            <li>The cluster framework managing CPU and memory resource allocations across applications is __________.</li>
+        </ol>
+
+        <h3>PART B: TRUE OR FALSE & JUSTIFICATION</h3>
+        <p>Write True or False in your notebook. If False, write the corrected statement:</p>
+        <ol>
+            <li><em>True / False:</em> HDFS supports random in-place edits and arbitrary binary file updates.</li>
+            <li><em>True / False:</em> Mappers write intermediate key-value output directly to replicated HDFS storage blocks.</li>
+            <li><em>True / False:</em> Apache Spark speeds computation primarily by holding intermediate data in system RAM.</li>
+        </ol>
+
+        <h3>PART C: MAPREDUCE TRACE TABLE</h3>
+        <p>Complete the trace table in your notebook for sequence input: <code>"CGT CGT AAC CGT AAC"</code></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pipeline Stage</th>
+                    <th>Output Representation / Key-Value Pairs</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Raw Input</strong></td>
+                    <td><code>&lt;0, "CGT CGT AAC CGT AAC"&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Mapper Output</strong></td>
+                    <td><em>(Fill in notebook: list all emitted pairs)</em></td>
+                </tr>
+                <tr>
+                    <td><strong>Shuffle & Sort Output</strong></td>
+                    <td><code>CGT -&gt; [?, ?, ?]</code>, <code>AAC -&gt; [?, ?]</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Reducer Output</strong></td>
+                    <td><code>CGT -&gt; ?</code>, <code>AAC -&gt; ?</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>PART D: SHORT ANSWER SCENARIO</h3>
+        <p>A research center receives <strong>50 Terabytes</strong> of novel viral sequence files in <code>.fastq</code> format.</p>
+        <ol>
+            <li>Recommend an appropriate Hadoop ingestion tool, storage layer, and compute engine.</li>
+            <li>Explain why attempting to store and compute this dataset on a single 10 TB desktop MySQL drive fails.</li>
+            <li>Describe the role of HDFS block replication ($RF=3$) if two DataNode drives fail simultaneously.</li>
+        </ol>
+
+        <h3>PART E: THREE-MINUTE REFLECTION</h3>
+        <p>Write three key summary statements in your notebook:</p>
+        <ul>
+            <li><strong>The primary computational concept I mastered today:</strong> ___________________________________</li>
+            <li><strong>The biggest architectural difference between traditional databases and Hadoop:</strong> ________________</li>
+            <li><strong>How MapReduce key-value processing accelerates bioinformatics pipelines:</strong> _____________________</li>
+        </ul>
+    </div>
+    <div class="footer">
+        <span>Classroom Guided Learning Workbook</span>
+        <span>Page 10</span>
+    </div>
+</div>
+
+</body>
+</html>
