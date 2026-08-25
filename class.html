@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Data in Genomics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161616;
+    --red:#C1121F;
+    --red-soft:#FBECEC;
+    --red-line:#E9B8BB;
+    --gray-bg:#F5F5F5;
+    --gray-line:#E4E4E4;
+    --muted:#5A5A5A;
+    --body:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#fff;color:var(--ink);font-family:var(--body);
+    font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:840px;margin:0 auto;padding:48px 22px 100px}
+
+  /* title */
+  .title{font-size:40px;font-weight:700;line-height:1.1;margin:0 0 10px;letter-spacing:-.02em}
+  .title .r{color:var(--red)}
+  .intro{font-size:18px;color:var(--muted);margin:0 0 34px;max-width:66ch}
+
+  /* contents */
+  .toc{border:1px solid var(--gray-line);border-radius:12px;padding:18px 22px;margin:0 0 46px;background:#fff}
+  .toc h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin:0 0 12px;font-weight:700}
+  .toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  .toc li{margin:5px 0;break-inside:avoid}
+  .toc a{color:var(--ink);text-decoration:none;font-weight:500;font-size:15.5px}
+  .toc a:hover{color:var(--red);text-decoration:underline}
+  @media(max-width:640px){.toc ol{columns:1}}
+
+  /* section */
+  section{padding-top:34px;margin-top:8px;border-top:1px solid var(--gray-line)}
+  section:first-of-type{border-top:0}
+  h2.sec{font-size:29px;font-weight:700;color:var(--red);margin:0 0 4px;line-height:1.18;letter-spacing:-.01em}
+  .lead{font-size:18.5px;font-weight:600;color:var(--ink);margin:6px 0 16px}
+
+  p{margin:0 0 14px}
+  b, strong{color:var(--red);font-weight:600}
+  ul{margin:0 0 16px;padding-left:0;list-style:none}
+  ul li{position:relative;padding-left:26px;margin:9px 0}
+  ul li::before{content:"";position:absolute;left:4px;top:11px;width:8px;height:8px;
+    background:var(--red);border-radius:2px}
+  ul li b{color:var(--red)}
+
+  .h3{font-size:15px;font-weight:700;color:var(--ink);margin:20px 0 8px;letter-spacing:.01em}
+
+  /* callout boxes */
+  .box{border-radius:10px;padding:16px 18px;margin:16px 0}
+  .ex{background:var(--red-soft);border:1px solid var(--red-line)}
+  .use{background:var(--gray-bg);border:1px solid var(--gray-line)}
+  .box .tag{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--red);margin:0 0 6px}
+  .box p{margin:0}
+  .box p+p{margin-top:8px}
+  .box b{color:var(--red)}
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+  .stat{border:1px solid var(--gray-line);border-radius:10px;padding:16px}
+  .stat .n{font-size:26px;font-weight:700;color:var(--red);line-height:1.1}
+  .stat .l{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  @media(max-width:640px){.stats{grid-template-columns:1fr}}
+
+  /* code / data */
+  pre{background:#F4F4F4;border-left:4px solid var(--red);border-radius:0 8px 8px 0;
+    padding:14px 16px;margin:14px 0;overflow-x:auto;font-family:var(--mono);font-size:14px;
+    line-height:1.7;color:#222}
+
+  /* comparison table */
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15.5px}
+  th,td{border:1px solid var(--gray-line);padding:10px 13px;text-align:left;vertical-align:top}
+  th{background:var(--red);color:#fff;font-weight:600;font-size:14.5px}
+  td b{color:var(--red)}
+
+  .back{display:inline-block;margin-top:6px;font-size:13px;color:var(--muted);text-decoration:none}
+  .back:hover{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1 class="title">Big Data in <span class="r">Genomics</span></h1>
+<p class="intro">A plain-language guide to the rest of Unit I and all of Unit II. Every idea is explained simply, with a worked example and a real use case. Read top to bottom, or jump to a topic.</p>
+
+<nav class="toc">
+  <h2>What is inside</h2>
+  <ol>
+    <li><a href="#cost">Communication cost</a></li>
+    <li><a href="#complexity">The parallelism trade-off</a></li>
+    <li><a href="#challenges">The genomic data problem</a></li>
+    <li><a href="#annotations">Annotations and search</a></li>
+    <li><a href="#irods">Tracing data (iRODS)</a></li>
+    <li><a href="#transfer">Moving huge files</a></li>
+    <li><a href="#distributed">Splitting the work</a></li>
+    <li><a href="#hadoop">Hadoop tools for genomics</a></li>
+    <li><a href="#rnaseq">RNA-seq and gene activity</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="cost">
+  <h2 class="sec">Communication cost</h2>
+  <p class="lead">When many computers work together, the slow part is moving data between them, not doing the maths.</p>
+  <ul>
+    <li>A cluster has hundreds of processors. They are cheap, and many sit idle. Doing more calculations is rarely the problem.</li>
+    <li>The network that links the machines is shared and slow. <b>Moving data is the expensive part.</b></li>
+    <li>So we judge a job by how many bytes travel across the network, not by how much arithmetic it does.</li>
+    <li>Simple rule: the cost of a step is about the size of the data it reads. The whole job's cost is all of those added together.</li>
+  </ul>
+  <div class="box ex">
+    <p class="tag">Example</p>
+    <p>Counting short DNA chunks (k-mers): 1 billion reads, each giving 100 chunks, is 100 billion tiny "(chunk, 1)" messages. If every one crosses the network, that is a mountain of traffic. A <b>combiner</b> adds up the chunks on each machine first, so only a few totals travel instead of billions of ones. Same answer, a tiny fraction of the traffic.</p>
+  </div>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>When a genomics job is slow, the real fix is almost always to make the machines send less data to each other (add a combiner, pick a smarter key), not to buy faster processors.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 2 -->
+<section id="complexity">
+  <h2 class="sec">The parallelism trade-off</h2>
+  <p class="lead">You can spread work over more machines to go faster, but that makes them send more data to each other. You cannot have both.</p>
+  <p>Every MapReduce job is described by two numbers:</p>
+  <ul>
+    <li><b>Reducer size (q)</b>: the most data any single machine has to hold and process at once. A small q means a light load per machine, so you can use many machines in parallel.</li>
+    <li><b>Replication rate (r)</b>: how many copies of each input piece get sent out. A big r means lots of copies travelling, which is more network cost.</li>
+  </ul>
+  <div class="h3">The trade-off</div>
+  <ul>
+    <li>Want more machines working at once (small q)? Then each piece of data must be sent to more of them, so r goes up.</li>
+    <li>Want to send less data (small r)? Then fewer machines share the work, so q goes up.</li>
+    <li><b>You always pay for parallelism with data movement.</b></li>
+  </ul>
+  <div class="box ex">
+    <p class="tag">Example</p>
+    <p>Comparing every read with every other read (needed to assemble a genome). Put it all on one machine: nothing is copied (small r), but that machine must hold everything (huge q, impossible). Split it across many machines: the load per machine drops (small q), but each read must be copied into many groups (big r, huge network cost). Both extremes hurt.</p>
+  </div>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>This is why real assembly tools never compare all reads directly. They first group reads by a shared chunk, and only compare reads inside the same group. They <b>redesign the problem so the expensive step never happens</b>. Tools like minimap2 and Kraken are built on this trick.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 3 -->
+<section id="challenges">
+  <h2 class="sec">The genomic data problem</h2>
+  <p class="lead">Modern biology produces enormous amounts of data, and ordinary tools cannot keep up.</p>
+  <div class="stats">
+    <div class="stat"><div class="n">~200 GB</div><div class="l">raw data from sequencing one human genome</div></div>
+    <div class="stat"><div class="n">$100M &rarr; &lt;$1000</div><div class="l">cost to sequence a genome, in 2001 and now</div></div>
+    <div class="stat"><div class="n">&gt;50 PB</div><div class="l">size of the public NCBI read archive, still growing</div></div>
+  </div>
+  <p>That scale creates five very practical challenges. The rest of Unit II is a set of answers to them:</p>
+  <ul>
+    <li><b>Volume</b>: one study can be hundreds of terabytes. No single hard drive holds it.</li>
+    <li><b>Finding things</b>: a genome is 3 billion letters. Locating one gene or one mutation needs smart searching.</li>
+    <li><b>Trust</b>: which exact version of the data produced this result, and who changed it?</li>
+    <li><b>Moving it</b>: sending terabytes between labs across the world is slow.</li>
+    <li><b>Computing</b>: analysis must run on many machines at once to finish in reasonable time.</li>
+  </ul>
+  <div class="box use">
+    <p class="tag">Why it matters</p>
+    <p>Sequencing got cheap faster than computers got powerful. The data now grows faster than the machines that process it, so these problems get harder every year, not easier.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 4 -->
+<section id="annotations">
+  <h2 class="sec">Annotations and search</h2>
+  <p class="lead">Raw DNA is just letters. Annotations are notes that say what the letters mean, stored so you can find any one instantly.</p>
+  <div class="h3">What an annotation is</div>
+  <ul>
+    <li>A label attached to a position on the genome.</li>
+    <li>For example: "this stretch is the BRCA1 gene", "this single letter is a known disease mutation", "this region switches a gene on and off".</li>
+  </ul>
+  <div class="h3">Why raw sequence is not enough</div>
+  <ul>
+    <li>Knowing a patient has a T where most people have a C means nothing on its own.</li>
+    <li>You need to know: is it inside a gene? Is it a known disease variant? Is it rare or common?</li>
+    <li>Those answers live in <b>annotation databases</b>, not in the DNA itself.</li>
+  </ul>
+  <div class="h3">Stored so it can be searched</div>
+  <ul>
+    <li>Annotations sit in <b>indexed databases</b>, so a lookup like "what is at chromosome 17, position 43,044,295?" returns instantly.</li>
+    <li>Without an index, every question would mean reading the whole genome again.</li>
+    <li>Common databases: <b>Ensembl</b> and <b>UCSC</b> (genes), <b>dbSNP</b> (known variants), <b>ClinVar</b> (variants linked to disease), <b>gnomAD</b> (how common a variant is).</li>
+    <li>Common file formats: GFF and GTF (genes), BED (regions), VCF (variants).</li>
+  </ul>
+  <div class="box ex">
+    <p class="tag">Example</p>
+    <p>Question: "list every known harmful mutation inside the BRCA1 gene" (this gene affects breast-cancer risk). Steps: find where BRCA1 sits, pull all variants in that range, keep the ones marked harmful.</p>
+    <pre>BRCA1  is at  chr17: 43,044,295 - 43,125,483
+&rarr; get all variants in that range      (dbSNP)
+&rarr; keep those marked "pathogenic"       (ClinVar)</pre>
+    <p>With indexed storage this takes seconds. On plain files it would be three full scans of the genome.</p>
+  </div>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>A clinical lab receives a patient's genome and must report which of their variants are known to cause disease. That report is only possible because annotations are stored in a fast, searchable form.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 5 -->
+<section id="irods">
+  <h2 class="sec">Tracing data with iRODS</h2>
+  <p class="lead">In science and medicine you must prove where data came from and be able to reproduce old results. iRODS is software that keeps this history for you.</p>
+  <div class="h3">The problem</div>
+  <ul>
+    <li>A result is produced today from some dataset.</li>
+    <li>Two years later someone asks: which exact version of the data was used? Who processed it? Has it changed since?</li>
+    <li>If you cannot answer, the result cannot be trusted or repeated.</li>
+  </ul>
+  <div class="h3">What iRODS is and gives you</div>
+  <ul>
+    <li>iRODS stands for the <b>integrated Rule-Oriented Data System</b>. It sits on top of your storage and manages the data, not just holds it.</li>
+    <li><b>Provenance</b>: a record of where each dataset came from and every step done to it.</li>
+    <li><b>Versioning</b>: old versions are kept, so a past analysis can be reproduced exactly.</li>
+    <li><b>One unified view</b> of data spread across many servers and locations.</li>
+    <li><b>Automatic rules</b>, for example "always keep three copies" or "tag every file with its study name".</li>
+  </ul>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>A hospital lab reports a patient's variant result. Years later an audit asks how it was produced. Because iRODS tracked the data version, the reference used, and every processing step, the lab can reproduce the exact result and prove it was correct.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 6 -->
+<section id="transfer">
+  <h2 class="sec">Moving huge files</h2>
+  <p class="lead">Genomic files are enormous, and ordinary internet transfer is far too slow. Special methods fix this.</p>
+  <div class="h3">The problem</div>
+  <ul>
+    <li>You need to send 50 TB of sequencing data to a collaborator overseas.</li>
+    <li>Over a normal 1 Gbps link at full speed, that is about 5 days, and in practice longer.</li>
+  </ul>
+  <div class="h3">Why normal transfer is slow</div>
+  <ul>
+    <li>FTP and HTTPS use TCP, which slows down whenever the network is busy or drops a packet.</li>
+    <li>Over long distances, TCP cannot keep the connection full, so a fast link is mostly wasted.</li>
+    <li>The bottleneck is the <b>method</b>, not the bandwidth you are paying for.</li>
+  </ul>
+  <div class="h3">Two faster methods</div>
+  <ul>
+    <li><b>FASP (Aspera)</b>: the "Fast And Secure Protocol". It sends data over UDP and controls speed itself, so distance and packet loss stop slowing it down. It fills the whole link, turning a multi-day transfer into hours. Big archives like the EBI and NCBI offer it for downloads.</li>
+    <li><b>Torrents and seeding</b>: the file is split into pieces held by many machines (seeders). A downloader grabs different pieces from different seeders at once. The more places that already have the data, the faster everyone else gets it.</li>
+  </ul>
+  <table>
+    <tr><th>Method</th><th>Best when</th><th>Why</th></tr>
+    <tr><td><b>FTP / HTTPS</b></td><td>Small files, short distances</td><td>Simple and universal, but slow over long links.</td></tr>
+    <tr><td><b>FASP (Aspera)</b></td><td>One big transfer, far away</td><td>Uses the full bandwidth; distance and loss do not slow it.</td></tr>
+    <tr><td><b>Torrent</b></td><td>Popular data, many recipients</td><td>The load is shared across many seeders at once.</td></tr>
+  </table>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>A reference dataset like the 1000 Genomes Project is wanted by thousands of labs. Sharing it by torrent spreads the load, so no single server is overwhelmed and everyone downloads faster.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 7 -->
+<section id="distributed">
+  <h2 class="sec">Splitting the work</h2>
+  <p class="lead">Genomic analysis breaks naturally into independent pieces, which is exactly what makes it easy to run on many machines at once.</p>
+  <div class="h3">Why it fits so well</div>
+  <ul>
+    <li>Millions of reads can each be processed on their own. One read never needs another.</li>
+    <li>The genome can be split into regions, and each region handled separately.</li>
+    <li>Independent pieces are exactly what a cluster handles best.</li>
+  </ul>
+  <div class="h3">The key move (same as Unit I)</div>
+  <ul>
+    <li>The data (reads plus the reference genome) is large. Your program is small.</li>
+    <li>So you do not bring the data to the program. You <b>send the small program to the machines that already hold the data</b>.</li>
+    <li>What splits well: read alignment, k-mer counting, variant calling by region, and quality filtering.</li>
+  </ul>
+  <div class="box ex">
+    <p class="tag">Example</p>
+    <p>Aligning a billion reads on one computer could take weeks. Split across a 100-machine cluster, each machine aligns its own share, and the whole job finishes in hours.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 8 -->
+<section id="hadoop">
+  <h2 class="sec">Hadoop tools for genomics</h2>
+  <p class="lead">Ready-made tools apply the Unit I machinery (Hadoop and Spark) to real genomic analysis, so you do not build it yourself.</p>
+  <div class="h3">How MapReduce fits an alignment job</div>
+  <pre>map(read):     align the read, label it with its genome region
+shuffle:       gather all reads that landed in the same region
+reduce(region): call the variants in that region</pre>
+  <p>That is <b>map, shuffle, reduce</b>, running on a genome, exactly the pattern from Unit I.</p>
+  <div class="h3">Real tools built this way</div>
+  <table>
+    <tr><th>Tool</th><th>What it does</th></tr>
+    <tr><td><b>Crossbow</b></td><td>Read alignment and variant calling on Hadoop, for whole genomes.</td></tr>
+    <tr><td><b>CloudBurst</b></td><td>Parallel read mapping using MapReduce.</td></tr>
+    <tr><td><b>GATK on Spark</b></td><td>The standard variant-calling toolkit, parallelised with Spark.</td></tr>
+    <tr><td><b>Hail</b></td><td>Analysis of very large variant datasets on Spark, used by gnomAD.</td></tr>
+  </table>
+  <div class="h3">Why it pays off</div>
+  <ul>
+    <li>A job that would take weeks on one machine finishes in hours across a cluster.</li>
+    <li>If a machine dies mid-run, only its part is redone, because the data is copied on other machines.</li>
+    <li>The same pipeline runs on 10 machines or 10,000 without being rewritten.</li>
+  </ul>
+  <div class="box use">
+    <p class="tag">Honest limit</p>
+    <p>For a small dataset, one machine is faster, because a cluster adds coordination overhead. Reach for the cluster only when the data is genuinely too big to finish any other way.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+<!-- 9 -->
+<section id="rnaseq">
+  <h2 class="sec">RNA-seq and gene activity</h2>
+  <p class="lead">DNA is the fixed recipe book. RNA-seq measures which recipes a cell is actually using right now.</p>
+  <div class="h3">What it measures</div>
+  <ul>
+    <li>Not the DNA sequence, but <b>gene activity</b>: how strongly each gene is switched on.</li>
+    <li>That activity differs between a healthy cell and a tumour, or before and after a drug.</li>
+    <li>So RNA-seq shows what a genome is doing, not just what it contains.</li>
+  </ul>
+  <div class="h3">The pipeline</div>
+  <pre>reads  &rarr;  align to the genome  &rarr;  count reads per gene  &rarr;  expression table</pre>
+  <ul>
+    <li>Sequence the RNA in a sample, giving reads (just like DNA sequencing).</li>
+    <li>Align each read to find which gene it came from.</li>
+    <li>Count the reads for each gene. That count is how active the gene was.</li>
+    <li>That counting step is the same k-mer counting job from Unit I, with the <b>gene as the key</b>.</li>
+  </ul>
+  <div class="h3">The gene expression table</div>
+  <p>The result is a big table: one row per gene, one column per sample, each cell a count.</p>
+  <pre>            Sample A    Sample B    Sample C
+  BRCA1        812         790          45
+  TP53        1204        1190         160
+  MYC          330         340        2100</pre>
+  <p>Reading across: BRCA1 is busy in samples A and B, but almost silent in C. MYC is the opposite.</p>
+  <div class="h3">What you find in it</div>
+  <ul>
+    <li><b>Differential expression</b>: genes that change between two groups, such as tumour versus normal.</li>
+    <li><b>Clustering</b>: samples that behave alike, which can reveal subtypes of a disease.</li>
+    <li><b>Biomarker discovery</b>: a small set of genes whose activity predicts an outcome.</li>
+  </ul>
+  <div class="box ex">
+    <p class="tag">Example</p>
+    <p>Compare tumour samples with healthy ones, and look for genes that are far more active in the tumour. Those genes are candidates to study further, or to target with a drug.</p>
+  </div>
+  <div class="box use">
+    <p class="tag">Use case</p>
+    <p>At population scale this table is huge, with tens of thousands of genes across thousands of samples. That is why it is analysed with the distributed tools from this unit, such as Hail.</p>
+  </div>
+  <a class="back" href="#top">Back to top</a>
+</section>
+
+</div>
+<span id="top"></span>
+</body>
+</html>
