@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Assignment</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #141a30;
+    --panel-2: #1b2444;
+    --accent: #64ffda;
+    --accent-2: #7c9cff;
+    --text: #e6ecff;
+    --muted: #93a0c2;
+    --err: #ff7a90;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #1a2450 0%, transparent 60%),
+                radial-gradient(1000px 500px at 90% 100%, #1e2a5a 0%, transparent 55%),
+                var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  h1 { margin: 0 0 6px; font-size: 22px; letter-spacing: 0.2px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+  label {
+    display: block; font-size: 12px; color: var(--muted);
+    margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  input {
+    width: 100%; background: var(--panel-2);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text); padding: 12px 14px;
+    border-radius: 10px; font-size: 15px; outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--accent-2); }
+  button {
+    margin-top: 22px; width: 100%; padding: 14px;
+    border: 0; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #0b1020; font-weight: 700; font-size: 15px;
+    cursor: pointer; letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  button:disabled { opacity: 0.7; cursor: not-allowed; }
+  .dice-icon { font-size: 20px; display: inline-block; }
+  .msg {
+    margin-top: 14px; font-size: 13px; min-height: 18px;
+    text-align: center;
+  }
+  .msg.err { color: var(--err); }
+
+  /* Rolling stage — shown during animation */
+  .stage {
+    display: none;
+    text-align: center;
+    padding: 20px 10px 6px;
+  }
+  .stage.show { display: block; }
+  .big-dice {
+    font-size: 82px;
+    display: inline-block;
+    filter: drop-shadow(0 6px 12px rgba(100,255,218,0.25));
+  }
+  .big-dice.rolling {
+    animation: roll 0.5s linear infinite;
+  }
+  @keyframes roll {
+    0%   { transform: rotate(0deg)   scale(1); }
+    25%  { transform: rotate(90deg)  scale(1.1); }
+    50%  { transform: rotate(180deg) scale(0.95); }
+    75%  { transform: rotate(270deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+  .cycler {
+    margin-top: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    height: 32px;
+    letter-spacing: 0.3px;
+    color: var(--accent-2);
+    transition: color 0.2s;
+  }
+  .cycler.settling { color: var(--accent); }
+
+  /* Final reveal */
+  .result {
+    margin-top: 6px;
+    padding: 22px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(100,255,218,0.08), rgba(124,156,255,0.08));
+    border: 1px solid rgba(100,255,218,0.2);
+    text-align: center;
+    display: none;
+  }
+  .result.show { display: block; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .result .hi { color: var(--muted); font-size: 13px; }
+  .result .name { font-size: 15px; margin: 4px 0 14px; }
+  .result .team-label {
+    color: var(--muted); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .result .team-name {
+    font-size: 28px; font-weight: 800; margin: 6px 0 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .result .note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+  .footer {
+    margin-top: 18px; text-align: center;
+    font-size: 11px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧬 Team Assignment</h1>
+    <div class="sub">Enter your details and roll the dice to get your team.</div>
+
+    <div id="form">
+      <label for="reg">Registration Number</label>
+      <input id="reg" type="text" autocomplete="off" placeholder="e.g. 127013001" />
+
+      <label for="name">Your Name</label>
+      <input id="name" type="text" autocomplete="off" placeholder="Full name" />
+
+      <button id="go">
+        <span class="dice-icon">🎲</span>
+        <span>Roll the dice</span>
+      </button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="big-dice" id="dice">🎲</div>
+      <div class="cycler" id="cycler">Rolling...</div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="hi">Welcome,</div>
+      <div class="name" id="rName"></div>
+      <div class="team-label">Your team</div>
+      <div class="team-name" id="rTeam"></div>
+      <div class="note">This assignment is final. Note it down!</div>
+    </div>
+
+    <div class="footer">One entry per registration number.</div>
+  </div>
+
+<script>
+(function () {
+  // ---- Team names (index 0-10) ----
+  const T = [
+    "Sticky Ends",         // 0
+    "Rogue Ribosomes",     // 1
+    "CRISPR Critters",     // 2
+    "Splice Squad",        // 3
+    "Frameshift Fiasco",   // 4
+    "Plasmid Pirates",     // 5
+    "Silent Mutants",      // 6
+    "Codon Crew",          // 7
+    "BLAST Radius",        // 8
+    "Okazaki Outlaws",     // 9
+    "Contig Crusaders"     // 10
+  ];
+
+  // ---- Reg -> team index (opaque lookup) ----
+  const A = {"126013045":5,"127013001":8,"127013002":8,"127013003":10,"127013004":4,"127013005":9,"127013006":9,"127013007":0,"127013008":10,"127013009":1,"127013010":5,"127013011":3,"127013012":7,"127013014":8,"127013015":10,"127013016":0,"127013017":1,"127013019":5,"127013020":2,"127013021":3,"127013022":2,"127013023":5,"127013025":3,"127013026":2,"127013027":4,"127013028":0,"127013029":6,"127013030":8,"127013031":6,"127013032":0,"127013033":1,"127013034":10,"127013035":7,"127013036":1,"127013037":9,"127013038":10,"127013039":5,"127013040":8,"127013041":7,"127013042":2,"127013043":3,"127013044":6,"127013045":4,"127013046":9,"127013047":0,"127013048":2,"127013049":2,"127013050":9,"127013051":6,"127013052":0,"127013053":1,"127013054":7,"127013055":4,"127013056":5,"127013057":6,"127013058":8,"127013059":6,"127013060":0,"127013061":3,"127013062":4,"127013064":9,"127013065":3,"127013066":7,"127013067":1,"127013068":7,"127013069":4,"127013070":10};
+
+  const DICE_FACES = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+  const LS_KEY = "team_assign_v1";
+  const $ = id => document.getElementById(id);
+
+  function reveal(name, teamIdx) {
+    $("form").style.display = "none";
+    $("stage").classList.remove("show");
+    $("rName").textContent = name;
+    $("rTeam").textContent = T[teamIdx];
+    $("result").classList.add("show");
+  }
+
+  // If already submitted, jump straight to their locked-in team.
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if (saved && saved.reg && A.hasOwnProperty(saved.reg)) {
+      reveal(saved.name || "", A[saved.reg]);
+      return;
+    }
+  } catch (e) {}
+
+  function startRoll(name, teamIdx) {
+    $("form").style.display = "none";
+    $("stage").classList.add("show");
+    const dice = $("dice");
+    const cycler = $("cycler");
+    dice.classList.add("rolling");
+
+    // Slot-machine style: cycle team names, decelerating.
+    // Intervals in ms — starts fast, ends slow. Total ~2.6s.
+    const schedule = [
+      80,80,80,80,80,80,80,80,80,80,   // fast blur (~800ms)
+      100,100,100,100,100,              // (~500ms)
+      140,140,140,140,                  // (~560ms)
+      200,240,                          // (~440ms)
+      320                               // final tick (~320ms)
+    ];
+
+    let step = 0;
+    let lastIdx = -1;
+
+    function tick() {
+      // Pick a random team name that isn't the same as last shown
+      let idx;
+      do { idx = Math.floor(Math.random() * T.length); } while (idx === lastIdx);
+      lastIdx = idx;
+      cycler.textContent = T[idx];
+
+      // Also flip dice face for extra motion
+      dice.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+
+      step++;
+      if (step >= schedule.length - 2) cycler.classList.add("settling");
+
+      if (step < schedule.length) {
+        setTimeout(tick, schedule[step]);
+      } else {
+        // Land on the real team
+        cycler.textContent = T[teamIdx];
+        dice.classList.remove("rolling");
+        dice.textContent = "🎲";
+        setTimeout(() => reveal(name, teamIdx), 550);
+      }
+    }
+    setTimeout(tick, schedule[0]);
+  }
+
+  $("go").addEventListener("click", function () {
+    const reg = $("reg").value.trim();
+    const name = $("name").value.trim();
+    const msg = $("msg");
+    msg.className = "msg";
+    msg.textContent = "";
+
+    if (!reg || !name) {
+      msg.className = "msg err";
+      msg.textContent = "Please enter both your registration number and name.";
+      return;
+    }
+    if (!A.hasOwnProperty(reg)) {
+      msg.className = "msg err";
+      msg.textContent = "Registration number not found in the class list. Please check and try again.";
+      return;
+    }
+
+    $("go").disabled = true;
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ reg: reg, name: name }));
+    } catch (e) {}
+    startRoll(name, A[reg]);
+  });
+
+  // Enter key rolls
+  ["reg","name"].forEach(function (id) {
+    $(id).addEventListener("keydown", function (e) {
+      if (e.key === "Enter") $("go").click();
+    });
+  });
+})();
+</script>
+</body>
+</html>
