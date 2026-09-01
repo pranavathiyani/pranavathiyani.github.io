@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz - Big Data in Genomics | INT411</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#64748b;--border:#d9e0ea;--accent:#b91c1c;--accent2:#7f1d1d;--soft:#fef2f2;--ok:#166534}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+body.locked{user-select:none}
+.container{max-width:900px;margin:0 auto;padding:28px 18px 50px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;box-shadow:0 8px 28px rgba(15,23,42,.06)}
+.header{text-align:center;margin-bottom:22px}
+.header h1{margin:0 0 7px;font-size:28px}
+.header p{margin:0;color:var(--muted)}
+label{display:block;font-weight:600;margin:18px 0 8px}
+input{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font-size:16px;outline:none}
+input:focus{border-color:var(--accent)}
+button{font:inherit}
+.primary{border:0;background:var(--accent);color:white;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer}
+.primary:hover{background:var(--accent2)}
+.primary:disabled{opacity:.45;cursor:not-allowed}
+.center{text-align:center}
+.hidden{display:none!important}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:12px}
+.progress-text{font-size:14px;color:var(--muted)}
+.timer{font-size:27px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent)}
+.timer.ready{color:var(--ok)}
+.bar{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;background:var(--accent);transition:width .2s linear}
+.question{font-size:21px;line-height:1.45;font-weight:700;margin-bottom:18px}
+.option{display:flex;gap:12px;width:100%;text-align:left;padding:14px 15px;margin:9px 0;border:1px solid var(--border);background:white;border-radius:11px;cursor:pointer}
+.option:hover{border-color:#94a3b8}
+.option.selected{border-color:var(--accent);background:var(--soft)}
+.letter{font-weight:800;min-width:24px}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}
+.notice{font-size:13px;color:var(--muted)}
+.warning{color:var(--accent);font-weight:600}
+.answer{padding:13px 15px;margin:9px 0;border-left:4px solid var(--accent);background:#fafafa;border-radius:8px}
+.score{font-size:24px;font-weight:800;margin:12px 0}
+.small{font-size:13px;color:var(--muted)}
+.error{color:var(--accent);font-size:14px;margin-top:8px}
+@media(max-width:600px){.card{padding:20px}.question{font-size:19px}.topbar{align-items:flex-start}.actions{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+<section id="intro" class="card">
+  <div class="header">
+    <h1>Quiz - Big Data in Genomics</h1>
+    <p>Course: INT411</p>
+  </div>
+  <p>Read and understand the assigned course material before beginning. The quiz presents one question at a time.</p>
+  <label for="studentName">Name</label>
+  <input id="studentName" type="text" autocomplete="off" spellcheck="false" placeholder="Enter your full name">
+  <div id="nameError" class="error hidden">Please enter your name.</div>
+  <div class="center" style="margin-top:20px">
+    <button id="startBtn" class="primary">Start Quiz</button>
+  </div>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="topbar">
+    <div>
+      <strong id="displayName"></strong>
+      <div id="progressText" class="progress-text"></div>
+    </div>
+    <div class="center">
+      <div class="small">Question timer</div>
+      <div id="timer" class="timer">30</div>
+    </div>
+  </div>
+  <div class="bar"><div id="progressFill" class="fill" style="width:0%"></div></div>
+  <div id="questionCard" class="card"></div>
+</section>
+
+<section id="result" class="card hidden"></section>
+
+<section id="terminated" class="card hidden center">
+  <h2>Attempt ended</h2>
+  <p>The quiz detected that the page was left during the attempt. No answer key is displayed.</p>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const QUESTION_DURATION = 30;
+
+const bank = [
+{q:"When many computers work together on a large genomics job, what is commonly the expensive part?",o:["Arithmetic calculations","Moving data between machines","Opening a text editor","Printing the results"],a:1},
+{q:"A practical approximation for the communication cost of a processing step is based mainly on:",o:["The number of genes","The size of the data it reads","The number of users","The CPU brand"],a:1},
+{q:"In the k-mer counting example, why is a combiner useful?",o:["It changes DNA into RNA","It aggregates local counts before data crosses the network","It increases sequencing depth","It removes the reference genome"],a:1},
+{q:"In the MapReduce trade-off described in the course, a smaller reducer size q means:",o:["More data must be processed by one machine","A lighter load per machine and potentially more parallelism","No replication is needed","The network becomes unnecessary"],a:1},
+{q:"What does a larger replication rate r generally imply?",o:["Less network traffic","More copies of input pieces being sent out","Smaller input files","Fewer machines can participate"],a:1},
+{q:"Why is directly comparing every sequencing read with every other read a poor approach to genome assembly?",o:["Reads contain no information","It creates excessive computation and data movement","It prevents sequencing","It makes files impossible to store"],a:1},
+{q:"Approximately how much raw data is cited for sequencing one human genome?",o:["200 MB","2 GB","200 GB","200 TB"],a:2},
+{q:"Which is NOT one of the five practical genomic-data challenges listed in the course?",o:["Volume","Finding things","Trust","Protein folding"],a:3},
+{q:"Why are genomic annotations needed in addition to raw DNA sequence?",o:["They replace the DNA sequence","They provide biological meaning and context for genomic positions","They eliminate storage requirements","They prevent all sequencing errors"],a:1},
+{q:"Why should annotations be stored in indexed databases?",o:["To make every query require a full genome scan","To allow fast lookup of genomic information","To remove genomic coordinates","To prevent variants from being stored"],a:1},
+{q:"Which database is associated with genes and genome annotations in the course?",o:["Ensembl","ClinVar","gnomAD","FASP"],a:0},
+{q:"Which database is associated with variants linked to disease?",o:["UCSC","dbSNP","ClinVar","Hadoop"],a:2},
+{q:"Which file format is commonly used for genomic variants?",o:["VCF","GTF","BED","FASTQ"],a:0},
+{q:"In the BRCA1 example, how can pathogenic variants be identified efficiently?",o:["Read the entire genome manually","Find the BRCA1 genomic range, retrieve variants there, then retain pathogenic ones","Only inspect RNA-seq reads","Copy all variants to every server"],a:1},
+{q:"What is the primary role of iRODS in the course material?",o:["DNA sequencing","Managing data history, provenance, versioning and distributed storage","Protein prediction","Genome assembly"],a:1},
+{q:"What does provenance record?",o:["Only the file size","Where data came from and the processing steps applied to it","Only the final answer","The CPU temperature"],a:1},
+{q:"Why is versioning important in genomic analysis?",o:["It makes all files smaller","It allows an earlier analysis to be reproduced using the appropriate data version","It eliminates metadata","It prevents collaboration"],a:1},
+{q:"Which is an example of an automatic iRODS rule mentioned in the course?",o:["Always keep three copies","Always delete old files","Always use one server","Always convert DNA to RNA"],a:0},
+{q:"Why can conventional FTP/HTTPS transfers be inefficient over long-distance links?",o:["They cannot transfer large files","TCP can slow down with distance, congestion and packet loss","They only work inside one laboratory","They cannot transfer binary data"],a:1},
+{q:"What does FASP/Aspera use to improve large genomic-data transfers?",o:["UDP with its own speed control","Only email attachments","Physical hard drives","DNA barcodes"],a:0},
+{q:"When is torrent-based distribution especially useful?",o:["When a popular dataset is needed by many recipients","When only one tiny file exists","When there is only one server and no network","When the dataset must never be copied"],a:0},
+{q:"In torrent seeding, why can additional seeders improve download performance?",o:["They remove the need for data","They provide different pieces from multiple machines simultaneously","They reduce the genome size","They eliminate all network traffic"],a:1},
+{q:"Why is genomic analysis well suited to distributed computing?",o:["Every read must always be processed with every other read","Many reads and genomic regions can be processed independently","Genomic data is always small","Distributed systems do not need storage"],a:1},
+{q:"What is the key data-locality strategy described in the course?",o:["Move all large data to the program","Send the small program to machines that already hold the data","Copy all data to one laptop","Avoid using parallel processing"],a:1},
+{q:"Which task is explicitly identified as suitable for splitting across machines?",o:["Read alignment","Manually naming genes","Writing a report","Designing a lecture"],a:0},
+{q:"In the MapReduce alignment example, what happens in the map stage?",o:["Reads are deleted","Each read is aligned and labelled with its genome region","All variants are manually reviewed","All data is copied to one server"],a:1},
+{q:"What does the shuffle stage do in the alignment example?",o:["Gathers reads that landed in the same genomic region","Deletes the reference genome","Compresses every FASTQ file","Calls all variants immediately"],a:0},
+{q:"Which tool is described as performing read alignment and variant calling on Hadoop for whole genomes?",o:["Crossbow","ClinVar","iRODS","gnomAD"],a:0},
+{q:"Which tool is described as analysing very large variant datasets on Spark and being used by gnomAD?",o:["Hail","CloudBurst","FASP","UCSC"],a:0},
+{q:"Which statement correctly describes the RNA-seq workflow?",o:["Reads → align to genome → count reads per gene → expression table","Reads → delete genes → torrent → protein table","DNA → iRODS → FASP → expression table","Reads → print → annotate manually → genome"],a:0},
+{q:"What does RNA-seq primarily measure?",o:["The fixed DNA sequence","Gene activity or expression","Only chromosome length","Only protein abundance"],a:1},
+{q:"In an RNA-seq expression table, what does a higher read count for a gene generally indicate?",o:["Greater gene activity in that sample","A smaller genome","Fewer chromosomes","No RNA was present"],a:0},
+{q:"Which analysis can be performed using a gene-expression table from RNA-seq?",o:["Differential expression","Network packet routing","File-system versioning","Physical DNA synthesis"],a:0}
+];
+
+// Keep exactly 30 questions selected randomly from the verified 34-question bank.
+// This gives each attempt a different question set as well as a different order.
+let questions=[], current=0, selected=null, remaining=QUESTION_DURATION;
+let answers=[], timerId=null, active=false, terminating=false;
+
+const $=id=>document.getElementById(id);
+const intro=$("intro"), quiz=$("quiz"), result=$("result"), terminated=$("terminated");
+const nameInput=$("studentName"), startBtn=$("startBtn"), questionCard=$("questionCard");
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function buildAttempt(){
+  // Deep-copy and randomize options while preserving correct-answer flags.
+  const pool=shuffle(bank.map(x=>({
+    q:x.q,
+    o:shuffle(x.o.map((text,i)=>({text,correct:i===x.a})))
+  })));
+  questions=pool.slice(0,30);
+}
+function startTimer(){
+  clearInterval(timerId);
+  remaining=QUESTION_DURATION;
+  $("timer").textContent=remaining;
+  $("timer").classList.remove("ready");
+  timerId=setInterval(()=>{
+    remaining--;
+    $("timer").textContent=remaining;
+    if(remaining<=0){
+      clearInterval(timerId);
+      $("timer").classList.add("ready");
+      const next=$("nextBtn");
+      next.disabled=(selected===null);
+      $("timerNote").textContent=selected===null ? "Select an answer to continue." : "Submission is now available.";
+    }
+  },1000);
+}
+
+const facts = [
+"A single human genome contains roughly 3 billion base pairs.",
+"Sequencing depth describes how many times, on average, a genomic position is represented by sequencing reads.",
+"Raw sequencing data can be much larger than the final biological results because several intermediate files may be generated.",
+"Genomic analysis combines biology with statistics, databases, algorithms, networking and computing.",
+"Moving a large dataset across a network can sometimes cost more time than processing that dataset.",
+"Data locality is the idea of performing computation close to where the data is stored.",
+"Parallel computing can reduce processing time, but communication and coordination introduce overhead.",
+"Genome annotation adds biological information to otherwise mostly uninterpreted DNA sequence.",
+"Annotations may describe genes, transcripts, regulatory regions, variants and functional information.",
+"Indexes allow genomic databases to locate relevant regions without scanning an entire genome.",
+"VCF is a widely used format for representing genomic variants and associated metadata.",
+"ClinVar provides information connecting human genetic variants with clinical interpretations.",
+"Ensembl provides extensive genome and gene annotation resources.",
+"Data provenance records the origin of data and the operations performed on it.",
+"Versioning helps researchers reproduce an analysis using the same version of the underlying data.",
+"Research datasets can change over time as new annotations, corrections and reference assemblies are released.",
+"iRODS is designed for managing distributed research data, metadata, policies and provenance.",
+"Large genomic files can expose limitations in conventional network transfer protocols.",
+"Network latency becomes increasingly important when transferring large datasets over long distances.",
+"High bandwidth alone does not guarantee that a data transfer will achieve the maximum possible speed.",
+"FASP/Aspera was designed for high-speed transfer of large datasets over wide-area networks.",
+"Peer-to-peer distribution can reduce the load on a single server when many users request the same dataset.",
+"Torrent systems divide files into pieces so different peers can exchange those pieces.",
+"Additional seeders can provide more sources from which different pieces of a dataset can be downloaded.",
+"Distributed computing divides a large computational problem across multiple machines.",
+"MapReduce separates large-scale processing into map, shuffle and reduce-style operations.",
+"The shuffle stage in MapReduce can involve substantial network communication.",
+"A combiner can reduce intermediate data before it is transferred across the network.",
+"Reducing unnecessary data movement is a major performance consideration in distributed genomics.",
+"Not every workload benefits from a cluster: for small jobs, coordination overhead may dominate.",
+"Hadoop was developed to support distributed storage and large-scale data processing.",
+"Spark provides a distributed computing framework commonly used for large-scale data analytics.",
+"Hail is a framework designed for scalable analysis of genomic and genetic datasets.",
+"RNA-seq measures RNA molecules and is widely used to study gene expression.",
+"An RNA-seq workflow commonly includes read alignment or quantification followed by counting or summarisation.",
+"An expression matrix can contain genes as rows and biological samples as columns.",
+"Gene-expression data can be used to identify genes that differ between experimental conditions.",
+"Sequencing reads are short observations that must be computationally related to a genome or transcriptome.",
+"Genome assembly attempts to reconstruct longer genomic sequences from sequencing reads.",
+"Reference genomes provide coordinates that allow genomic observations to be organised consistently.",
+"Metadata is essential for interpreting large genomic datasets correctly.",
+"Large-scale genomics requires both efficient algorithms and careful data management.",
+"Reproducible science benefits when datasets, versions, metadata and processing steps are recorded.",
+"Distributed storage can place different copies or pieces of data on different machines.",
+"Network traffic can become a bottleneck when intermediate results are unnecessarily large.",
+"Local aggregation can reduce the amount of information that has to cross a network.",
+"Genomics is an example of a field where data volume has become a central computational challenge.",
+"Searching genomic information by chromosome and coordinate is much faster with suitable indexing.",
+"Big-data genomics is not only about storing data; it also involves finding, moving, processing and trusting it."
+];
+let factTimer=null, factIndex=0;
+function startFactRotation(){
+  clearInterval(factTimer);
+  const el=document.getElementById("factText");
+  if(!el)return;
+  factIndex=Math.floor(Math.random()*facts.length);
+  el.textContent=facts[factIndex];
+  factTimer=setInterval(()=>{
+    factIndex=(factIndex+1)%facts.length;
+    el.textContent=facts[factIndex];
+  },5000);
+}
+
+function renderQuestion(){
+  clearInterval(factTimer);
+  selected=null;
+  const item=questions[current];
+  $("progressText").textContent=`Question ${current+1} of 30`;
+  $("progressFill").style.width=`${(current/30)*100}%`;
+  questionCard.innerHTML="";
+  const q=document.createElement("div"); q.className="question"; q.textContent=item.q;
+  questionCard.appendChild(q);
+  const opts=document.createElement("div");
+  item.o.forEach((op,i)=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="option";
+    b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}.</span><span>${escapeHTML(op.text)}</span>`;
+    b.addEventListener("click",()=>{
+      if(!active)return;
+      selected=i;
+      opts.querySelectorAll(".option").forEach(x=>x.classList.remove("selected"));
+      b.classList.add("selected");
+
+      // Show the fact IMMEDIATELY after the student selects an answer.
+      // It remains visible only during this question's waiting period.
+      const factPanel=questionCard.querySelector(".fact");
+      if(factPanel){
+        factPanel.classList.add("visible");
+        factPanel.style.display="block";
+        startFactRotation();
+      }
+
+      if(remaining<=0) $("nextBtn").disabled=false;
+    });
+    opts.appendChild(b);
+  });
+  questionCard.appendChild(opts);
+  const actions=document.createElement("div"); actions.className="actions";
+  actions.innerHTML=`<span id="timerNote" class="notice">Select an answer to start the waiting period.</span>
+  <button id="nextBtn" class="primary" type="button" disabled>Submit Answer</button>`;
+  questionCard.appendChild(actions);
+  $("nextBtn").addEventListener("click",()=>{
+    if(remaining>0 || selected===null)return;
+    answers[current]=selected;
+    if(current===29) finish(); else {current++;renderQuestion();startTimer();}
+  });
+  startTimer();
+}
+function finish(){
+  active=false; clearInterval(timerId); clearInterval(factTimer);
+  quiz.classList.add("hidden"); result.classList.remove("hidden");
+  $("progressFill").style.width="100%";
+  let score=0;
+  answers.forEach((ans,i)=>{if(questions[i].o[ans]?.correct)score++;});
+  let out=`<div class="header"><h1>Quiz Complete</h1><p>Course: INT411</p></div>
+  <p>Name: <strong>${escapeHTML(nameInput.value.trim())}</strong></p>
+  <div class="score">Score: ${score} / 30</div>
+  <h2>Answer Key</h2>`;
+  questions.forEach((x,i)=>{
+    const correct=x.o.findIndex(o=>o.correct);
+    out+=`<div class="answer"><strong>${i+1}. ${escapeHTML(x.q)}</strong><br>
+    <span class="small">Correct answer: ${String.fromCharCode(65+correct)}. ${escapeHTML(x.o[correct].text)}</span></div>`;
+  });
+  result.innerHTML=out;
+}
+function terminate(){
+  if(!active || terminating)return;
+  terminating=true; active=false; clearInterval(timerId);
+  quiz.classList.add("hidden"); result.classList.add("hidden"); terminated.classList.remove("hidden");
+}
+startBtn.addEventListener("click",()=>{
+  const n=nameInput.value.trim();
+  if(!n){$("nameError").classList.remove("hidden");nameInput.focus();return;}
+  $("nameError").classList.add("hidden");
+  $("displayName").textContent=n;
+  buildAttempt(); current=0; answers=[];
+  intro.classList.add("hidden"); terminated.classList.add("hidden"); result.classList.add("hidden"); quiz.classList.remove("hidden");
+  active=true; terminating=false; document.body.classList.add("locked");
+  renderQuestion();
+});
+
+// Browser-level anti-copy / anti-context-menu controls.
+document.addEventListener("contextmenu",e=>{if(active)e.preventDefault();});
+["copy","cut","paste","dragstart"].forEach(evt=>document.addEventListener(evt,e=>{if(active)e.preventDefault();}));
+document.addEventListener("keydown",e=>{
+  if(!active)return;
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&["c","x","v","a","s","p","u"].includes(k))e.preventDefault();
+  if(e.key==="F12" || (e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k)))e.preventDefault();
+});
+document.addEventListener("visibilitychange",()=>{if(active && document.hidden)terminate();});
+window.addEventListener("blur",()=>{if(active)terminate();});
+
+})();
+</script>
+</body>
+</html>
