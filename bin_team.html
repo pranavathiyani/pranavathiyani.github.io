@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Team</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Inter, Arial, sans-serif;
+        background:
+            radial-gradient(circle at 20% 20%, #dbeafe 0, transparent 35%),
+            radial-gradient(circle at 80% 80%, #ede9fe 0, transparent 35%),
+            #f8fafc;
+        color: #111827;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 520px;
+        padding: 30px 20px;
+        text-align: center;
+    }
+
+    .dna {
+        font-size: 42px;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 38px;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+    }
+
+    .subtitle {
+        margin: 10px 0 28px;
+        color: #64748b;
+        font-size: 15px;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.92);
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 20px 60px rgba(15,23,42,0.10);
+    }
+
+    input {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 17px;
+        text-align: center;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px #e0e7ff;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 14px;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(79,70,229,0.25);
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .error {
+        min-height: 22px;
+        margin-top: 12px;
+        color: #dc2626;
+        font-size: 14px;
+    }
+
+    /* ---------------- DIE ---------------- */
+
+    .dice-area {
+        display: none;
+        margin-top: 25px;
+    }
+
+    .dice-area.show {
+        display: block;
+    }
+
+    .scene {
+        width: 130px;
+        height: 130px;
+        margin: 0 auto 15px;
+        perspective: 700px;
+    }
+
+    .die {
+        width: 90px;
+        height: 90px;
+        position: relative;
+        margin: 20px auto;
+        transform-style: preserve-3d;
+    }
+
+    .die.rolling {
+        animation: rollDice 1.6s cubic-bezier(.2,.7,.3,1) forwards;
+    }
+
+    .face {
+        position: absolute;
+        width: 90px;
+        height: 90px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+        border: 3px solid #312e81;
+        background: linear-gradient(145deg, #ffffff, #eef2ff);
+
+        font-size: 40px;
+        font-weight: 900;
+        color: #312e81;
+
+        box-shadow:
+            inset 0 0 15px rgba(99,102,241,0.12);
+    }
+
+    .front  { transform: translateZ(45px); }
+    .back   { transform: rotateY(180deg) translateZ(45px); }
+    .right  { transform: rotateY(90deg) translateZ(45px); }
+    .left   { transform: rotateY(-90deg) translateZ(45px); }
+    .top    { transform: rotateX(90deg) translateZ(45px); }
+    .bottom { transform: rotateX(-90deg) translateZ(45px); }
+
+    @keyframes rollDice {
+
+        0% {
+            transform:
+                rotateX(0deg)
+                rotateY(0deg)
+                rotateZ(0deg)
+                scale(0.8);
+        }
+
+        20% {
+            transform:
+                rotateX(180deg)
+                rotateY(140deg)
+                rotateZ(50deg)
+                scale(1.05);
+        }
+
+        45% {
+            transform:
+                rotateX(400deg)
+                rotateY(320deg)
+                rotateZ(130deg)
+                scale(1);
+        }
+
+        70% {
+            transform:
+                rotateX(650deg)
+                rotateY(520deg)
+                rotateZ(210deg)
+                scale(1.08);
+        }
+
+        100% {
+            transform:
+                rotateX(720deg)
+                rotateY(540deg)
+                rotateZ(360deg)
+                scale(1);
+        }
+    }
+
+    .rolling-text {
+        color: #64748b;
+        font-size: 14px;
+        animation: pulse 0.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+        from { opacity: 0.4; }
+        to   { opacity: 1; }
+    }
+
+    /* ---------------- RESULT ---------------- */
+
+    .result {
+        display: none;
+    }
+
+    .result.show {
+        display: block;
+        animation: reveal 0.8s cubic-bezier(.16,1,.3,1);
+    }
+
+    @keyframes reveal {
+        from {
+            opacity: 0;
+            transform: scale(0.65) translateY(20px);
+        }
+
+        60% {
+            transform: scale(1.08);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .your-team {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+
+    .team-name {
+        font-size: 40px;
+        font-weight: 950;
+        letter-spacing: -1.5px;
+        background: linear-gradient(135deg, #4f46e5, #9333ea);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .again {
+        margin-top: 25px;
+        background: transparent;
+        color: #4f46e5;
+        border: 2px solid #e0e7ff;
+        box-shadow: none;
+    }
+
+    .again:hover {
+        background: #eef2ff;
+        box-shadow: none;
+    }
+
+    @media (max-width: 500px) {
+        h1 {
+            font-size: 31px;
+        }
+
+        .team-name {
+            font-size: 31px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="dna">🧬</div>
+
+    <h1>Find Your Team</h1>
+
+    <p class="subtitle">
+        Enter your registration number to discover your team.
+    </p>
+
+    <div class="card">
+
+        <input
+            id="registration"
+            type="text"
+            inputmode="numeric"
+            placeholder="Registration Number"
+            autocomplete="off"
+        >
+
+        <button id="rollButton">
+            🎲 Roll the Die
+        </button>
+
+        <div id="error" class="error"></div>
+
+        <!-- Dice animation -->
+        <div id="diceArea" class="dice-area">
+
+            <div class="scene">
+
+                <div id="die" class="die">
+
+                    <div class="face front">⚂</div>
+                    <div class="face back">⚄</div>
+                    <div class="face right">⚁</div>
+                    <div class="face left">⚅</div>
+                    <div class="face top">⚃</div>
+                    <div class="face bottom">⚀</div>
+
+                </div>
+
+            </div>
+
+            <div class="rolling-text">
+                Sequencing your destiny...
+            </div>
+
+        </div>
+
+        <!-- Result -->
+        <div id="result" class="result">
+
+            <div class="your-team">
+                Your Team
+            </div>
+
+            <div id="teamName" class="team-name"></div>
+
+            <button id="again" class="again">
+                Find Another Team
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * ============================================================
+     * FIXED TEAM ASSIGNMENTS
+     * ============================================================
+     *
+     * Registration number → Team number
+     *
+     * These assignments do NOT change when the page is refreshed.
+     */
+
+    const assignments = {
+
+        "130177001": 1,
+        "130177002": 8,
+        "130177004": 5,
+        "130177005": 5,
+        "130177006": 1,
+        "130177007": 8,
+        "130177009": 5,
+        "130177010": 4,
+        "130177011": 1,
+        "130177012": 3,
+        "130177013": 6,
+        "130177015": 2,
+        "130177016": 6,
+        "130177017": 3,
+        "130177018": 1,
+        "130177020": 4,
+        "130177021": 6,
+        "130177022": 7,
+        "130177024": 2,
+        "130177026": 6,
+        "130177027": 4,
+        "130177028": 1,
+        "130177030": 7,
+        "130177031": 8,
+        "130177032": 3,
+        "130177033": 4,
+        "130177034": 3,
+        "130177035": 2,
+        "130177036": 7,
+        "130177038": 7,
+        "130177039": 7,
+        "130177040": 5,
+        "130177041": 2,
+        "130177042": 5,
+        "130177043": 8,
+        "130177044": 3,
+        "130177046": 8,
+        "130177047": 6,
+        "130177049": 1,
+        "130177050": 8,
+        "130177051": 5,
+        "130177052": 1,
+        "130177053": 4,
+        "130177054": 3,
+        "130177055": 6,
+        "130177056": 7,
+        "130177057": 4,
+        "130177058": 4,
+        "130177059": 2
+
+    };
+
+
+    /*
+     * ============================================================
+     * TEAM NAMES
+     * ============================================================
+     */
+
+    const teams = {
+
+        1: "BLAST Heroes",
+        2: "PCR Pirates",
+        3: "Codon Commandos",
+        4: "Genome Gremlins",
+        5: "FASTA Force",
+        6: "Annotation Avengers",
+        7: "Mutation Nation",
+        8: "Operon Operators"
+
+    };
+
+
+    const registration =
+        document.getElementById("registration");
+
+    const rollButton =
+        document.getElementById("rollButton");
+
+    const error =
+        document.getElementById("error");
+
+    const diceArea =
+        document.getElementById("diceArea");
+
+    const die =
+        document.getElementById("die");
+
+    const result =
+        document.getElementById("result");
+
+    const teamName =
+        document.getElementById("teamName");
+
+    const again =
+        document.getElementById("again");
+
+
+    /*
+     * ============================================================
+     * ROLL
+     * ============================================================
+     */
+
+    function revealTeam() {
+
+        const reg = registration.value.trim();
+
+        error.textContent = "";
+        result.classList.remove("show");
+        result.style.display = "none";
+
+        if (!reg) {
+
+            error.textContent =
+                "Please enter your registration number.";
+
+            return;
+        }
+
+        if (!assignments[reg]) {
+
+            error.textContent =
+                "Registration number not found.";
+
+            return;
+        }
+
+
+        /*
+         * Hide input controls while rolling
+         */
+
+        registration.disabled = true;
+        rollButton.disabled = true;
+
+
+        /*
+         * Show dice
+         */
+
+        diceArea.classList.add("show");
+
+
+        /*
+         * Restart animation cleanly
+         */
+
+        die.classList.remove("rolling");
+
+        void die.offsetWidth;
+
+        die.classList.add("rolling");
+
+
+        /*
+         * The visual die roll takes 1.6 seconds.
+         *
+         * The actual team is already fixed internally
+         * based on the registration number.
+         */
+
+        setTimeout(function() {
+
+            const teamNumber =
+                assignments[reg];
+
+            teamName.textContent =
+                teams[teamNumber];
+
+
+            diceArea.classList.remove("show");
+
+            result.style.display = "block";
+
+            requestAnimationFrame(function() {
+                result.classList.add("show");
+            });
+
+
+            registration.disabled = false;
+            rollButton.disabled = false;
+
+        }, 1650);
+
+    }
+
+
+    /*
+     * Button
+     */
+
+    rollButton.addEventListener(
+        "click",
+        revealTeam
+    );
+
+
+    /*
+     * Enter key
+     */
+
+    registration.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+                revealTeam();
+            }
+
+        }
+    );
+
+
+    /*
+     * Reset
+     */
+
+    again.addEventListener(
+        "click",
+        function() {
+
+            registration.value = "";
+
+            error.textContent = "";
+
+            result.classList.remove("show");
+
+            result.style.display = "none";
+
+            registration.disabled = false;
+
+            rollButton.disabled = false;
+
+            registration.focus();
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
