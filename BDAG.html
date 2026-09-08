@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big Data Applications in Healthcare — Interactive Quiz</title>
+<style>
+:root{--navy:#17324d;--teal:#167c80;--orange:#d77a2a;--ink:#17212b;--muted:#637381;--line:#dce3e8;--bg:#f5f8fa;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.quiz{max-width:900px;margin:auto;padding:28px 18px 48px}
+.head{background:var(--navy);color:#fff;border-radius:18px;padding:26px 28px;margin-bottom:18px}
+h1{margin:0 0 5px;font-size:clamp(24px,4vw,34px)} .head p{margin:0;opacity:.88}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:17px;font-size:14px}
+.progress{height:8px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin-top:16px}
+.bar{height:100%;background:#fff;width:0;transition:width .2s}
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 8px 25px rgba(23,50,77,.06)}
+.topic{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.q{font-size:clamp(19px,3vw,25px);font-weight:750;margin:10px 0 22px}
+.answers{display:grid;gap:12px}
+.ans{width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:13px;padding:15px 16px;font-size:16px;cursor:pointer;min-height:56px}
+.ans:hover,.ans:focus{border-color:var(--teal);outline:none;background:#f7fbfb}
+.ans.sel{border-color:var(--teal);background:#eaf7f6}
+.letter{font-weight:800;color:var(--teal);margin-right:8px}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px;flex-wrap:wrap}
+button.action{border:0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:750;cursor:pointer;min-height:46px}
+.primary{background:var(--teal);color:#fff} .secondary{background:#eef2f5;color:var(--navy)}
+button:disabled{opacity:.45;cursor:not-allowed} .hidden{display:none!important}
+.result{text-align:center} .score{font-size:52px;font-weight:850;color:var(--navy)} .grade{font-size:19px;font-weight:750;color:var(--teal)}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
+.stat{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fafcfd}
+.stat strong{display:block;font-size:20px;color:var(--navy)}
+.review{margin-top:25px;text-align:left} .item{border-top:1px solid var(--line);padding:16px 0}
+.rq{font-weight:750;margin-bottom:8px} .correct{color:#1d6b4a;font-weight:700} .wrong{color:#9a3d32;font-weight:700}
+.note{margin-top:16px;padding:13px 15px;background:#fff8ef;border-left:4px solid var(--orange);border-radius:8px;color:#5d4632;font-size:14px;text-align:left}
+.gcr{margin-top:18px;padding:16px;border:1px dashed var(--line);border-radius:12px;text-align:left}
+.gcr input{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;font-size:15px;margin-top:7px}
+.small{font-size:13px;color:var(--muted)} code{background:#f0f3f5;padding:2px 5px;border-radius:4px}
+@media(max-width:600px){.quiz{padding:14px 10px 32px}.card,.head{padding:20px}.summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="quiz" id="quiz">
+<section class="head">
+<h1>Big Data Applications in Healthcare</h1>
+<p>Attempt the Quiz and submit the final marks screenshot in GCR assignment</p>
+<div class="meta"><span id="prog">Question 1 of 40</span><span id="answered">0 answered</span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+</section>
+
+<section class="card" id="quizCard">
+<div class="topic">Big Data in Healthcare</div>
+<div class="q" id="q"></div>
+<div class="answers" id="answers" role="radiogroup" aria-label="Answer choices"></div>
+<div class="actions">
+<button class="action secondary" id="prev" type="button">Previous</button>
+<button class="action primary" id="next" type="button">Next</button>
+</div>
+</section>
+
+<section class="card result hidden" id="result">
+<div class="topic">Quiz complete</div>
+<div class="score" id="score"></div>
+<div class="grade" id="grade"></div>
+<div class="summary">
+<div class="stat"><strong id="cs">0</strong>Correct</div>
+<div class="stat"><strong id="ws">0</strong>Incorrect</div>
+<div class="stat"><strong id="ps">0%</strong>Score</div>
+</div>
+<div class="note">The answer key is hidden until submission. Question order and answer choices are shuffled for every new attempt.</div>
+
+<div class="gcr">
+<strong>Google Classroom (GCR) submission</strong>
+<p class="small">A standalone HTML file cannot directly authenticate to Google Classroom. To enable automatic score submission, paste a deployed Google Apps Script <code>doPost</code> Web App URL into <code>GCR_ENDPOINT</code> in this file.</p>
+<label for="name">Student name (optional)</label>
+<input id="name" placeholder="Enter student name">
+<button class="action primary" id="gcr" type="button" style="margin-top:10px">Submit score to GCR</button>
+<div class="small" id="gcrStatus" aria-live="polite" style="margin-top:8px"></div>
+</div>
+
+<div class="actions"><button class="action secondary" id="restart" type="button">Start New Random Attempt</button></div>
+<div class="review" id="review"></div>
+</section>
+</main>
+
+<script>
+(()=>{
+"use strict";
+const DATA=[{"question": "What is the key idea behind making healthcare big data useful?", "options": ["Converting heterogeneous measurements into a consistent, interpretable patient or population view", "Replacing all clinical measurements with a single value", "Storing every dataset without preprocessing", "Using only the largest dataset"], "answer": 0}, {"question": "Which combination is central to big-data analytics in radiation oncology?", "options": ["Imaging, dosimetry, treatment plans, clinical variables, and outcomes", "Only pathology and genomic variants", "Only appointments and bed occupancy", "Only medication and laboratory data"], "answer": 0}, {"question": "What might pre-treatment imaging plus dose metrics be used to predict in radiation oncology?", "options": ["Later toxicity or tumor control", "Genome assembly quality", "Hospital staffing demand", "Reference-sequence provenance"], "answer": 0}, {"question": "In radiomics, what does texture primarily describe?", "options": ["Spatial heterogeneity", "Tumor treatment stage", "Reference-sequence quality", "Hospital workflow"], "answer": 0}, {"question": "Why can radiomic features change across scanners or imaging protocols?", "options": ["Acquisition, reconstruction, segmentation, and preprocessing choices can affect them", "The tumor always changes genotype between scanners", "AUC changes the image values", "CRAM requires a different scanner reference"], "answer": 0}, {"question": "What should a clinical prediction model start with?", "options": ["A defined outcome and a valid evaluation strategy", "The most complex algorithm available", "The largest possible feature set", "A target of 100% training accuracy"], "answer": 0}, {"question": "What is data leakage in clinical prediction?", "options": ["Using information unavailable at prediction time, causing unrealistically strong performance", "Losing data during transfer", "Compressing data with a reference", "Having missing values"], "answer": 0}, {"question": "Why is an independent cohort valuable for model validation?", "options": ["It tests whether performance generalizes beyond development data", "It guarantees clinical utility", "It removes all measurement noise", "It eliminates the need for external validation"], "answer": 0}, {"question": "What does calibration assess?", "options": ["Whether predicted probabilities agree with observed frequencies", "Whether all patients are ranked perfectly", "Whether the training set is larger", "Whether imaging protocols are identical"], "answer": 0}, {"question": "Why does a high AUC not automatically mean a model is clinically useful?", "options": ["Clinical utility depends on whether using the prediction meaningfully changes or improves care", "AUC cannot measure discrimination", "High AUC always means leakage", "AUC is valid only for imaging"], "answer": 0}, {"question": "What is the goal of personalized disease phenotyping?", "options": ["Move from broad diagnostic labels to biologically or clinically meaningful subgroups", "Replace diagnoses with genomic sequences", "Avoid clinical data", "Use only population averages"], "answer": 0}, {"question": "Why can two patients with the same diagnosis respond differently?", "options": ["They may differ in molecular drivers, disease trajectory, and treatment response", "They always have different reference genomes", "Their EHRs must contain different data types", "Their imaging data are necessarily identical"], "answer": 0}, {"question": "What does deep phenotyping combine in the material?", "options": ["Clinical, imaging, and omics information", "Only clinical stage", "Only DNA variants", "Only treatment history"], "answer": 0}, {"question": "What does genomics primarily represent in the OMICS framework?", "options": ["DNA variants", "RNA expression", "Proteins", "Small molecules"], "answer": 0}, {"question": "What does transcriptomics primarily measure?", "options": ["RNA expression", "DNA variants", "Regulatory state only", "Protein abundance only"], "answer": 0}, {"question": "What can multi-OMICS integration support?", "options": ["Biomarker discovery, patient stratification, and treatment-response analysis", "Guaranteed causal inference", "Elimination of dimensionality", "Removal of all missing data"], "answer": 0}, {"question": "Which technique can expose rare cell states that may disappear in tissue-level averages?", "options": ["Single-cell RNA-seq", "Bulk averaging", "CRAM decoding", "Appointment scheduling"], "answer": 0}, {"question": "What is a key difference between bulk RNA-seq and single-cell RNA-seq?", "options": ["Bulk averages expression across cells, whereas single-cell RNA-seq measures expression cell by cell", "Bulk measures proteins while single-cell measures DNA only", "Bulk preserves spatial location while single-cell removes it", "They differ only in file format"], "answer": 0}, {"question": "What information does spatial transcriptomics retain?", "options": ["Tissue location", "Treatment dose", "Hospital location", "Reference provenance"], "answer": 0}, {"question": "What is the main purpose of a Self-Organizing Map (SOM) in this material?", "options": ["Map high-dimensional patterns onto a low-dimensional grid while preserving neighborhood relationships", "Perform supervised treatment prediction only", "Compress genomic alignments", "Make autonomous clinical decisions"], "answer": 0}, {"question": "What can a SOM NOT prove by itself?", "options": ["A biological mechanism or new disease subtype", "That nearby profiles are similar", "That gradients can be visualized", "That clusters may be apparent"], "answer": 0}, {"question": "What is the defining property of lossless compression?", "options": ["The original data can be recovered exactly", "Some information is intentionally discarded", "Only images can be compressed", "It requires a prediction model"], "answer": 0}, {"question": "When should lossy compression be used?", "options": ["Only with a scientifically justified and validated purpose", "Whenever a dataset is large", "For all primary scientific data", "Whenever exact reconstruction is required"], "answer": 0}, {"question": "Why can CRAM compress genomic alignments efficiently?", "options": ["It uses alignment structure and a reference sequence in a reference-aware representation", "It discards all alignment information", "It stores only clinical outcomes", "It converts RNA into protein"], "answer": 0}, {"question": "Which is a major challenge in multi-omics integration?", "options": ["Different scales, noise, missingness, technologies, and biological meanings", "All layers have identical distributions", "Every patient has every assay", "All measurements are simultaneous"], "answer": 0}, {"question": "Which integration strategy combines or jointly transforms features before modeling?", "options": ["Early / feature-level integration", "Intermediate / latent integration", "Late / decision-level integration", "Clinical-utility integration"], "answer": 0}, {"question": "Which integration strategy learns a lower-dimensional representation from multiple modalities?", "options": ["Intermediate / latent integration", "Early / feature-level integration", "Late / decision-level integration", "Reference-aware compression"], "answer": 0}, {"question": "What is characteristic of late / decision-level integration?", "options": ["Separate models are built and their predictions are combined", "All raw features must be concatenated first", "Only one modality can be used", "The data are always compressed lossily"], "answer": 0}, {"question": "Which sequence describes the healthcare analytics lifecycle?", "options": ["Acquire → Curate → Represent → Model → Validate → Monitor", "Model → Acquire → Monitor → Curate → Validate → Represent", "Acquire → Model → Delete → Compress → Deploy → Stop", "Validate → Acquire → Curate → Model → Ignore → Deploy"], "answer": 0}, {"question": "Why is monitoring needed after deployment?", "options": ["Patient mix, workflows, and clinical practice can change over time", "Validation becomes unnecessary", "Monitoring guarantees perfect AUC", "Clinical data stop changing after deployment"], "answer": 0}, {"question": "Which is an example of big-data analytics for clinical operations?", "options": ["Forecasting demand, scheduling resources, and identifying workflow bottlenecks", "Replacing all clinicians with automated decisions", "Sequencing every patient for every appointment", "Using only protein data to allocate beds"], "answer": 0}, {"question": "How can big data support healthcare R&D?", "options": ["Connecting variants, proteins, pathways, disease phenotypes, and interventions into hypotheses", "Removing biological context from drug research", "Using only hospital scheduling data", "Avoiding integration of biomedical facts"], "answer": 0}, {"question": "How can pathogen genomics support public health outbreak investigation?", "options": ["Whole-genome sequencing with collection dates and locations can help identify genetically related cases", "It replaces all epidemiological information", "It guarantees the exact source of every infection", "It is useful only for hospital scheduling"], "answer": 0}, {"question": "What role for big-data tools best supports physician performance in the material?", "options": ["Augmentation: organize evidence and surface useful signals while keeping clinicians in the loop", "Fully autonomous treatment decisions", "Replacing clinical judgment with an AUC score", "Showing molecular results without context"], "answer": 0}, {"question": "Which safeguards are appropriate for sensitive genomic and clinical data?", "options": ["Access control, audit, secure storage/transfer, and appropriate governance", "Publicly sharing identifiers", "Removing validation to speed deployment", "Using only lossy compression"], "answer": 0}, {"question": "Why might a model developed at one hospital fail at another?", "options": ["Population mix, equipment, coding, and clinical workflows can differ", "External sites always have identical data", "AUC cannot be evaluated externally", "Clinical workflows never affect models"], "answer": 0}, {"question": "Which sequence best represents clinical translation?", "options": ["Retrospective research → external validation → prospective real workflow → clinical impact → monitoring", "Retrospective research → deployment → stop monitoring", "Training → compression → publication → automatic treatment", "SOM → CRAM → EHR → diagnosis"], "answer": 0}, {"question": "In the precision-oncology example, what should a computational tool do?", "options": ["Rank evidence, quantify uncertainty, explain predictions, and defer treatment decisions to the clinical team", "Make treatment decisions without clinician review", "Hide uncertainty to simplify decisions", "Use only one molecular layer"], "answer": 0}, {"question": "What is the overall pipeline emphasized in the final slide?", "options": ["Measurement → computation → evidence → action", "Diagnosis → compression → sequencing → billing", "Imaging → storage → deletion → treatment", "Data entry → prediction → publication → archiving"], "answer": 0}, {"question": "Which measures are commonly used for discrimination?", "options": ["AUC and C-index", "CRAM ratio and BAM size", "Batch effect and missingness", "Sensitivity and file size"], "answer": 0}];
+const GCR_ENDPOINT=""; // Paste your Google Apps Script /doPost Web App URL here.
+let order=[],pos=0,answers=[],shown=[];
+
+const $=id=>document.getElementById(id);
+function shuffle(a){
+  a=a.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+function start(){
+  order=shuffle(DATA.map((_,i)=>i));
+  pos=0; answers=Array(DATA.length).fill(null); shown=Array(DATA.length).fill(null);
+  $("quizCard").classList.remove("hidden"); $("result").classList.add("hidden"); render();
+}
+function render(){
+  const qi=order[pos],item=DATA[qi];
+  if(!shown[qi]) shown[qi]=shuffle(item.options.map((text,i)=>({text,original:i})));
+  $("q").textContent=item.question;
+  const box=$("answers"); box.innerHTML="";
+  shown[qi].forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="ans"+(answers[qi]===o.original?" sel":"");
+    b.setAttribute("role","radio"); b.setAttribute("aria-checked",answers[qi]===o.original?"true":"false");
+    const l=document.createElement("span"); l.className="letter"; l.textContent=String.fromCharCode(65+i)+".";
+    b.append(l,document.createTextNode(o.text));
+    b.addEventListener("click",()=>{answers[qi]=o.original;render()});
+    box.appendChild(b);
+  });
+  $("prog").textContent=`Question ${pos+1} of ${DATA.length}`;
+  $("answered").textContent=`${answers.filter(x=>x!==null).length} answered`;
+  $("bar").style.width=`${((pos+1)/DATA.length)*100}%`;
+  $("prev").disabled=pos===0;
+  $("next").textContent=pos===DATA.length-1?"Submit Quiz":"Next";
+}
+function finish(){
+  if(answers.some(x=>x===null)){
+    const missing=answers.findIndex(x=>x===null);
+    pos=order.indexOf(missing); render();
+    alert("Please answer all 40 questions before submitting."); return;
+  }
+  let correct=0; DATA.forEach((x,i)=>{if(answers[i]===x.answer)correct++});
+  const pct=Math.round(correct/DATA.length*100);
+  $("quizCard").classList.add("hidden"); $("result").classList.remove("hidden");
+  $("score").textContent=`${correct} / ${DATA.length}`;
+  $("cs").textContent=correct; $("ws").textContent=DATA.length-correct; $("ps").textContent=pct+"%";
+  $("grade").textContent=pct>=90?"Excellent understanding":pct>=75?"Strong performance":pct>=60?"Good — review a few concepts":"Review the material and try again";
+
+  const r=$("review"); r.innerHTML="<h2>Answer Key & Review</h2>";
+  order.forEach((qi,n)=>{
+    const x=DATA[qi],d=document.createElement("div"); d.className="item";
+    const q=document.createElement("div"); q.className="rq"; q.textContent=`${n+1}. ${x.question}`;
+    const y=document.createElement("div"); y.className=answers[qi]===x.answer?"correct":"wrong"; y.textContent="Your answer: "+x.options[answers[qi]];
+    const k=document.createElement("div"); k.className="correct"; k.textContent="Correct answer: "+x.options[x.answer];
+    d.append(q,y,k); r.appendChild(d);
+  });
+}
+$("prev").addEventListener("click",()=>{if(pos>0){pos--;render()}});
+$("next").addEventListener("click",()=>{if(pos<DATA.length-1){pos++;render()}else finish()});
+$("restart").addEventListener("click",start);
+$("gcr").addEventListener("click",async()=>{
+  const s=$("gcrStatus");
+  if(!GCR_ENDPOINT){s.textContent="GCR endpoint is not configured. Add your Apps Script Web App URL to GCR_ENDPOINT.";return}
+  let correct=0; DATA.forEach((x,i)=>{if(answers[i]===x.answer)correct++});
+  const body={name:$("name").value.trim(),quiz:"Big Data Applications in Healthcare",score:correct,total:DATA.length,percentage:Math.round(correct/DATA.length*100),submittedAt:new Date().toISOString()};
+  s.textContent="Submitting…";
+  try{
+    await fetch(GCR_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),mode:"no-cors"});
+    s.textContent="Submission sent. Verify the receiving Google Sheet/Classroom workflow.";
+  }catch(e){s.textContent="Submission failed. Check the Apps Script URL and deployment permissions.";}
+});
+start();
+})();
+</script>
+</body>
+</html>
