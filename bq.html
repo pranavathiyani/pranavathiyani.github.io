@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bioinformatics Quiz</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:#f5f7fa;color:#1f2937;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:28px 18px 50px}
+  .header{
+    background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+    padding:24px;margin-bottom:18px;
+  }
+  h1{margin:0 0 8px;font-size:30px}
+  .sub{margin:0;color:#6b7280}
+  .timer{
+    position:sticky;top:10px;z-index:10;background:#111827;color:#fff;
+    border-radius:12px;padding:13px 18px;margin:12px 0 18px;
+    display:flex;justify-content:space-between;align-items:center;
+    box-shadow:0 5px 16px rgba(0,0,0,.12)
+  }
+  #time{font-size:25px;font-weight:700}
+  .question{
+    background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+    padding:20px;margin-bottom:14px;
+  }
+  .qtext{font-size:17px;font-weight:600;line-height:1.45;margin-bottom:13px}
+  label{
+    display:block;padding:11px 13px;margin:8px 0;border:1px solid #e5e7eb;
+    border-radius:9px;cursor:pointer;transition:.15s;background:#fafafa;
+  }
+  label:hover{background:#f3f4f6}
+  input{margin-right:9px}
+  button{
+    width:100%;border:0;border-radius:11px;padding:15px;
+    background:#111827;color:#fff;font-size:17px;font-weight:700;cursor:pointer
+  }
+  button:hover{background:#374151}
+  #result{display:none}
+  .score{
+    background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+    padding:22px;margin-bottom:18px;text-align:center
+  }
+  .score strong{font-size:34px}
+  .review{
+    background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+    padding:18px;margin-bottom:12px
+  }
+  .correct{border-left:5px solid #15803d}
+  .wrong{border-left:5px solid #b91c1c}
+  .unanswered{border-left:5px solid #9ca3af}
+  .review p{margin:7px 0;line-height:1.45}
+  .small{font-size:13px;color:#6b7280}
+  .warning{
+    display:none;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;
+    padding:12px;border-radius:10px;margin-bottom:14px
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>Bioinformatics Quiz</h1>
+    <p class="sub">Sequence-based Algorithms and Searches</p>
+  </div>
+
+  <div id="warning" class="warning"></div>
+
+  <div id="candidateArea" class="header">
+    <h2 style="margin:0 0 8px;font-size:22px">Participant Details</h2>
+    <p class="sub" style="margin-bottom:16px">Enter your details to begin the quiz.</p>
+    <input id="studentName" type="text" placeholder="Name" autocomplete="name"
+      style="width:100%;padding:13px;border:1px solid #d1d5db;border-radius:9px;margin-bottom:10px;font-size:16px">
+    <input id="regNumber" type="text" placeholder="Register Number" autocomplete="off"
+      style="width:100%;padding:13px;border:1px solid #d1d5db;border-radius:9px;margin-bottom:14px;font-size:16px">
+    <button id="startBtn" type="button">Start Quiz</button>
+  </div>
+
+  <div id="quizArea" style="display:none">
+    <div class="timer">
+      <span>Time remaining</span><span id="time">20</span>
+    </div>
+    <div id="progress" class="small" style="margin:0 0 10px 4px"></div>
+    <form id="quizForm"></form>
+    <button id="nextBtn" type="button">Submit Answer</button>
+  </div></div>
+
+  <div id="result">
+    <div class="score">
+      <div id="studentResult" style="font-size:18px;font-weight:700;margin-bottom:8px"></div>
+      <strong id="scoreText"></strong>
+      <div class="small" id="scoreDetail"></div>
+    </div>
+    <div id="review"></div>
+    <button type="button" onclick="location.reload()">Try Again</button>
+  </div>
+</div>
+
+<script>
+const bank = [
+ {q:"What is the main purpose of a sequence similarity search?",a:["To find biologically related sequences","To measure DNA concentration","To determine cell size","To count chromosomes"],e:"Sequence similarity searches identify database sequences that are similar to a query sequence and may therefore share biological relationships."},
+ {q:"Which alignment compares two sequences directly?",a:["Pairwise alignment","Multiple sequence alignment","Genome assembly","Read trimming"],e:"Pairwise alignment compares two biological sequences."},
+ {q:"Which alignment attempts to align two sequences across their full lengths?",a:["Global alignment","Local alignment","Random alignment","Circular alignment"],e:"Global alignment is designed to compare sequences across their entire lengths."},
+ {q:"Which alignment is most useful for finding a highly similar region within longer sequences?",a:["Local alignment","Global alignment","End-to-end sequencing","Genome annotation"],e:"Local alignment identifies the best-matching subsections of two sequences."},
+ {q:"A semi-global alignment is particularly useful when:",a:["One sequence overlaps part of another and end gaps should not be penalized","Both sequences must be completely unrelated","Only protein structures are compared","No gaps are allowed"],e:"Semi-global alignment can leave terminal gaps unpenalized, making it useful for partial or overlapping sequences."},
+ {q:"What does sequence identity mean?",a:["The percentage of aligned positions containing exactly the same residue","The total length of a sequence","The number of gaps only","The molecular weight of a protein"],e:"Identity refers to positions where the aligned residues are exactly the same."},
+ {q:"What does sequence similarity generally include?",a:["Identical residues and conservative substitutions","Only identical residues","Only gaps","Only sequence length"],e:"Similarity can include identical residues as well as substitutions with related biochemical properties."},
+ {q:"What does a substitution matrix provide?",a:["Scores for replacing one residue with another","Genome coordinates only","PCR temperatures","Read quality values"],e:"Substitution matrices assign scores or probabilities to amino-acid substitutions."},
+ {q:"BLOSUM matrices are primarily used for:",a:["Protein sequence comparisons","DNA sequencing quality control","RNA extraction","Genome assembly"],e:"BLOSUM matrices are amino-acid substitution matrices used in protein sequence alignment and searching."},
+ {q:"What does PSSM stand for?",a:["Position-Specific Scoring Matrix","Protein Sequence Search Method","Pairwise Similarity Scoring Model","Position Sequence Search Map"],e:"PSSM stands for Position-Specific Scoring Matrix."},
+ {q:"A PSSM differs from a single substitution matrix because it:",a:["Can use position-specific scores","Contains only nucleotide frequencies","Cannot be used in database searches","Always gives the same score at every position"],e:"A PSSM assigns scores according to the particular position in a sequence or motif."},
+ {q:"Which program package is associated with FASTA sequence similarity searching?",a:["FASTA3","BLASTX-only","Clustal-only","Bowtie-only"],e:"FASTA3 is a commonly used package for sequence similarity searches."},
+ {q:"What is the primary input to a sequence similarity search?",a:["A query sequence","A microscope image","A protein purification buffer","A cell culture"],e:"The query sequence is compared against sequences stored in a database."},
+ {q:"BLAST stands for:",a:["Basic Local Alignment Search Tool","Biological Linear Alignment Search Technique","Basic Long Alignment Sequence Test","Biochemical Local Analysis Search Table"],e:"BLAST means Basic Local Alignment Search Tool."},
+ {q:"BLAST is mainly designed to find:",a:["Local sequence similarities","Only complete genome alignments","Only protein structures","Only phylogenetic trees"],e:"BLAST is optimized for finding regions of local similarity between sequences."},
+ {q:"Which BLAST program is normally used for a protein query against a protein database?",a:["BLASTP","BLASTN","BLASTX","TBLASTN"],e:"BLASTP compares an amino-acid query sequence against a protein database."},
+ {q:"Which BLAST program is normally used for a nucleotide query against a nucleotide database?",a:["BLASTN","BLASTP","PSI-BLAST","DELTA-BLAST"],e:"BLASTN compares a nucleotide query against nucleotide sequences."},
+ {q:"Which BLAST type searches a protein database using translated nucleotide query sequences?",a:["BLASTX","BLASTP","BLASTN","PHI-BLAST"],e:"BLASTX translates a nucleotide query in reading frames and searches a protein database."},
+ {q:"Which BLAST type searches a nucleotide database using a protein query translated into nucleotide sequences?",a:["TBLASTN","BLASTN","BLASTP","PSI-BLAST"],e:"TBLASTN compares a protein query against translated nucleotide sequences in a database."},
+ {q:"What is PSI-BLAST especially useful for?",a:["Detecting more distant protein relationships","Measuring DNA concentration","Aligning only identical DNA sequences","Removing sequencing adapters"],e:"PSI-BLAST builds a position-specific scoring matrix iteratively to detect more distant protein similarities."},
+ {q:"What is the basic idea of an iterative PSI-BLAST search?",a:["Use significant hits to build an improved position-specific profile","Delete all database hits","Convert proteins into chromosomes","Randomly change the query sequence"],e:"PSI-BLAST uses selected significant matches to construct a PSSM for subsequent searches."},
+ {q:"PHI-BLAST combines similarity searching with:",a:["A specified pattern or motif","Genome assembly","RNA folding only","Chromosome counting"],e:"PHI-BLAST searches for sequences that both contain a specified pattern and show similarity around that pattern."},
+ {q:"What does DELTA-BLAST use to improve detection of protein relationships?",a:["Conserved domain information","Raw sequencing quality scores","Microscope images","PCR primer concentrations"],e:"DELTA-BLAST uses conserved-domain information to construct a position-specific scoring model."},
+ {q:"In a BLAST result, a high bit score generally indicates:",a:["A stronger alignment score normalized for comparison","A longer laboratory experiment","A higher DNA concentration","A larger chromosome"],e:"The bit score is a normalized alignment score; higher values indicate stronger similarity."},
+ {q:"What does the E-value in BLAST approximately describe?",a:["The expected number of similar hits occurring by chance","The exact number of genes in a genome","The sequence length in nucleotides","The number of amino acids in a protein"],e:"The E-value estimates how many matches of similar quality could be expected by chance in the searched database."},
+ {q:"Which result is generally more statistically significant?",a:["A very small E-value","A very large E-value","An E-value of 1000","An undefined E-value"],e:"Smaller E-values indicate that a match is less likely to have occurred by chance."},
+ {q:"What does a gap in a sequence alignment usually represent?",a:["An insertion or deletion event","A sequencing machine model","A substitution matrix","A database accession number"],e:"Alignment gaps can represent inferred insertions or deletions between sequences."},
+ {q:"Why are gaps introduced in sequence alignment?",a:["To improve correspondence between homologous positions","To increase sequence length artificially for storage","To remove all substitutions","To identify chromosome numbers"],e:"Gaps allow sequences with insertions or deletions to be aligned so corresponding positions can be compared."},
+ {q:"Which approach is most appropriate when comparing two full-length homologous proteins?",a:["Global alignment","Local alignment only","Pattern matching only","Read quality analysis"],e:"Global alignment is appropriate when the two sequences are expected to correspond across most or all of their lengths."},
+ {q:"If two proteins share only one conserved domain, which alignment approach is usually more appropriate for finding that region?",a:["Local alignment","Global alignment","End-to-end alignment only","No alignment"],e:"Local alignment is designed to identify high-scoring conserved regions within longer sequences."},
+ {q:"What is the main role of a database in a similarity search?",a:["Provide sequences against which the query can be compared","Store only microscope images","Calculate PCR volumes","Produce protein structures automatically"],e:"A sequence database provides the reference sequences used for comparison with the query."},
+ {q:"Which statement about BLAST and FASTA is correct?",a:["Both are used for sequence similarity searching","Both are protein structure prediction tools","Both are genome assemblers","Neither compares sequences"],e:"BLAST and FASTA are established tools/packages for sequence similarity searching."},
+ {q:"A researcher has a protein sequence and wants to identify similar proteins in a protein database. Which is the most direct choice?",a:["BLASTP","BLASTN","FASTA genome assembly","PCR"],e:"BLASTP directly searches a protein database using a protein query."},
+ {q:"Why can similarity be biologically informative even when identity is not 100%?",a:["Conservative substitutions can preserve biochemical properties","Every substitution destroys protein function","Similarity ignores sequence positions","Identity is unrelated to sequence comparison"],e:"Conservative substitutions may preserve chemical or structural properties, so similar sequences can retain related functions."}
+];
+
+// 30 randomly selected questions; order and options change on every attempt.
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+let questions = shuffle(bank.map(x => ({...x, a:[...x.a]}))).slice(0,30);
+questions.forEach(x => {
+  x.correct = x.a[0];
+  shuffle(x.a);
+});
+
+const form = document.getElementById("quizForm");
+const progress = document.getElementById("progress");
+const nextBtn = document.getElementById("nextBtn");
+const timer = document.getElementById("time");
+let current = 0, score = 0, answered = 0, submitted = false, remaining = 20, clock;
+
+let studentName = "", regNumber = "";
+
+document.getElementById("startBtn").addEventListener("click",()=>{
+  const name = document.getElementById("studentName").value.trim();
+  const reg = document.getElementById("regNumber").value.trim();
+  if(!name || !reg){
+    alert("Please enter both Name and Register Number.");
+    return;
+  }
+  studentName = name;
+  regNumber = reg;
+  document.getElementById("candidateArea").style.display="none";
+  document.getElementById("quizArea").style.display="block";
+  renderQuestion();
+});
+
+function renderQuestion(){
+  remaining = 20;
+  timer.textContent = remaining;
+  progress.textContent = `Question ${current + 1} of 30`;
+  nextBtn.textContent = current === 29 ? "Submit Answer" : "Submit Answer";
+  const item = questions[current];
+  form.innerHTML =
+    `<div class="question">
+      <div class="qtext">${escapeHtml(item.q)}</div>
+      ${item.a.map((opt,j)=>`<label><input type="radio" name="answer" value="${escapeAttr(opt)}"> ${escapeHtml(opt)}</label>`).join("")}
+    </div>`;
+  clearInterval(clock);
+  clock = setInterval(()=>{
+    remaining--;
+    timer.textContent = remaining;
+    if(remaining <= 0){
+      clearInterval(clock);
+      processAnswer(true);
+    }
+  },1000);
+}
+
+function processAnswer(timeExpired=false){
+  if(submitted)return;
+  clearInterval(clock);
+  const chosen=document.querySelector('input[name="answer"]:checked');
+  if(chosen){
+    answered++;
+    if(chosen.value === questions[current].correct) score++;
+  }
+  current++;
+  if(current >= questions.length){
+    showResult(timeExpired);
+  }else{
+    renderQuestion();
+  }
+}
+
+function showResult(timeExpired=false){
+  submitted=true;
+  document.getElementById("quizArea").style.display="none";
+  document.getElementById("result").style.display="block";
+  document.getElementById("studentResult").textContent=`${escapeHtml(studentName)} — ${escapeHtml(regNumber)}`;
+  document.getElementById("scoreText").textContent=`${score} / 30`;
+  document.getElementById("scoreDetail").textContent=`Answered: ${answered} | All questions completed`;
+  const review=document.getElementById("review");
+  review.innerHTML="";
+  questions.forEach((item,i)=>{
+    const div=document.createElement("div");
+    div.className="review";
+    div.innerHTML =
+      `<p><strong>${escapeHtml(item.q)}</strong></p>`+
+      `<p>Correct answer: <strong>${escapeHtml(item.correct)}</strong></p>`+
+      `<p>${escapeHtml(item.e)}</p>`;
+    review.appendChild(div);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+nextBtn.addEventListener("click",()=>processAnswer(false));
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function escapeAttr(s){return escapeHtml(s);}
+
+renderQuestion();
+
+// Prevent common context/menu shortcuts.
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey) && ["c","x","u","s","p"].includes(e.key.toLowerCase())) e.preventDefault();
+  if(e.key==="F12") e.preventDefault();
+});
+</script>
+</body>
+</html>
