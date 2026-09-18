@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bioinformatics Quiz</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f6f8;color:#20242a;font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:940px;margin:auto;padding:26px 18px 50px}
+.panel{background:#fff;border:1px solid #dfe3e8;border-radius:16px;padding:24px;margin-bottom:18px}
+h1{margin:0 0 7px;font-size:30px}.muted{color:#6b7280}
+input{width:100%;padding:13px;border:1px solid #cfd4da;border-radius:9px;font-size:16px;margin:7px 0}
+button{border:0;border-radius:9px;padding:13px 18px;background:#20242a;color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+button.light{background:#eef0f3;color:#20242a}
+button.full{width:100%;margin-top:10px}
+.progress{font-size:14px;color:#6b7280;margin-bottom:10px}
+.question{font-size:20px;font-weight:700;line-height:1.45;margin-bottom:8px}
+.instruction{font-size:14px;color:#6b7280;margin-bottom:18px}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col-title{font-size:13px;font-weight:700;color:#6b7280;margin-bottom:8px}
+.card{border:1px solid #d2d7dd;background:#fafafa;border-radius:11px;padding:15px;margin:8px 0;min-height:55px;display:flex;align-items:center;line-height:1.35;user-select:none}
+.card.draggable{cursor:grab;touch-action:none}
+.card.dragging{opacity:.45}
+.card.drop-target{border:2px dashed #20242a;background:#f1f3f5}
+.card.matched{background:#edf6ef;border-color:#9abca0}
+.card.selected{border:2px solid #20242a;background:#eef0f3}
+.match-status{margin-top:12px;font-size:13px;color:#6b7280}
+.order-list{display:flex;flex-direction:column;gap:9px}
+.order-item{display:flex;align-items:center;gap:10px;border:1px solid #d2d7dd;background:#fafafa;border-radius:11px;padding:9px;touch-action:none}
+.order-item.dragging{opacity:.45}
+.order-text{flex:1;padding:5px;line-height:1.35}
+.handle{font-size:20px;color:#68717c;cursor:grab}
+.move{display:flex;gap:5px}
+.move button{padding:7px 10px;font-size:14px}
+.drop-zone{border:2px dashed #c8cdd3;border-radius:12px;padding:10px;min-height:70px;margin:8px 0}
+.drop-zone.highlight{border-color:#20242a;background:#f4f5f6}
+.drop-label{font-size:12px;color:#6b7280;margin-bottom:4px}
+.feedback{display:none;margin-top:15px;padding:12px;border-radius:9px;background:#f1f3f5;line-height:1.4}
+.actions{display:flex;gap:10px;margin-top:16px}.actions button{flex:1}
+.result{text-align:center}.score{font-size:42px;font-weight:700;margin:12px}
+.review{text-align:left;border:1px solid #dfe3e8;border-radius:10px;padding:14px;margin:10px 0}
+.review p{line-height:1.4}
+.warning{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;display:none;align-items:center;justify-content:center;color:#fff;text-align:center}
+.warning-box{background:#20242a;border-radius:16px;padding:30px;max-width:430px;margin:20px}
+.count{font-size:52px;font-weight:700;margin-top:8px}
+@media(max-width:700px){.board{grid-template-columns:1fr}.actions{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="start" class="panel">
+<h1>Bioinformatics Quiz</h1>
+<p class="muted">Sequence-based algorithms and searches</p>
+<input id="name" placeholder="Name" autocomplete="name">
+<input id="reg" placeholder="Register Number" autocomplete="off">
+<button id="startBtn" class="full">Start Quiz</button>
+</section>
+
+<section id="quiz" style="display:none">
+<div id="progress" class="progress"></div>
+<div class="panel">
+<div id="question" class="question"></div>
+<div id="instruction" class="instruction"></div>
+<div id="stage"></div>
+<div id="feedback" class="feedback"></div>
+<div class="actions">
+<button id="check">Check</button>
+<button id="next" style="display:none">Next</button>
+</div>
+</div>
+</section>
+
+<section id="result" class="panel result" style="display:none">
+<h2>Quiz Completed</h2>
+<div id="student"></div>
+<div id="score" class="score"></div>
+<div class="muted">Answer review</div>
+<div id="review"></div>
+<button class="full" onclick="location.reload()">Try Again</button>
+</section>
+</div>
+
+<div id="warning" class="warning">
+<div class="warning-box">
+<div style="font-size:23px;font-weight:700">Your quiz is getting reset</div>
+<div style="margin-top:8px">Please do not switch tabs or leave the quiz.</div>
+<div id="count" class="count">3</div>
+</div>
+</div>
+
+<script>
+"use strict";
+
+/* 30 genuine interactive activities. Every activity asks the learner to
+   perform a meaningful matching, classification, or ordering task. */
+
+const activities=[
+{type:"match",q:"Match each BLAST program to the query/database combination it uses.",
+ left:["BLASTP","BLASTN","BLASTX","TBLASTN"],
+ right:["Protein → protein","Nucleotide → nucleotide","Translated nucleotide → protein","Protein → translated nucleotide"]},
+
+{type:"match",q:"Match each alignment type to the situation it is designed for.",
+ left:["Global alignment","Local alignment","Semi-global alignment","Pairwise alignment"],
+ right:["Full-length comparison","Best matching region","Terminal gaps may be unpenalized","Comparison of two sequences"]},
+
+{type:"match",q:"Match each term to its correct meaning.",
+ left:["Sequence identity","Sequence similarity","BLOSUM","PSSM"],
+ right:["Exactly matching aligned residues","Related residues including conservative substitutions","Amino-acid substitution matrix","Position-specific scoring matrix"]},
+
+{type:"match",q:"Match each search method with its defining feature.",
+ left:["FASTA3","BLAST","PSI-BLAST","PHI-BLAST"],
+ right:["Sequence similarity search package","Local similarity search family","Iterative profile-based search","Pattern plus similarity search"]},
+
+{type:"match",q:"Match each result term with what it represents.",
+ left:["E-value","Bit score","Substitution matrix","Sequence database"],
+ right:["Expected chance occurrence of a match","Normalized alignment score","Scores residue substitutions","Reference sequences for comparison"]},
+
+{type:"match",q:"Match each tool to the sequence type most directly associated with its standard use.",
+ left:["BLASTP","BLASTN","BLASTX","TBLASTN"],
+ right:["Protein query","Nucleotide query","Translated nucleotide query","Protein query against translated nucleotide sequences"]},
+
+{type:"match",q:"Match the alignment goal to the appropriate alignment strategy.",
+ left:["Compare two complete homologous proteins","Find one conserved domain","Allow terminal overhangs","Compare exactly two sequences"],
+ right:["Global","Local","Semi-global","Pairwise"]},
+
+{type:"match",q:"Match the search method to the information it uses.",
+ left:["BLOSUM","PSSM","PSI-BLAST","DELTA-BLAST"],
+ right:["General amino-acid substitution scores","Position-specific scores","Iteratively refined position-specific search","Conserved-domain information"]},
+
+{type:"match",q:"Match each concept with its role in sequence analysis.",
+ left:["Query sequence","Database","Alignment","Significant hit"],
+ right:["Sequence being searched","Reference collection","Residue correspondence","Match supported by a strong statistical signal"]},
+
+{type:"match",q:"Match each BLAST-related name to its main purpose.",
+ left:["BLASTP","BLASTN","PSI-BLAST","PHI-BLAST"],
+ right:["Protein similarity search","Nucleotide similarity search","Distant protein similarity detection","Pattern-constrained similarity search"]},
+
+{type:"order",q:"Arrange the steps of a basic sequence similarity search in logical order.",
+ items:["Prepare the query sequence","Select a suitable sequence database","Run the similarity search","Inspect and interpret the hits"]},
+
+{type:"order",q:"Arrange the basic PSI-BLAST workflow in logical order.",
+ items:["Start with a protein query","Run the initial search","Use significant matches to build a profile","Search again using the profile"]},
+
+{type:"order",q:"Arrange the concepts from a general sequence comparison to a position-specific model.",
+ items:["Compare related sequences","Align corresponding positions","Identify position-specific conservation","Build a PSSM"]},
+
+{type:"order",q:"Arrange these alignment concepts from full-length comparison toward a focused region.",
+ items:["Global alignment","Semi-global alignment","Local alignment","Best matching region"]},
+
+{type:"order",q:"Arrange the process from sequence data to biological interpretation.",
+ items:["Query sequence","Database search","Alignment results","Biological interpretation"]},
+
+{type:"order",q:"Arrange these steps for interpreting a BLAST search.",
+ items:["Inspect alignment hits","Consider score and E-value","Examine sequence similarity","Assess possible biological relationship"]},
+
+{type:"order",q:"Arrange the development of a profile-based search.",
+ items:["Initial protein sequence","Initial similarity search","Collect significant related sequences","Create a position-specific profile"]},
+
+{type:"order",q:"Arrange the search concepts from a single substitution rule toward position-specific scoring.",
+ items:["Amino-acid substitution","Substitution matrix","Position-specific conservation","PSSM"]},
+
+{type:"order",q:"Arrange a simple database-search workflow.",
+ items:["Choose query","Choose database","Compare sequences","Review significant matches"]},
+
+{type:"order",q:"Arrange these terms from raw sequence comparison toward interpretation.",
+ items:["Sequence identity","Sequence similarity","Statistical significance","Biological interpretation"]},
+
+{type:"classify",q:"Drag each item into the correct alignment category.",
+ bins:["Global","Local","Semi-global"],
+ items:[
+  ["Full-length comparison","Global"],
+  ["Best matching internal region","Local"],
+  ["Terminal gaps may be ignored","Semi-global"],
+  ["End-to-end comparison","Global"],
+  ["Conserved domain within a longer protein","Local"],
+  ["Partial overlap with terminal overhang","Semi-global"]
+ ]},
+
+{type:"classify",q:"Drag each item into the correct BLAST category.",
+ bins:["BLASTP","BLASTN","BLASTX","TBLASTN"],
+ items:[
+  ["Protein → protein database","BLASTP"],
+  ["Nucleotide → nucleotide database","BLASTN"],
+  ["Translated nucleotide → protein database","BLASTX"],
+  ["Protein → translated nucleotide database","TBLASTN"]
+ ]},
+
+{type:"classify",q:"Drag each item into the correct concept.",
+ bins:["Identity","Similarity","BLOSUM","PSSM"],
+ items:[
+  ["Exact residue matches","Identity"],
+  ["Conservative substitutions may contribute","Similarity"],
+  ["General amino-acid substitution matrix","BLOSUM"],
+  ["Position-specific scoring matrix","PSSM"]
+ ]},
+
+{type:"classify",q:"Drag each item into the correct search method.",
+ bins:["PSI-BLAST","PHI-BLAST","DELTA-BLAST","FASTA3"],
+ items:[
+  ["Iterative PSSM-based protein search","PSI-BLAST"],
+  ["Pattern plus similarity search","PHI-BLAST"],
+  ["Uses conserved-domain information","DELTA-BLAST"],
+  ["Sequence similarity search package","FASTA3"]
+ ]},
+
+{type:"classify",q:"Drag each item into the correct sequence type.",
+ bins:["Nucleotide","Protein"],
+ items:[
+  ["DNA sequence","Nucleotide"],
+  ["RNA sequence","Nucleotide"],
+  ["Amino-acid sequence","Protein"],
+  ["Peptide sequence","Protein"]
+ ]},
+
+{type:"classify",q:"Drag each item into the correct statistical interpretation.",
+ bins:["Smaller E-value","Higher bit score"],
+ items:[
+  ["Lower expected chance occurrence","Smaller E-value"],
+  ["Stronger normalized alignment score","Higher bit score"],
+  ["Generally stronger evidence against a chance match","Smaller E-value"],
+  ["Higher normalized alignment score","Higher bit score"]
+ ]},
+
+{type:"classify",q:"Drag each task to the most appropriate approach.",
+ bins:["Global","Local","Semi-global"],
+ items:[
+  ["Compare two complete protein sequences","Global"],
+  ["Find a conserved motif region","Local"],
+  ["Compare sequences with terminal overhangs","Semi-global"],
+  ["Identify the strongest internal match","Local"]
+ ]},
+
+{type:"classify",q:"Drag each item to the correct search direction.",
+ bins:["Protein query","Nucleotide query"],
+ items:[
+  ["BLASTP query","Protein query"],
+  ["BLASTN query","Nucleotide query"],
+  ["PSI-BLAST query","Protein query"],
+  ["BLASTX starting sequence","Nucleotide query"]
+ ]},
+
+{type:"classify",q:"Drag each item to the correct scoring concept.",
+ bins:["Substitution matrix","PSSM"],
+ items:[
+  ["BLOSUM","Substitution matrix"],
+  ["Position-specific residue scores","PSSM"],
+  ["General amino-acid substitution scores","Substitution matrix"],
+  ["Scores that vary by sequence position","PSSM"]
+ ]},
+
+{type:"classify",q:"Drag each item to the correct similarity-search stage.",
+ bins:["Before search","During search","After search"],
+ items:[
+  ["Prepare query sequence","Before search"],
+  ["Generate alignments","During search"],
+  ["Interpret significant hits","After search"],
+  ["Select database","Before search"]
+ ]}
+];
+
+let quizItems=[],current=0,score=0,checked=false,name="",reg="";
+let resetRunning=false;
+
+function shuffle(a){let x=a.slice();for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
+
+document.getElementById("startBtn").onclick=()=>{
+ name=document.getElementById("name").value.trim();
+ reg=document.getElementById("reg").value.trim();
+ if(!name||!reg){alert("Please enter both Name and Register Number.");return}
+ quizItems=shuffle(activities);
+ document.getElementById("start").style.display="none";
+ document.getElementById("quiz").style.display="block";
+ render();
+};
+
+function render(){
+ checked=false;
+ document.getElementById("progress").textContent=`Activity ${current+1} of ${quizItems.length}`;
+ document.getElementById("question").textContent=quizItems[current].q;
+ document.getElementById("feedback").style.display="none";
+ document.getElementById("check").style.display="block";
+ document.getElementById("next").style.display="none";
+ const a=quizItems[current];
+ if(a.type==="match")renderMatch(a);
+ else if(a.type==="order")renderOrder(a);
+ else renderClassify(a);
+}
+
+function renderMatch(a){
+ document.getElementById("instruction").textContent="Drag each term onto its matching description.";
+ const stage=document.getElementById("stage");
+ stage.innerHTML=`<div class="board"><div><div class="col-title">Terms</div><div id="matchLeft"></div></div><div><div class="col-title">Descriptions</div><div id="matchRight"></div></div></div><div class="match-status" id="matchStatus">0 of ${a.left.length} matched</div>`;
+ shuffle(a.left).forEach(term=>{
+  const d=document.createElement("div");d.className="card draggable";d.textContent=term;d.draggable=true;d.dataset.term=term;
+  d.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",term);d.classList.add("dragging")});
+  d.addEventListener("dragend",()=>d.classList.remove("dragging"));
+  document.getElementById("matchLeft").appendChild(d);
+ });
+ shuffle(a.right).forEach(desc=>{
+  const d=document.createElement("div");d.className="card";d.textContent=desc;d.dataset.desc=desc;
+  d.addEventListener("dragover",e=>{e.preventDefault();d.classList.add("drop-target")});
+  d.addEventListener("dragleave",()=>d.classList.remove("drop-target"));
+  d.addEventListener("drop",e=>{
+   e.preventDefault();d.classList.remove("drop-target");
+   const term=e.dataTransfer.getData("text/plain");
+   if(!term)return;
+   d.dataset.term=term;d.classList.add("matched");
+   const source=[...document.querySelectorAll("#matchLeft .card")].find(x=>x.dataset.term===term);
+   if(source)source.classList.add("matched");
+   updateMatchStatus(a);
+  });
+  // Touch: tap term then tap destination.
+  d.addEventListener("click",()=>{
+   if(!selectedTerm)return;
+   d.dataset.term=selectedTerm.dataset.term;d.classList.add("matched");
+   selectedTerm.classList.add("matched");selectedTerm=null;updateMatchStatus(a);
+  });
+  document.getElementById("matchRight").appendChild(d);
+ });
+ let selectedTerm=null;
+ document.querySelectorAll("#matchLeft .card").forEach(d=>d.addEventListener("click",()=>{
+  document.querySelectorAll("#matchLeft .card").forEach(x=>x.classList.remove("selected"));
+  d.classList.add("selected");selectedTerm=d;
+ }));
+}
+function updateMatchStatus(a){
+ const n=[...document.querySelectorAll("#matchRight .card")].filter(x=>x.dataset.term).length;
+ document.getElementById("matchStatus").textContent=`${n} of ${a.left.length} matched`;
+}
+
+function renderOrder(a){
+ document.getElementById("instruction").textContent="Drag the steps into the correct order. On touch devices, use ↑ and ↓.";
+ document.getElementById("stage").innerHTML='<div id="orderList" class="order-list"></div>';
+ shuffle(a.items).forEach(text=>addOrder(text));
+}
+function addOrder(text){
+ const r=document.createElement("div");r.className="order-item";r.draggable=true;r.dataset.value=text;
+ const h=document.createElement("div");h.className="handle";h.textContent="☷";
+ const t=document.createElement("div");t.className="order-text";t.textContent=text;
+ const m=document.createElement("div");m.className="move";
+ const up=document.createElement("button");up.className="light";up.textContent="↑";up.type="button";
+ const dn=document.createElement("button");dn.className="light";dn.textContent="↓";dn.type="button";
+ up.onclick=()=>moveOrder(r,-1);dn.onclick=()=>moveOrder(r,1);
+ m.append(up,dn);r.append(h,t,m);
+ r.addEventListener("dragstart",()=>{r.classList.add("dragging")});
+ r.addEventListener("dragend",()=>r.classList.remove("dragging"));
+ r.addEventListener("dragover",e=>{
+  e.preventDefault();const drag=document.querySelector(".order-item.dragging");if(!drag||drag===r)return;
+  const box=r.getBoundingClientRect();
+  if(e.clientY<box.top+box.height/2)r.parentNode.insertBefore(drag,r);else r.parentNode.insertBefore(drag,r.nextSibling);
+ });
+ // Touch: select a row, then tap ↑ or ↓.
+ r.addEventListener("click",e=>{
+  if(e.target.tagName==="BUTTON")return;
+  document.querySelectorAll(".order-item").forEach(x=>x.classList.remove("selected"));
+  r.classList.add("selected");
+ });
+ document.getElementById("orderList").appendChild(r);
+}
+function moveOrder(r,dir){
+ const list=document.getElementById("orderList"),rows=[...list.children],i=rows.indexOf(r),j=i+dir;
+ if(j<0||j>=rows.length)return;
+ if(dir<0)list.insertBefore(r,rows[j]);else list.insertBefore(rows[j],r);
+}
+function renderClassify(a){
+ document.getElementById("instruction").textContent="Drag each item into the category where it belongs.";
+ const stage=document.getElementById("stage");
+ stage.innerHTML=`<div class="board"><div><div class="col-title">Items</div><div id="sourceItems"></div></div><div><div class="col-title">Categories</div><div id="bins"></div></div></div>`;
+ shuffle(a.items).forEach(pair=>{
+  const d=document.createElement("div");d.className="card draggable";d.textContent=pair[0];d.draggable=true;d.dataset.answer=pair[1];
+  d.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",pair[0]);d.classList.add("dragging")});
+  d.addEventListener("dragend",()=>d.classList.remove("dragging"));
+  document.getElementById("sourceItems").appendChild(d);
+ });
+ a.bins.forEach(bin=>{
+  const z=document.createElement("div");z.className="drop-zone";z.dataset.bin=bin;
+  z.innerHTML=`<div class="drop-label">${esc(bin)}</div>`;
+  z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("highlight")});
+  z.addEventListener("dragleave",()=>z.classList.remove("highlight"));
+  z.addEventListener("drop",e=>{
+   e.preventDefault();z.classList.remove("highlight");
+   const text=e.dataTransfer.getData("text/plain");
+   const d=[...document.querySelectorAll("#sourceItems .card")].find(x=>x.textContent===text);
+   if(d){z.appendChild(d);d.classList.remove("dragging")}
+  });
+  document.getElementById("bins").appendChild(z);
+ });
+}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+document.getElementById("check").onclick=()=>{
+ if(checked)return;
+ const a=quizItems[current];let ok=false;
+ if(a.type==="match"){
+  const drops=[...document.querySelectorAll("#matchRight .card")];
+  if(drops.some(x=>!x.dataset.term)){alert("Please match all cards before checking.");return}
+  ok=drops.every(x=>a.left.indexOf(x.dataset.term)===a.right.indexOf(x.dataset.desc));
+ }
+ if(a.type==="order"){
+  const vals=[...document.querySelectorAll("#orderList .order-item")].map(x=>x.dataset.value);
+  ok=vals.length===a.items.length&&vals.every((v,i)=>v===a.items[i]);
+ }
+ if(a.type==="classify"){
+  const placed=[...document.querySelectorAll("#bins .card")];
+  if(placed.length!==a.items.length){alert("Please place every item into a category.");return}
+  ok=placed.every(x=>x.parentElement.dataset.bin===x.dataset.answer);
+ }
+ checked=true;if(ok)score++;
+ const fb=document.getElementById("feedback");
+ fb.textContent=ok?"Correct.":"Checked. The correct arrangement will be shown after the quiz.";
+ fb.style.display="block";
+ document.getElementById("check").style.display="none";
+ document.getElementById("next").style.display="block";
+};
+
+document.getElementById("next").onclick=()=>{
+ current++;
+ if(current>=quizItems.length)finish();else render();
+};
+
+function finish(){
+ document.getElementById("quiz").style.display="none";
+ document.getElementById("result").style.display="block";
+ document.getElementById("student").textContent=`${name} — ${reg}`;
+ document.getElementById("score").textContent=`${score} / ${quizItems.length}`;
+ const review=document.getElementById("review");
+ review.innerHTML="";
+ quizItems.forEach((a,i)=>{
+  const d=document.createElement("div");d.className="review";
+  let ans="";
+  if(a.type==="match")ans=a.left.map((x,k)=>`${esc(x)} → ${esc(a.right[k])}`).join("<br>");
+  if(a.type==="order")ans=a.items.map(esc).join(" → ");
+  if(a.type==="classify")ans=a.bins.map(b=>`<strong>${esc(b)}</strong>: ${a.items.filter(x=>x[1]===b).map(x=>esc(x[0])).join(", ")}`).join("<br>");
+  d.innerHTML=`<strong>Activity ${i+1}</strong><p>${esc(a.q)}</p><p>${ans}</p>`;
+  review.appendChild(d);
+ });
+}
+
+/* Leaving the quiz resets it after the requested 3-2-1 warning. */
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden && document.getElementById("quiz").style.display!=="none" && !resetRunning){
+  resetRunning=true;
+  const overlay=document.getElementById("warning"),count=document.getElementById("count");
+  overlay.style.display="flex";let n=3;count.textContent=n;
+  const timer=setInterval(()=>{n--;count.textContent=n;if(n===0){clearInterval(timer);location.reload()}},1000);
+ }
+});
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+ const k=e.key.toLowerCase();
+ if(e.key==="F12"||(e.ctrlKey||e.metaKey)&&["u","s","p","c","x"].includes(k))e.preventDefault();
+});
+</script>
+</body>
+</html>
