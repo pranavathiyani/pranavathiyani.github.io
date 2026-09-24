@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find your team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F9; --surface:#FFFFFF; --ink:#10233F; --muted:#56677F; --line:#CCD7E5;
+  --blue:#2E5D8C; --blue-soft:#DCE7F3; --yellow:#F7C948; --yellow-ink:#3B2E00; --error:#B42318;
+  --sans:"Bricolage Grotesque", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A2B; --surface:#15243A; --ink:#E7EEF7; --muted:#9AAAC0; --line:#2A3D57;
+    --blue:#86B4E2; --blue-soft:#1E3350; --yellow:#FFD64D; --yellow-ink:#2A2000; --error:#FF8A80;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A2B; --surface:#15243A; --ink:#E7EEF7; --muted:#9AAAC0; --line:#2A3D57;
+  --blue:#86B4E2; --blue-soft:#1E3350; --yellow:#FFD64D; --yellow-ink:#2A2000; --error:#FF8A80;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%; scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0; min-height:100%; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.5;
+  display:flex; justify-content:center; padding:48px 20px 64px}
+main{width:100%; max-width:480px}
+h1{font-size:clamp(2.6rem,9vw,3.6rem); line-height:1; font-weight:800; letter-spacing:-.03em; margin:0 0 12px}
+.lede{color:var(--muted); margin:0 0 32px; max-width:38ch}
+label{display:block; font-weight:600; margin:0 0 6px}
+input{width:100%; font:inherit; color:var(--ink); background:var(--surface); border:2px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:20px}
+input:focus{outline:none; border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-soft)}
+.btn{font:inherit; font-weight:600; cursor:pointer; border:0; border-radius:10px; padding:14px 22px; background:var(--blue); color:var(--surface); width:100%}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--yellow); outline-offset:3px}
+.btn:hover{filter:brightness(1.08)}
+.error{color:var(--error); font-weight:600; min-height:1.5em; margin:12px 0 0}
+.hidden{display:none !important}
+
+/* stage */
+.stage{display:flex; flex-direction:column; align-items:center; text-align:center; padding-top:24px}
+.scene{width:132px; height:132px; perspective:600px; margin:24px 0 40px}
+.cube{width:100%; height:100%; position:relative; transform-style:preserve-3d; transform:rotateX(-24deg) rotateY(32deg)}
+.cube.rolling{animation:roll 10s cubic-bezier(.15,.55,.25,1) forwards}
+@keyframes roll{
+  0%{transform:rotateX(-24deg) rotateY(32deg)}
+  100%{transform:rotateX(2856deg) rotateY(3632deg) rotateZ(720deg)}
+}
+.face{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:18px;
+  font-family:var(--mono); font-weight:700; font-size:1.05rem; padding:8px; text-align:center; word-break:break-all;
+  border:3px solid var(--ink)}
+.face:nth-child(odd){background:var(--blue); color:#fff}
+.face:nth-child(even){background:var(--yellow); color:var(--yellow-ink)}
+.f1{transform:translateZ(66px)} .f2{transform:rotateY(180deg) translateZ(66px)}
+.f3{transform:rotateY(90deg) translateZ(66px)} .f4{transform:rotateY(-90deg) translateZ(66px)}
+.f5{transform:rotateX(90deg) translateZ(66px)} .f6{transform:rotateX(-90deg) translateZ(66px)}
+.status{color:var(--muted); margin:0}
+.shuffle{font-size:1.9rem; font-weight:800; letter-spacing:-.02em; margin:4px 0 0; min-height:1.3em}
+
+/* reveal */
+.reveal{text-align:center; padding-top:32px}
+.youre{color:var(--muted); font-size:1.15rem; margin:0}
+.team-name{font-size:clamp(2.8rem,11vw,4.2rem); font-weight:800; letter-spacing:-.035em; line-height:1.02; margin:6px 0 14px}
+.tag{display:inline-block; font-family:var(--mono); font-weight:700; background:var(--yellow); color:var(--yellow-ink); padding:4px 12px; border-radius:6px; margin-bottom:32px}
+.reveal.enter .team-name{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.6); opacity:0} to{transform:none; opacity:1}}
+.members{list-style:none; padding:0; margin:24px 0 0; text-align:left; border-top:2px solid var(--ink)}
+.members li{display:grid; grid-template-columns:1fr auto; gap:2px 12px; padding:14px 4px; border-bottom:1px solid var(--line)}
+.members .m-name{font-weight:600}
+.members .m-reg{font-family:var(--mono); font-size:.85rem; color:var(--muted); align-self:center}
+.members .m-prog{grid-column:1/-1; color:var(--muted); font-size:.9rem}
+.members li.me{background:var(--blue-soft); border-radius:8px}
+.you{font-size:.75rem; font-weight:600; background:var(--blue); color:var(--surface); border-radius:4px; padding:1px 6px; margin-left:6px; vertical-align:2px}
+.members li{opacity:0; transform:translateY(8px); animation:in .35s forwards}
+@keyframes in{to{opacity:1; transform:none}}
+.count{color:var(--muted); font-size:.95rem; margin:12px 0 0}
+.link{background:none; border:0; font:inherit; color:var(--blue); text-decoration:underline; cursor:pointer; margin-top:32px; padding:4px}
+@media (prefers-reduced-motion:reduce){
+  .cube.rolling,.reveal.enter .team-name,.members li{animation:none; opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <section id="form-view">
+    <h1>Find your team</h1>
+    <p class="lede">Enter your name and register number to see which team you're in and who your teammates are.</p>
+    <form id="form" novalidate>
+      <label for="name">Name</label>
+      <input id="name" autocomplete="name" placeholder="Your name">
+      <label for="reg">Register number</label>
+      <input id="reg" inputmode="numeric" maxlength="9" placeholder="9 digits, e.g. 128162001" required>
+      <button class="btn" type="submit">Find my team</button>
+      <p class="error" id="error" role="alert"></p>
+    </form>
+  </section>
+
+  <section id="stage" class="stage hidden" aria-live="polite">
+    <div class="scene"><div class="cube" id="cube">
+      <div class="face f1"></div><div class="face f2"></div><div class="face f3"></div>
+      <div class="face f4"></div><div class="face f5"></div><div class="face f6"></div>
+    </div></div>
+    <p class="status" id="status">Assigning your team…</p>
+    <p class="shuffle" id="shuffle">&nbsp;</p>
+  </section>
+
+  <section id="reveal" class="reveal hidden" aria-live="polite">
+    <p class="youre" id="youre"></p>
+    <p class="team-name" id="team-name"></p>
+    <span class="tag" id="tag"></span>
+    <button class="btn" id="show-members" type="button">See your team</button>
+    <div id="members-wrap" class="hidden">
+      <ul class="members" id="members"></ul>
+      <p class="count" id="count"></p>
+    </div>
+    <button class="link" id="again" type="button">Look up another student</button>
+  </section>
+</main>
+<script>
+const TEAMS = [{"team": "Team Comprehension", "tag": "[x for x]", "members": [{"reg": "128163007", "name": "Dhanyaa S U", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162007", "name": "Guhan S", "program": "Artificial Intelligence & Data Science"}, {"reg": "128165002", "name": "Lakshmi Nrsimha Rao", "program": "Digital Manufacturing"}, {"reg": "128163021", "name": "Tamilmaran K", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162019", "name": "Thanasri J", "program": "Artificial Intelligence & Data Science"}]}, {"team": "Team Decorator", "tag": "@", "members": [{"reg": "128162001", "name": "Adhithiya V L", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163002", "name": "Angelin Pricilla M", "program": "Artificial Intelligence & Robotics"}, {"reg": "128163006", "name": "Devadharshini S", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164002", "name": "Hema Harshitha J P", "program": "Big Data Biology"}, {"reg": "128162010", "name": "Kishore D", "program": "Artificial Intelligence & Data Science"}]}, {"team": "Team Dunder", "tag": "__init__", "members": [{"reg": "128165003", "name": "Ashwin R", "program": "Digital Manufacturing"}, {"reg": "128163005", "name": "Dakshana S B", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162015", "name": "Monfort Joel J", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163019", "name": "Sneharaj", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164007", "name": "Srija R", "program": "Big Data Biology"}]}, {"team": "Team Generator", "tag": "yield", "members": [{"reg": "128162002", "name": "Angu Karthika C", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163010", "name": "Hemanth Sivaganesh S P", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164005", "name": "Nithish D", "program": "Big Data Biology"}, {"reg": "128163016", "name": "Prince Aswin A S", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162017", "name": "Sivaneswari R", "program": "Artificial Intelligence & Data Science"}]}, {"team": "Team Iterator", "tag": "next()", "members": [{"reg": "128162008", "name": "Gurram Chenchu Rakesh", "program": "Artificial Intelligence & Data Science"}, {"reg": "128164004", "name": "Lokesh S", "program": "Big Data Biology"}, {"reg": "128163012", "name": "Manasa G", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162016", "name": "Samarjith R", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163018", "name": "Sampremkumar V", "program": "Artificial Intelligence & Robotics"}]}, {"team": "Team Kwargs", "tag": "**kwargs", "members": [{"reg": "128165001", "name": "Abinath T", "program": "Digital Manufacturing"}, {"reg": "128162005", "name": "Dhanavardhini A", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163008", "name": "Divakar B", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162018", "name": "Srihari S", "program": "Artificial Intelligence & Data Science"}, {"reg": "128164009", "name": "Sutharrshnaa", "program": "Big Data Biology"}]}, {"team": "Team Lambda", "tag": "lambda", "members": [{"reg": "128163009", "name": "Hayagrive P", "program": "Artificial Intelligence & Robotics"}, {"reg": "128163013", "name": "Nithish Sam Kamalesan D", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164008", "name": "Subhikssha B", "program": "Big Data Biology"}, {"reg": "128162020", "name": "Valenteena Vency S", "program": "Artificial Intelligence & Data Science"}]}, {"team": "Team Pickle", "tag": ".pkl", "members": [{"reg": "128162003", "name": "Bhuvaneshwaran R", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163004", "name": "Chandra Prasaad M", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162013", "name": "Mithusha S R", "program": "Artificial Intelligence & Data Science"}, {"reg": "128164006", "name": "Rabisha Jennippar P", "program": "Big Data Biology"}, {"reg": "128163017", "name": "Rohith A", "program": "Artificial Intelligence & Robotics"}]}, {"team": "Team Slice", "tag": "[::]", "members": [{"reg": "128163003", "name": "Ashwin R", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162006", "name": "Dhavavignesh Rajendran", "program": "Artificial Intelligence & Data Science"}, {"reg": "128162009", "name": "Hudson B", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163014", "name": "Perzcy Raya B", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164010", "name": "Varsha Prakalya M", "program": "Big Data Biology"}]}, {"team": "Team Tuple", "tag": "( , )", "members": [{"reg": "128162011", "name": "Kodali Bhargav", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163020", "name": "Swathi R", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162021", "name": "Vasudevan S R", "program": "Artificial Intelligence & Data Science"}, {"reg": "128164011", "name": "Vedashree N N", "program": "Big Data Biology"}, {"reg": "128163023", "name": "Venkadesa Prasad S", "program": "Artificial Intelligence & Robotics"}]}, {"team": "Team Walrus", "tag": ":=", "members": [{"reg": "128163001", "name": "Abdul Aziz M", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164001", "name": "Arlin Newzina A", "program": "Big Data Biology"}, {"reg": "128162012", "name": "Kundurthi Vijaya Sai Nisanth", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163015", "name": "Pragadeshwaran D P", "program": "Artificial Intelligence & Robotics"}, {"reg": "128162022", "name": "Yogambigai S", "program": "Artificial Intelligence & Data Science"}]}, {"team": "Team Wheel", "tag": ".whl", "members": [{"reg": "128162004", "name": "Celsi Jaya Sreejha P", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163011", "name": "Karthick Rajan R", "program": "Artificial Intelligence & Robotics"}, {"reg": "128164003", "name": "Kaviyaashree G", "program": "Big Data Biology"}, {"reg": "128162014", "name": "Mohammad Sahir Baig", "program": "Artificial Intelligence & Data Science"}, {"reg": "128163022", "name": "Vengada Ramana M", "program": "Artificial Intelligence & Robotics"}]}];
+const byReg = {};
+TEAMS.forEach(t => t.members.forEach(m => { byReg[m.reg] = { team: t, me: m }; }));
+
+const $ = id => document.getElementById(id);
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("name").value.trim();
+  const reg = $("reg").value.replace(/\D/g, "");
+  const err = $("error");
+  if (!reg) { err.textContent = "Enter your register number."; return; }
+  if (reg.length !== 9) { err.textContent = "Register numbers have 9 digits. Check yours and try again."; return; }
+  const hit = byReg[reg];
+  if (!hit) { err.textContent = "This register number isn't on the class list. Check the digits."; return; }
+  err.textContent = "";
+  roll(hit);
+});
+
+function roll(hit) {
+  $("form-view").classList.add("hidden");
+  $("stage").classList.remove("hidden");
+  const faces = document.querySelectorAll(".face");
+  const pool = TEAMS.map(t => t.tag).sort(() => Math.random() - .5);
+  faces.forEach((f, i) => f.textContent = pool[i % pool.length]);
+  const cube = $("cube");
+  cube.classList.remove("rolling"); void cube.offsetWidth; cube.classList.add("rolling");
+
+  const names = TEAMS.map(t => t.team);
+  const total = reduced ? 600 : 10000;
+  const start = performance.now();
+  let delay = 60, i = Math.floor(Math.random() * names.length);
+  const phases = [[0, "Assigning your team…"], [.25, "Loading the class list…"], [.5, "Shuffling all team names…"], [.85, "Almost there…"]];
+  phases.forEach(([at, msg]) => setTimeout(() => $("status").textContent = msg, total * at));
+  (function tick() {
+    const t = performance.now() - start;
+    if (t >= total) { $("shuffle").textContent = hit.team.team; setTimeout(() => reveal(hit), 450); return; }
+    i = (i + 1) % names.length;
+    $("shuffle").textContent = names[i];
+    delay = 70 + 380 * Math.pow(t / total, 2.4);
+    setTimeout(tick, delay);
+  })();
+}
+
+function reveal(hit) {
+  $("stage").classList.add("hidden");
+  const r = $("reveal");
+  r.classList.remove("hidden", "enter"); void r.offsetWidth; r.classList.add("enter");
+  $("youre").textContent = hit.me.name.split(" ")[0] + ", you're in";
+  $("team-name").textContent = hit.team.team;
+  $("tag").textContent = hit.team.tag;
+  $("show-members").classList.remove("hidden");
+  $("members-wrap").classList.add("hidden");
+  const ul = $("members"); ul.innerHTML = "";
+  hit.team.members.forEach((m, k) => {
+    const li = document.createElement("li");
+    if (m.reg === hit.me.reg) li.className = "me";
+    li.style.animationDelay = (k * 90) + "ms";
+    const n = document.createElement("span"); n.className = "m-name"; n.textContent = m.name;
+    if (m.reg === hit.me.reg) { const y = document.createElement("span"); y.className = "you"; y.textContent = "you"; n.appendChild(y); }
+    const g = document.createElement("span"); g.className = "m-reg"; g.textContent = m.reg;
+    const p = document.createElement("span"); p.className = "m-prog"; p.textContent = "M.Tech. " + m.program;
+    li.append(n, g, p); ul.appendChild(li);
+  });
+  $("count").textContent = hit.team.members.length + " members";
+  $("show-members").focus();
+}
+
+$("show-members").addEventListener("click", () => {
+  $("show-members").classList.add("hidden");
+  $("members-wrap").classList.remove("hidden");
+});
+
+$("again").addEventListener("click", () => {
+  $("reveal").classList.add("hidden");
+  $("form-view").classList.remove("hidden");
+  $("form").reset(); $("name").focus();
+});
+</script>
+</body>
+</html>
