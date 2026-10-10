@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structural Bioinformatics — Unit IV Quiz</title>
+<style>
+  :root{
+    --cream:#FBF7EF; --teal:#0E7C7B; --teal2:#12968F; --ink:#0B3B3C; --seafoam:#5EEAD4;
+    --gold:#E8A33A; --gold2:#F6C445; --coral:#E9724C; --muted:#6a7a78; --text:#13302e;
+    --line:#e7ded0; --good:#17926b; --bad:#DC4A2B; --mint:#EAF5F3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% -10%, #13504e 0%, #0B3B3C 60%); color:var(--text);
+    display:flex; align-items:center; justify-content:center; padding:18px; min-height:100dvh;}
+  .wrap{width:100%; max-width:640px;}
+  .card{background:var(--cream); border-radius:22px; box-shadow:0 20px 60px rgba(0,0,0,.35); padding:30px 28px; position:relative; overflow:hidden;}
+  .screen{display:none;} .screen.on{display:block;}
+  h1{font-size:28px; color:var(--ink); letter-spacing:-.4px; line-height:1.12;}
+  h1 .g{color:var(--gold);}
+  .btn{background:var(--teal); color:#fff; border:none; border-radius:13px; padding:15px 32px; font-size:17px; font-weight:800;
+    cursor:pointer; box-shadow:0 7px 18px rgba(14,124,123,.35); transition:transform .07s, background .15s;}
+  .btn:hover{background:#0c6b6a;} .btn:active{transform:translateY(1px);}
+  .btn.gold{background:var(--gold); color:#3a2a06; box-shadow:0 7px 18px rgba(232,163,58,.4);} .btn.gold:hover{background:#d8932f;}
+  .btn.ghost{background:transparent; color:var(--teal); border:2px solid var(--teal); box-shadow:none;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  /* START */
+  #start{text-align:center;}
+  #start .kick{font-size:13px; font-weight:800; letter-spacing:2px; color:var(--teal); margin-bottom:10px;}
+  #start .sub{color:var(--muted); font-size:15px; margin:10px 0 24px;}
+  .field{max-width:360px; margin:0 auto 16px; text-align:left;}
+  .field label{display:block; font-size:12.5px; font-weight:800; color:var(--muted); letter-spacing:.4px; margin-bottom:7px;}
+  .field input{width:100%; padding:14px 16px; font-size:17px; border:2px solid var(--line); border-radius:12px; outline:none; background:#fff;}
+  .field input:focus{border-color:var(--gold);}
+  .err{color:var(--bad); font-size:13px; font-weight:700; min-height:18px; margin-top:4px;}
+  .pills{display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-bottom:22px;}
+  .pill{font-size:11.5px; font-weight:700; color:var(--teal); background:var(--mint); border-radius:20px; padding:5px 11px;}
+
+  /* ROULETTE */
+  #spin{text-align:center;}
+  #spin .who{font-size:17px; color:var(--muted); margin-bottom:6px;} #spin .who b{color:var(--ink);}
+  .wheelwrap{position:relative; width:280px; height:280px; margin:14px auto 8px;}
+  .pointer{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:0; height:0;
+    border-left:15px solid transparent; border-right:15px solid transparent; border-top:26px solid var(--coral); z-index:6;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));}
+  .wheel{position:absolute; inset:0; border-radius:50%; border:9px solid var(--gold);
+    box-shadow:0 0 0 4px var(--ink), inset 0 0 22px rgba(0,0,0,.35), 0 14px 30px rgba(0,0,0,.3);
+    transition:transform 3.4s cubic-bezier(.16,.72,.19,1);}
+  .wheel .lbl{position:absolute; top:50%; left:50%; font-family:"Courier New",monospace; font-weight:800; font-size:15px; color:#fff;}
+  .hub{position:absolute; top:50%; left:50%; width:62px; height:62px; transform:translate(-50%,-50%);
+    background:var(--ink); border:4px solid var(--gold); border-radius:50%; z-index:5; display:flex; align-items:center; justify-content:center;
+    color:var(--seafoam); font-weight:800; font-family:"Courier New",monospace; font-size:17px;}
+  #spin .rmsg{margin-top:14px; color:var(--muted); font-size:14.5px; font-style:italic; min-height:20px;}
+
+  /* QUIZ */
+  .qhead{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+  .qhead .n{font-size:13px; font-weight:800; color:var(--muted);}
+  .qhead .sc{font-size:13px; font-weight:800; color:var(--teal);}
+  .tbar{height:10px; background:#eadfce; border-radius:8px; overflow:hidden; margin-bottom:4px;}
+  #tfill{height:100%; width:100%; background:linear-gradient(90deg,var(--teal),var(--teal2)); border-radius:8px;}
+  #tfill.grace{background:linear-gradient(90deg,var(--coral),#f08a63); animation:pulse .6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .tlabel{display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--muted); margin-bottom:16px; min-height:15px;}
+  .tlabel .grace{color:var(--coral);}
+  .qtext{font-size:20px; font-weight:800; color:var(--ink); line-height:1.35; min-height:62px; margin-bottom:16px;}
+  .opts{display:flex; flex-direction:column; gap:10px;}
+  .opt{text-align:left; background:#fff; border:2px solid var(--line); border-radius:12px; padding:13px 15px; font-size:16px; color:var(--text);
+    cursor:pointer; display:flex; align-items:center; gap:12px; transition:border-color .1s, background .1s;}
+  .opt:hover:not(.locked){border-color:var(--gold);}
+  .opt .k{flex:0 0 27px; height:27px; border-radius:7px; background:#f3ece0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--muted);}
+  .opt.locked{cursor:default;}
+  .opt.correct{border-color:var(--good); background:#e7f6ef;} .opt.correct .k{background:var(--good); color:#fff;}
+  .opt.wrong{border-color:var(--bad); background:#fcebe6;} .opt.wrong .k{background:var(--bad); color:#fff;}
+  .verdict{margin-top:14px; font-weight:800; font-size:15px; min-height:20px;}
+  .verdict.ok{color:var(--good);} .verdict.no{color:var(--bad);}
+  .btnrow{margin-top:14px; text-align:right; min-height:50px;}
+  #nextBtn{display:none;}
+  .fact{margin-top:16px; padding:12px 15px; background:var(--mint); border-left:4px solid var(--teal); border-radius:8px; font-size:13.5px; color:#3c5250; line-height:1.5;}
+  .fact b{color:var(--teal);}
+
+  /* RESULT */
+  #result{text-align:center;}
+  #result .em{font-size:46px; margin-bottom:4px;}
+  #result h2{font-size:24px; color:var(--ink); margin-bottom:6px;}
+  #result .big{font-size:56px; font-weight:800; color:var(--teal); line-height:1; margin:8px 0 2px;}
+  #result .big span{font-size:24px; color:var(--muted);}
+  #result .msg{color:var(--muted); font-size:16px; margin:10px 0 22px;}
+  #result .rbtns{display:flex; gap:10px; justify-content:center;}
+
+  /* pause overlay */
+  #pause{position:fixed; inset:0; background:rgba(11,59,60,.92); display:none; align-items:center; justify-content:center; z-index:50; padding:24px;}
+  #pause.on{display:flex;}
+  #pause .inner{text-align:center; color:#fff; max-width:380px;}
+  #pause .em{font-size:40px; margin-bottom:8px;}
+  #pause h3{font-size:22px; margin-bottom:8px;} #pause p{color:#bfe0dc; font-size:15px; margin-bottom:20px;}
+  @media(max-width:480px){ .card{padding:24px 18px;} h1{font-size:24px;} .qtext{font-size:18px;} .wheelwrap{width:240px;height:240px;} }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+
+  <!-- START -->
+  <div class="screen on" id="start">
+    <div class="kick">BIN104 · UNIT IV</div>
+    <h1>Structural Bioinformatics<br><span class="g">Roulette Quiz</span></h1>
+    <div class="sub">Spin the wheel, then answer one question at a time. Beat the clock!</div>
+    <div class="pills">
+      <span class="pill">structure levels</span><span class="pill">SCOP · CATH</span><span class="pill">RMSD</span>
+      <span class="pill">modelling</span><span class="pill">Ramachandran</span>
+    </div>
+    <div class="field">
+      <label>Enter your name</label>
+      <input id="nameInput" type="text" autocomplete="off" placeholder="Your name" maxlength="28">
+      <div class="err" id="nameErr"></div>
+    </div>
+    <button class="btn gold" id="startBtn">Spin to begin &nbsp;🎡</button>
+  </div>
+
+  <!-- ROULETTE -->
+  <div class="screen" id="spin">
+    <div class="who">Round the residues, <b id="spinName">player</b>…</div>
+    <div class="wheelwrap">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+      <div class="hub">φψ</div>
+    </div>
+    <div class="rmsg" id="rmsg">spinning…</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="qhead"><span class="n">Q <b id="qnum">1</b> / <span id="qtot">25</span></span><span class="sc">Score <span id="scoreVal">0</span></span></div>
+    <div class="tbar"><div id="tfill"></div></div>
+    <div class="tlabel"><span id="tphase">answer now</span><span id="tsecs">25s</span></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="btnrow"><button class="btn" id="nextBtn">Next →</button></div>
+    <div class="fact" id="fact"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <div class="em" id="rEm">🎉</div>
+    <h2 id="rTitle">Nice run!</h2>
+    <div class="big"><span id="rScore">0</span><span>/<span id="rTot">25</span></span></div>
+    <div class="msg" id="rMsg"></div>
+    <div class="fact" id="rFact" style="text-align:left;"></div>
+    <div class="rbtns" style="margin-top:22px;">
+      <button class="btn gold" id="againBtn">Spin again 🎡</button>
+      <button class="btn ghost" id="newBtn">New player</button>
+    </div>
+  </div>
+
+</div></div>
+
+<!-- PAUSE -->
+<div id="pause"><div class="inner">
+  <div class="em">⏸️</div><h3>Paused</h3>
+  <p>You left the quiz window. The timer is frozen — come back and resume.</p>
+  <button class="btn gold" id="resumeBtn">Resume</button>
+</div></div>
+
+<script>
+// ---------------- question bank (32) ----------------
+const BANK = [
+ {q:"How many levels of protein structure are there?",a:"Four",o:["Four","Two","Three","Five"]},
+ {q:"The primary structure of a protein is…",a:"The sequence of amino acids",o:["The sequence of amino acids","The 3-D fold","The arrangement of subunits","The set of helices and sheets"]},
+ {q:"Which bonds mainly stabilise secondary structure?",a:"Hydrogen bonds",o:["Hydrogen bonds","Disulfide bonds","Peptide bonds only","Metal bonds"]},
+ {q:"An α-helix is best described as…",a:"A right-handed coil",o:["A right-handed coil","A flat sheet","Two twisted strands","A random loop"]},
+ {q:"In diagrams, β-sheet strands are drawn as…",a:"Arrows",o:["Arrows","Cylinders","Coils","Dots"]},
+ {q:"Quaternary structure refers to…",a:"Several chains assembled together",o:["Several chains assembled together","A single folded chain","The amino-acid sequence","One α-helix"]},
+ {q:"Haemoglobin's quaternary structure is…",a:"2α + 2β subunits",o:["2α + 2β subunits","A single chain","Four identical chains","Two chains only"]},
+ {q:"Myoglobin is historically famous as…",a:"The first protein structure ever solved",o:["The first protein structure ever solved","The largest known protein","A membrane transporter","A DNA-binding protein"]},
+ {q:"A protein domain is…",a:"A part of a chain that folds independently",o:["A part of a chain that folds independently","A single amino acid","A region of the genome","A type of chemical bond"]},
+ {q:"Which database stores protein families as profile HMMs?",a:"Pfam",o:["Pfam","PDB","GenBank","PROSITE"]},
+ {q:"PROSITE represents a motif as…",a:"A regular-expression pattern",o:["A regular-expression pattern","A 3-D model","A phylogenetic tree","A distance matrix"]},
+ {q:"InterPro's main role is to…",a:"Integrate several family/domain databases",o:["Integrate several family/domain databases","Store raw DNA reads","Predict genes","Store metabolic pathways"]},
+ {q:"The pattern [AG]-x(4)-G-K-[ST] marks a…",a:"Nucleotide/ATP-binding site (P-loop)",o:["Nucleotide/ATP-binding site (P-loop)","Stop codon","Promoter","Restriction site"]},
+ {q:"Structural alignment compares proteins by their…",a:"Positions in 3-D space",o:["Positions in 3-D space","Names","Molecular weight","GC content"]},
+ {q:"Structural alignment beats sequence alignment when sequences are…",a:"Highly diverged (low identity)",o:["Highly diverged (low identity)","Identical","Very short","Made of DNA"]},
+ {q:"SCOP and CATH are used to…",a:"Classify 3-D protein structures",o:["Classify 3-D protein structures","Align DNA sequences","Predict genes","Store expression data"]},
+ {q:"Which level exists in CATH but NOT in SCOP?",a:"Architecture",o:["Architecture","Class","Family","Fold"]},
+ {q:"The globin fold belongs to which structural class?",a:"All-α",o:["All-α","All-β","α/β","Membrane"]},
+ {q:"RMSD measures…",a:"Average distance between matched atoms",o:["Average distance between matched atoms","Sequence identity","Number of genes","Molecular weight"]},
+ {q:"A lower RMSD between two structures means they are…",a:"More similar",o:["More similar","Less similar","Longer","Made of more chains"]},
+ {q:"RMSD must always be reported together with…",a:"The number of aligned residues/atoms",o:["The number of aligned residues/atoms","The E-value","The GC content","The isoelectric point"]},
+ {q:"The distance-matrix method of comparison is…",a:"Orientation-free (no superposition needed)",o:["Orientation-free (no superposition needed)","Only usable for DNA","Impossible to compute","Identical to BLAST"]},
+ {q:"Homology modelling predicts a structure using…",a:"A known template structure",o:["A known template structure","Random coordinates","The genetic code","A distance matrix alone"]},
+ {q:"The usual first step of homology modelling is…",a:"Find a template (BLAST vs the PDB)",o:["Find a template (BLAST vs the PDB)","Validate the model","Build the side chains","Run a simulation"]},
+ {q:"Homology modelling becomes unreliable when target–template identity is…",a:"Below about 20%",o:["Below about 20%","Above 80%","Exactly 50%","Above 30%"]},
+ {q:"Threading (fold recognition) is used when…",a:"No closely related template exists",o:["No closely related template exists","The structure is already known","The sequence is DNA","There are too many templates"]},
+ {q:"The Ramachandran plot plots which two angles?",a:"φ (phi) and ψ (psi)",o:["φ (phi) and ψ (psi)","α and β","x and y","Only θ and ω"]},
+ {q:"Which backbone bond is essentially rigid (not freely rotatable)?",a:"The peptide bond (ω)",o:["The peptide bond (ω)","The N–Cα bond","The Cα–C bond","All are freely rotatable"]},
+ {q:"On a Ramachandran plot, the two big allowed clusters are…",a:"α-helix and β-sheet",o:["α-helix and β-sheet","DNA and RNA","Start and stop","Only glycine and proline"]},
+ {q:"Which residue is allowed in 'forbidden' Ramachandran regions because it has no side chain?",a:"Glycine",o:["Glycine","Tryptophan","Proline","Cysteine"]},
+ {q:"AlphaFold is a tool for…",a:"Predicting protein 3-D structure",o:["Predicting protein 3-D structure","Aligning DNA","Building phylogenetic trees","Designing PCR primers"]},
+ {q:"DSSP is used to…",a:"Assign secondary structure from 3-D coordinates",o:["Assign secondary structure from 3-D coordinates","Predict genes","Compute E-values","Search sequence databases"]},
+];
+
+const FACTS = [
+ "Myoglobin was the first protein structure ever solved — by Kendrew in 1958.",
+ "The PDB holds 200,000+ structures but only a few thousand distinct folds.",
+ "AlphaFold has predicted structures for nearly every known protein.",
+ "Haemoglobin changes shape as it binds oxygen — that's cooperativity.",
+ "Glycine is the smallest amino acid; tryptophan is the bulkiest.",
+ "The Ramachandran plot is named after G. N. Ramachandran (1963).",
+ "Two proteins can share a fold with under 20% sequence identity.",
+ "One ångström (Å) is a ten-billionth of a metre — atoms live at this scale.",
+ "Disulfide bridges are the only covalent cross-links in a folded chain.",
+ "SCOP groups folds by expert eye; CATH does it more automatically.",
+ "A domain can be reused across totally different proteins — like a module.",
+ "The peptide bond is flat because it has partial double-bond character.",
+];
+
+const AA = ["A","R","N","D","C","Q","E","G","H","I","L","K"];
+const N_ASK = 25, T_MAIN = 25, T_GRACE = 5, KEYS = ["A","B","C","D"];
+const $ = id => document.getElementById(id);
+let name="", quiz=[], idx=0, score=0, selected=false, phase="idle", remaining=0, tick=null, factTimer=null, active=false;
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on");}
+function randFact(){return FACTS[Math.floor(Math.random()*FACTS.length)];}
+
+// ---- build wheel ----
+(function buildWheel(){
+  const w=$("wheel"); const seg=360/AA.length;
+  let stops=""; for(let i=0;i<AA.length;i++){const c=i%2?"#0B3B3C":"#0E7C7B"; stops+=`${c} ${i*seg}deg ${(i+1)*seg}deg${i<AA.length-1?",":""}`;}
+  w.style.background=`conic-gradient(from ${-seg/2}deg, ${stops})`;
+  AA.forEach((L,i)=>{const s=document.createElement("div"); s.className="lbl"; s.textContent=L;
+    const ang=i*seg; s.style.transform=`rotate(${ang}deg) translateY(-110px) rotate(${-ang}deg) translate(-50%,-50%)`;
+    s.style.transformOrigin="0 0"; w.appendChild(s);});
+})();
+
+// ---- start ----
+$("startBtn").onclick=start;
+$("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")start();});
+function start(){
+  const v=$("nameInput").value.trim();
+  if(!v){$("nameErr").textContent="Please enter your name to spin.";return;}
+  $("nameErr").textContent=""; name=v; $("spinName").textContent=name;
+  show("spin"); doSpin();
+}
+
+// ---- roulette spin ----
+function doSpin(){
+  const w=$("wheel"); $("rmsg").textContent="spinning…";
+  const turns=5+Math.floor(Math.random()*3); const extra=Math.floor(Math.random()*360);
+  const R=turns*360+extra;
+  w.style.transition="none"; w.style.transform="rotate(0deg)"; void w.offsetWidth;
+  w.style.transition="transform 3.4s cubic-bezier(.16,.72,.19,1)"; w.style.transform=`rotate(${R}deg)`;
+  const seg=360/AA.length;
+  const land=((Math.round(-R/seg)%AA.length)+AA.length)%AA.length;
+  setTimeout(()=>{ $("rmsg").innerHTML=`landed on <b style="color:var(--gold)">${AA[land]}</b> — here we go, ${name}!`;
+    setTimeout(startQuiz,1100); },3450);
+}
+
+// ---- quiz ----
+function startQuiz(){
+  quiz=shuffle(BANK).slice(0,N_ASK); idx=0; score=0; active=true;
+  $("qtot").textContent=N_ASK; $("rTot").textContent=N_ASK; $("scoreVal").textContent="0";
+  show("quiz");
+  clearInterval(factTimer);
+  factTimer=setInterval(()=>{ if(active && !selected) $("fact").innerHTML="<b>Did you know?</b> "+randFact(); },6000);
+  render();
+}
+function render(){
+  selected=false; phase="answer"; remaining=T_MAIN;
+  const it=quiz[idx];
+  $("qnum").textContent=idx+1;
+  $("qtext").textContent=it.q;
+  $("verdict").textContent=""; $("verdict").className="verdict";
+  $("nextBtn").style.display="none";
+  $("fact").innerHTML="<b>Did you know?</b> "+randFact();
+  const opts=$("opts"); opts.innerHTML="";
+  shuffle(it.o).forEach((text,i)=>{
+    const b=document.createElement("button"); b.className="opt";
+    b.innerHTML=`<span class="k">${KEYS[i]}</span><span>${text}</span>`;
+    b.onclick=()=>choose(text,b);
+    opts.appendChild(b);
+  });
+  $("tfill").className=""; $("tphase").textContent="answer now"; $("tphase").className="";
+  startTimer();
+}
+function startTimer(){
+  clearInterval(tick);
+  updateBar();
+  tick=setInterval(()=>{
+    remaining-=0.1;
+    if(remaining<=0){
+      if(phase==="answer"){ phase="grace"; remaining=T_GRACE;
+        $("tfill").className="grace"; $("tphase").innerHTML='<span class="grace">⏳ last chance — lock in!</span>';
+      } else if(phase==="grace"){ clearInterval(tick); timeOut(); return; }
+    }
+    updateBar();
+  },100);
+}
+function updateBar(){
+  const tot = phase==="grace"?T_GRACE:T_MAIN;
+  $("tfill").style.width=Math.max(0,remaining/tot*100)+"%";
+  $("tsecs").textContent=Math.ceil(Math.max(0,remaining))+"s";
+}
+function lockAll(correct,chosen){
+  document.querySelectorAll(".opt").forEach(b=>{
+    b.classList.add("locked");
+    const label=b.querySelector("span:last-child").textContent;
+    if(label===correct) b.classList.add("correct");
+    if(chosen && label===chosen && label!==correct) b.classList.add("wrong");
+  });
+}
+function choose(text,btn){
+  if(selected) return; selected=true; clearInterval(tick);
+  const correct=quiz[idx].a;
+  lockAll(correct,text);
+  if(text===correct){ score++; $("scoreVal").textContent=score;
+    $("verdict").textContent="✓ Correct!"; $("verdict").className="verdict ok";
+  } else {
+    $("verdict").textContent="✗ Answer: "+correct; $("verdict").className="verdict no";
+  }
+  $("tsecs").textContent=""; $("tphase").textContent="";
+  $("nextBtn").style.display="inline-block";
+  $("nextBtn").textContent = idx===N_ASK-1 ? "See score →" : "Next →";
+}
+function timeOut(){
+  if(selected) return; selected=true;
+  lockAll(quiz[idx].a,null);
+  $("tfill").style.width="0%"; $("tsecs").textContent=""; $("tphase").textContent="";
+  $("verdict").textContent="⏰ Time up — answer: "+quiz[idx].a; $("verdict").className="verdict no";
+  setTimeout(()=>{ if(active) next(); }, 1500);
+}
+$("nextBtn").onclick=()=>{ if(active) next(); };
+function next(){
+  clearInterval(tick);
+  if(idx<N_ASK-1){ idx++; render(); } else finish();
+}
+
+// ---- result ----
+function finish(){
+  active=false; clearInterval(tick); clearInterval(factTimer);
+  const pct=score/N_ASK;
+  let em="🎉",title="Nice run!",msg="A solid round of structure.";
+  if(pct===1){em="🏆";title="Perfect spin!";msg="Flawless — you own Unit IV.";}
+  else if(pct>=0.8){em="🌟";title="Excellent!";msg="Strong grasp of structural bioinformatics.";}
+  else if(pct>=0.6){em="👍";title="Good going!";msg="A little revision and you're set.";}
+  else if(pct>=0.4){em="📚";title="Getting there.";msg="Review the four levels and SCOP/CATH, then respin.";}
+  else {em="🌱";title="Keep at it.";msg="Revisit the Unit IV deck and spin again.";}
+  $("rEm").textContent=em; $("rTitle").textContent=title+"  "+name;
+  $("rScore").textContent=score; $("rMsg").textContent=msg;
+  $("rFact").innerHTML="<b>Did you know?</b> "+randFact();
+  show("result");
+}
+$("againBtn").onclick=()=>{ show("spin"); doSpin(); };
+$("newBtn").onclick=resetAll;
+function resetAll(){
+  active=false; clearInterval(tick); clearInterval(factTimer);
+  $("nameInput").value=""; $("nameErr").textContent=""; $("pause").classList.remove("on");
+  show("start"); $("nameInput").focus();
+}
+
+// ---- gentle guards ----
+["contextmenu","copy","cut","selectstart","dragstart"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault()));
+let pausedRemaining=null, pausedPhase=null;
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden && active && !selected){
+    clearInterval(tick); pausedRemaining=remaining; pausedPhase=phase; $("pause").classList.add("on");
+  }
+});
+$("resumeBtn").onclick=()=>{
+  $("pause").classList.remove("on");
+  if(active && !selected && pausedRemaining!=null){ remaining=pausedRemaining; phase=pausedPhase; startTimer(); }
+};
+
+$("nameInput").focus();
+</script>
+</body>
+</html>
