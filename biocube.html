@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioCube — Bioinformatics Rubik's Cube</title>
+<style>
+  :root{--ink:#0B3B3C;--teal:#0E7C7B;--cream:#FBF7EF;--muted:#5B6F6D;--line:#dcd2bf;
+    --c0:#E9724C;--c1:#2E9E6B;--c2:#0E7C7B;--c3:#2F6FB0;--c4:#E8A33A;--c5:#8E5AB0;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% -10%,#14514f,#0B3B3C 60%);color:var(--ink);
+    min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden;}
+  .card{background:var(--cream);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);
+    width:100%;max-width:860px;height:100%;max-height:720px;display:flex;flex-direction:column;overflow:hidden;}
+  /* top bar */
+  .top{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .title{font-size:19px;font-weight:800;color:var(--ink);} .title span{color:var(--teal);}
+  .stat{display:flex;gap:8px;margin-left:auto;}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 12px;text-align:center;min-width:78px;}
+  .chip .k{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;}
+  .chip .v{font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .chip.win .v{color:var(--c1);}
+  /* stage */
+  .stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;perspective:1100px;cursor:grab;min-height:0;}
+  .stage:active{cursor:grabbing;}
+  .cube{position:relative;width:180px;height:180px;transform-style:preserve-3d;transition:transform .12s ease-out;}
+  .face{position:absolute;width:180px;height:180px;transform-style:preserve-3d;display:grid;
+    grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;padding:5px;
+    background:#0B3B3C;border-radius:10px;}
+  .tile{border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+    color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.35);transition:background .25s, transform .25s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+  .win-banner{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:var(--c1);color:#fff;
+    font-weight:800;font-size:15px;padding:9px 20px;border-radius:20px;box-shadow:0 6px 16px rgba(0,0,0,.3);display:none;z-index:20;}
+  /* controls */
+  .controls{border-top:1px solid var(--line);padding:11px 16px;display:flex;flex-direction:column;gap:9px;}
+  .row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;}
+  .row .lbl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-right:2px;}
+  .mv{border:none;border-radius:9px;padding:8px 11px;font-size:13px;font-weight:800;cursor:pointer;color:#fff;min-width:42px;
+    box-shadow:0 3px 7px rgba(0,0,0,.18);transition:transform .06s;}
+  .mv:active{transform:translateY(1px);}
+  .orbit{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none;border-radius:9px;padding:7px 12px;font-size:15px;font-weight:800;cursor:pointer;}
+  .act{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:14px;font-weight:800;cursor:pointer;}
+  .act.ghost{background:transparent;color:var(--teal);border:2px solid var(--teal);}
+  .legend{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;font-size:11px;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:4px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  @media(max-width:640px){.cube,.face{width:150px;height:150px;}.card{max-height:none;}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="title">Bio<span>Cube</span> · match each face</div>
+    <div class="stat">
+      <div class="chip" id="timeChip"><div class="k">Time</div><div class="v" id="time">0.0</div></div>
+      <div class="chip"><div class="k">Moves</div><div class="v" id="moves">0</div></div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="win-banner" id="win">Solved! Every face matched 🎉</div>
+    <div class="cube" id="cube"></div>
+  </div>
+
+  <div class="controls">
+    <div class="row" id="moveRow"><span class="lbl">Turn</span></div>
+    <div class="row">
+      <span class="lbl">Rotate view</span>
+      <button class="orbit" data-o="left">◀</button>
+      <button class="orbit" data-o="up">▲</button>
+      <button class="orbit" data-o="down">▼</button>
+      <button class="orbit" data-o="right">▶</button>
+      <span style="width:14px"></span>
+      <button class="act" id="scramble">Scramble</button>
+      <button class="act ghost" id="reset">Reset</button>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+
+<script>
+// ===== course symbols: one concept per face colour =====
+const CONCEPTS=[
+ {c:"#E9724C",label:"PROT",name:"Protein"},   // 0  (U)
+ {c:"#2E9E6B",label:"GENE",name:"Gene"},       // 1  (D)
+ {c:"#0E7C7B",label:"DNA", name:"DNA"},        // 2  (F)
+ {c:"#2F6FB0",label:"RNA", name:"RNA"},        // 3  (B)
+ {c:"#E8A33A",label:"α-HLX",name:"Helix"},     // 4  (L)
+ {c:"#8E5AB0",label:"TREE",name:"Phylogeny"},  // 5  (R)
+];
+// ===== cube engine (geometry-based, integer coords) =====
+function colorForFace(axis,s){ if(axis===1)return s>0?0:1; if(axis===2)return s>0?2:3; return s>0?5:4; }
+function buildSolved(){
+  const st=[];
+  for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
+    if(x===0&&y===0&&z===0)continue;
+    const c=[x,y,z];
+    for(let a=0;a<3;a++)for(const s of [-1,1]){
+      if(c[a]===s){const n=[0,0,0];n[a]=s;st.push({ctr:[x,y,z],n:n.slice(),col:colorForFace(a,s)});}
+    }
+  }
+  return st; // 54 stickers
+}
+function rot(v,axis,dir){ // dir +1 CW, -1 CCW ; returns new vec
+  const [x,y,z]=v;
+  if(axis===0) return dir>0?[x,-z,y]:[x,z,-y];
+  if(axis===1) return dir>0?[z,y,-x]:[-z,y,x];
+  return dir>0?[-y,x,z]:[y,-x,z];
+}
+function applyMove(st,axis,sign,dir){
+  for(const s of st){ if(s.ctr[axis]===sign){ s.ctr=rot(s.ctr,axis,dir); s.n=rot(s.n,axis,dir); } }
+}
+function isSolved(st){
+  const byDir={}; // key of n -> set of colours
+  for(const s of st){ const k=s.n.join(","); (byDir[k]=byDir[k]||[]).push(s.col); }
+  for(const k in byDir){ const a=byDir[k]; if(a.length!==9)return false; for(const c of a)if(c!==a[0])return false; }
+  return Object.keys(byDir).length===6;
+}
+// ===== faces & rendering =====
+// face key by outward normal; in-plane mapping to row,col
+const FACES=[ // dir vector, and which center axes map to col(u) and row(v) with signs
+ {n:[0,1,0],  u:0,us:1,  v:2,vs:1},  // U (+y)
+ {n:[0,-1,0], u:0,us:1,  v:2,vs:-1}, // D
+ {n:[0,0,1],  u:0,us:1,  v:1,vs:-1}, // F (+z)
+ {n:[0,0,-1], u:0,us:-1, v:1,vs:-1}, // B
+ {n:[-1,0,0], u:2,us:1,  v:1,vs:-1}, // L (-x)
+ {n:[1,0,0],  u:2,us:-1, v:1,vs:-1}, // R
+];
+let stickers=buildSolved();
+const cubeEl=document.getElementById("cube");
+const U=58; // cubie unit for face offset
+const tiles={}; // face index -> array[9] of tile elements
+const FACE_T=[ // css transform per face (matches FACES order)
+ `rotateX(90deg) translateZ(${U*1.5}px)`,
+ `rotateX(-90deg) translateZ(${U*1.5}px)`,
+ `translateZ(${U*1.5}px)`,
+ `rotateY(180deg) translateZ(${U*1.5}px)`,
+ `rotateY(-90deg) translateZ(${U*1.5}px)`,
+ `rotateY(90deg) translateZ(${U*1.5}px)`,
+];
+FACES.forEach((f,fi)=>{
+  const fe=document.createElement("div"); fe.className="face"; fe.style.transform=FACE_T[fi];
+  fe.style.width=U*3+"px"; fe.style.height=U*3+"px";
+  const arr=[];
+  for(let i=0;i<9;i++){ const t=document.createElement("div"); t.className="tile"; fe.appendChild(t); arr.push(t); }
+  tiles[fi]=arr; cubeEl.appendChild(fe);
+});
+function render(){
+  // clear
+  for(let fi=0;fi<6;fi++)for(let i=0;i<9;i++){tiles[fi][i].style.background="#0B3B3C";tiles[fi][i].textContent="";}
+  for(const s of stickers){
+    const fi=FACES.findIndex(f=>f.n[0]===s.n[0]&&f.n[1]===s.n[1]&&f.n[2]===s.n[2]);
+    const f=FACES[fi];
+    const col=s.ctr[f.u]*f.us+1, row=s.ctr[f.v]*f.vs+1;
+    const t=tiles[fi][row*3+col];
+    t.style.background=CONCEPTS[s.col].c; t.textContent=CONCEPTS[s.col].label;
+  }
+}
+// ===== view orbit =====
+let rx=-24, ry=-32;
+function applyView(){ cubeEl.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`; }
+applyView();
+const stage=document.getElementById("stage");
+let drag=null;
+stage.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener("pointermove",e=>{ if(!drag)return; ry+=(e.clientX-drag.x)*0.5; rx-=(e.clientY-drag.y)*0.5; rx=Math.max(-88,Math.min(88,rx)); drag={x:e.clientX,y:e.clientY}; applyView(); });
+stage.addEventListener("pointerup",()=>drag=null);
+stage.addEventListener("pointercancel",()=>drag=null);
+document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const o=b.dataset.o;
+  if(o==="left")ry-=30; if(o==="right")ry+=30; if(o==="up")rx-=30; if(o==="down")rx+=30; rx=Math.max(-88,Math.min(88,rx)); applyView();});
+// ===== timer / moves =====
+let state="idle", moves=0, t0=0, raf=null;
+const timeEl=document.getElementById("time"), movesEl=document.getElementById("moves"), winEl=document.getElementById("win"), timeChip=document.getElementById("timeChip");
+function fmt(ms){ const s=ms/1000; return s<60?s.toFixed(1):Math.floor(s/60)+":"+(s%60).toFixed(1).padStart(4,"0"); }
+function tick(){ timeEl.textContent=fmt(performance.now()-t0); raf=requestAnimationFrame(tick); }
+function startTimer(){ if(state==="running")return; state="running"; t0=performance.now(); tick(); }
+function stopTimer(){ state="done"; if(raf)cancelAnimationFrame(raf); }
+// ===== moves =====
+// face buttons: [label, axis, sign, concept index for colour]
+const BTN=[["F",2,1,2],["B",2,-1,3],["U",1,1,0],["D",1,-1,1],["L",0,-1,4],["R",0,1,5]];
+const moveRow=document.getElementById("moveRow");
+BTN.forEach(([lab,axis,sign,ci])=>{
+  [["",1],["'",-1]].forEach(([suf,dir])=>{
+    const b=document.createElement("button"); b.className="mv"; b.textContent=lab+suf;
+    b.style.background=CONCEPTS[ci].c;
+    b.onclick=()=>doMove(axis,sign,dir);
+    moveRow.appendChild(b);
+  });
+});
+function doMove(axis,sign,dir,silent){
+  applyMove(stickers,axis,sign,dir); render();
+  if(silent)return;
+  if(state==="idle") startTimer();
+  if(state==="running"){ moves++; movesEl.textContent=moves; }
+  if(isSolved(stickers) && state==="running"){ stopTimer(); winEl.style.display="block"; timeChip.classList.add("win"); }
+}
+// ===== scramble / reset =====
+function scramble(){
+  winEl.style.display="none"; timeChip.classList.remove("win");
+  stickers=buildSolved();
+  let last=-1;
+  for(let i=0;i<25;i++){ let m; do{ m=Math.floor(Math.random()*6);}while(m===last); last=m;
+    const [,axis,sign]=BTN[m]; const dir=Math.random()<0.5?1:-1; applyMove(stickers,axis,sign,dir); }
+  render();
+  state="idle"; moves=0; movesEl.textContent="0"; timeEl.textContent="0.0";
+}
+function reset(){
+  winEl.style.display="none"; timeChip.classList.remove("win");
+  if(raf)cancelAnimationFrame(raf);
+  stickers=buildSolved(); render();
+  state="idle"; moves=0; movesEl.textContent="0"; timeEl.textContent="0.0";
+}
+document.getElementById("scramble").onclick=scramble;
+document.getElementById("reset").onclick=reset;
+// legend
+const leg=document.getElementById("legend");
+CONCEPTS.forEach(c=>{const s=document.createElement("span");s.innerHTML=`<i class="sw" style="background:${c.c}"></i>${c.name}`;leg.appendChild(s);});
+// init (solved, timer idle — press Scramble to begin)
+render();
+// prevent scroll/drag selecting
+document.addEventListener("contextmenu",e=>e.preventDefault());
+</script>
+</body>
+</html>
