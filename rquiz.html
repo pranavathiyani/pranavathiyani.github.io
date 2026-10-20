@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit IV Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161616; --red:#C1121F; --red-soft:#FBECEC; --red-line:#E9B8BB;
+    --gray:#5A5A5A; --line:#D8D8D8; --panel:#FFFFFF; --bg:#FAFAFA;
+    --ok:#1E7A46; --ok-soft:#E6F4EC; --warn:#B45309;
+    --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{overflow-x:hidden}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:780px;margin:0 auto;padding:28px 20px 60px}
+  .hidden{display:none !important}
+  .noselect{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+  /* ---------- landing ---------- */
+  .hero{text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--red);font-weight:700;margin:12px 0 6px}
+  h1{font-weight:700;font-size:32px;margin:0 0 10px;letter-spacing:-.01em}
+  .sub{color:var(--gray);margin:0 0 24px;font-size:15.5px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:16px}
+
+  label{display:block;font-size:12px;font-weight:600;color:var(--gray);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  input[type=text]{width:100%;font:400 16px/1.5 var(--body);color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px 14px}
+  input[type=text]:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+
+  /* ---------- compass ---------- */
+  .compass{position:relative;width:260px;height:260px;margin:16px auto;
+    border-radius:50%;background:
+      radial-gradient(circle at center, #fff 56%, #F4F4F4 57% 100%);
+    border:3px solid var(--ink);box-shadow:inset 0 2px 8px rgba(0,0,0,.08)}
+  .mark{position:absolute;left:50%;top:50%;transform-origin:0 0;color:var(--ink);
+    font-weight:700;font-size:13px;font-family:var(--mono)}
+  .needle-wrap{position:absolute;inset:0;display:grid;place-items:center;
+    transform:rotate(0deg);transition:transform 3.2s cubic-bezier(.17,.67,.3,1)}
+  .needle{width:12px;height:200px;position:relative}
+  .needle::before,.needle::after{content:"";position:absolute;left:0;width:12px}
+  .needle::before{top:0;height:100px;background:var(--red);
+    clip-path:polygon(50% 0,100% 100%,0 100%);
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+  .needle::after{bottom:0;height:100px;background:#2a2a2a;
+    clip-path:polygon(0 0,100% 0,50% 100%);
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+  .pivot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:16px;height:16px;border-radius:50%;background:var(--ink);
+    border:3px solid #fff;z-index:3}
+
+  .spinbox{text-align:center;margin:8px 0 4px}
+  .result{min-height:28px;font-size:14px;color:var(--gray);margin-top:10px;text-align:center}
+  .result b{color:var(--red);font-family:var(--mono);font-size:16px;letter-spacing:.08em}
+
+  /* ---------- buttons ---------- */
+  .btn{font:600 15px/1 var(--body);border-radius:10px;padding:14px 24px;cursor:pointer;
+    border:1px solid var(--red);background:var(--red);color:#fff;
+    -webkit-tap-highlight-color:transparent}
+  .btn.ghost{background:#fff;color:var(--red)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn:active:not(:disabled){transform:scale(.98)}
+  .btn:hover:not(:disabled){opacity:.92}
+
+  /* ---------- quiz ---------- */
+  .bar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .prog{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+  .prog span{display:block;height:100%;background:var(--red);width:0;transition:width .3s}
+  .count{font-family:var(--mono);font-size:12.5px;color:var(--gray);white-space:nowrap}
+
+  .timer{position:relative;width:52px;height:52px;flex:none}
+  .timer svg{transform:rotate(-90deg)}
+  .timer circle{fill:none;stroke-width:4}
+  .timer .track{stroke:var(--line)}
+  .timer .arc{stroke:var(--red);stroke-linecap:round;
+    transition:stroke-dashoffset 1s linear, stroke .3s}
+  .timer.low .arc{stroke:var(--warn)}
+  .timer.crit .arc{stroke:var(--red)}
+  .timer b{position:absolute;inset:0;display:grid;place-items:center;
+    font-family:var(--mono);font-size:14px;font-weight:700}
+  .timer.crit b{color:var(--red)}
+
+  .qtext{font-weight:500;font-size:21px;line-height:1.35;margin:0 0 18px;letter-spacing:-.005em}
+  .opts{display:grid;gap:10px}
+  .opt{display:flex;gap:13px;align-items:flex-start;text-align:left;width:100%;
+    background:#fff;border:1px solid var(--line);border-radius:11px;
+    padding:14px 16px;font:400 15.5px/1.45 var(--body);color:var(--ink);
+    cursor:pointer;transition:border-color .12s, background .12s;
+    -webkit-tap-highlight-color:transparent}
+  .opt:hover{border-color:#B9C4CE;background:#FCFDFE}
+  .opt:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+  .opt.sel{border-color:var(--red);background:var(--red-soft)}
+  .opt .ltr{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--gray);
+    border:1px solid var(--line);border-radius:6px;min-width:24px;height:24px;
+    display:grid;place-items:center;flex:none;margin-top:1px}
+  .opt.sel .ltr{border-color:var(--red);color:var(--red)}
+
+  .foot{display:flex;align-items:center;gap:12px;margin-top:18px}
+  .spacer{flex:1}
+  .note{font-size:13px;color:var(--gray)}
+
+  /* ---------- results ---------- */
+  .score{font-weight:700;font-size:64px;line-height:1;margin:0 0 4px;color:var(--ink)}
+  .score small{font-size:22px;color:var(--gray);font-weight:500}
+  .pct{font-size:20px;color:var(--red);font-weight:600;margin:0 0 6px}
+  .verdict{color:var(--gray);font-size:15px}
+
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 24px}
+  .pill{font-size:13px;background:var(--red-soft);color:var(--red);
+    border-radius:20px;padding:6px 13px;font-weight:600}
+
+  h2.sect{font-size:14px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--red);font-weight:700;margin:28px 0 12px}
+
+  .rev{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:9px;background:#fff}
+  .rev.ok{border-left:3px solid var(--ok)}
+  .rev.no{border-left:3px solid var(--red)}
+  .rev .rq{font-weight:600;margin-bottom:8px}
+  .rev .ra{font-size:14px;margin:4px 0;display:flex;gap:6px;align-items:baseline}
+  .rev .ra .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--gray);flex:none;min-width:50px}
+  .tick{color:var(--ok);font-weight:600}
+  .cross{color:var(--red);font-weight:600}
+
+  @media(max-width:600px){
+    .compass{width:220px;height:220px}
+    .needle{height:170px}
+    .needle::before,.needle::after{height:85px}
+    h1{font-size:26px}
+    .qtext{font-size:18px}
+    .score{font-size:52px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===================== LANDING ===================== -->
+<section id="landing">
+  <div class="hero noselect">
+    <p class="eyebrow">INT411 . Unit IV</p>
+    <h1>R, Hadoop &amp; Machine Learning</h1>
+    <p class="sub">30 questions. 25 seconds each. Spin the compass to pick your path.</p>
+  </div>
+
+  <div class="card">
+    <label for="sName">Your name</label>
+    <input id="sName" type="text" placeholder="Type your name" autocomplete="off">
+  </div>
+
+  <div class="card noselect">
+    <div class="compass" id="compass">
+      <div class="needle-wrap" id="needleWrap"><div class="needle"></div></div>
+      <div class="pivot"></div>
+    </div>
+    <div class="spinbox">
+      <button class="btn ghost" id="spinBtn">Spin the compass</button>
+    </div>
+    <div class="result" id="direction">Spin to reveal your direction.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:18px">
+    <button class="btn" id="startBtn" disabled>Start quiz</button>
+    <p class="note" style="margin-top:10px">You will see your score and all correct answers at the end.</p>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="quiz" class="hidden">
+  <div class="bar">
+    <div class="timer" id="timer">
+      <svg width="52" height="52">
+        <circle class="track" cx="26" cy="26" r="22"></circle>
+        <circle class="arc" id="arc" cx="26" cy="26" r="22"></circle>
+      </svg>
+      <b id="secs">25</b>
+    </div>
+    <div class="prog"><span id="prog"></span></div>
+    <div class="count" id="count">1 / 30</div>
+  </div>
+
+  <div class="card">
+    <h2 class="qtext" id="qtext"></h2>
+    <div class="opts" id="opts"></div>
+    <div class="foot">
+      <span class="note" id="hint">Pick one. No feedback until the end.</span>
+      <span class="spacer"></span>
+      <button class="btn" id="next" disabled>Next</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTS ===================== -->
+<section id="result" class="hidden">
+  <div style="text-align:center">
+    <p class="eyebrow noselect">Done</p>
+    <p class="score"><span id="sc">0</span><small>/30</small></p>
+    <p class="pct" id="pct"></p>
+    <p class="verdict" id="verdict"></p>
+    <div class="meta noselect">
+      <span class="pill" id="pName"></span>
+      <span class="pill" id="pDir"></span>
+    </div>
+  </div>
+
+  <h2 class="sect noselect">Every question, with the correct answer</h2>
+  <div id="review"></div>
+
+  <div style="margin-top:28px;text-align:center">
+    <button class="btn ghost" id="again">Spin and go again</button>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ============== QUESTION BANK (~45 Qs; 30 picked at random) ============== */
+const BANK = [
+  // R fundamentals
+  {q:"R loads data primarily into...", o:["Memory (RAM)","Disk","The cloud","A database"], a:0},
+  {q:"c(1, 2, 3) in R creates a...", o:["List","Vector","Matrix","Data frame"], a:1},
+  {q:"How many CPU cores does R use by default?", o:["One","Two","All available","Depends on the data"], a:0},
+  {q:"Which object type holds a table with named columns of possibly different types?", o:["vector","matrix","data frame","array"], a:2},
+  {q:"Which package is the standard for plotting in R?", o:["ggplot2","matplotlib","plot9","seaborn"], a:0},
+  {q:"Which function reads a CSV file in base R?", o:["read.table()","read.csv()","read_csv()","load.csv()"], a:1},
+  {q:"The pipe operator in dplyr is written as...", o:["|>","-->","%>%","::"], a:2},
+  {q:"To add a new column to a data frame in dplyr, which verb do you use?", o:["filter()","select()","mutate()","summarise()"], a:2},
+  {q:"Which dplyr verb keeps only rows matching a condition?", o:["filter()","select()","mutate()","arrange()"], a:0},
+  {q:"The main memory limitation of R is that...", o:["Objects must fit in RAM","Files must be under 1 GB","It needs a server","It cannot read binary data"], a:0},
+
+  // R + Hadoop integrations
+  {q:"Which R + Hadoop approach lets any R script serve as a mapper?", o:["RHIPE","RHadoop","Hadoop Streaming","SparkR"], a:2},
+  {q:"RHIPE stands for...", o:["R Hadoop Integrated Pipeline Engine","R and Hadoop Integrated Programming Environment","Rapid Hadoop Interface for Parallel Execution","R and Hive Pipeline Environment"], a:1},
+  {q:"Which R + Hadoop integration is generally considered the friendliest for beginners?", o:["Streaming","RHIPE","RHadoop","Hive"], a:2},
+  {q:"The main RHadoop package for writing MapReduce jobs in R is...", o:["rhdfs","rhbase","rmr2","plyrmr"], a:2},
+  {q:"Hadoop Streaming communicates with mapper and reducer programs through...", o:["TCP sockets","stdin and stdout","HDFS files","REST APIs"], a:1},
+  {q:"The chief downside of Hadoop Streaming for R is...", o:["It cannot run on a cluster","Text serialisation makes it slow for numbers","It only works with Python","It needs a GPU"], a:1},
+  {q:"RHIPE's advantage over Streaming is that it...", o:["Runs faster on one machine","Passes native R objects through MapReduce","Works without Hadoop","Uses GPUs"], a:1},
+  {q:"The RHadoop package rhdfs is used for...", o:["Reading and writing HDFS from R","Running SVMs","Rendering plots","Compressing files"], a:0},
+  {q:"The honest limitation of RHIPE today is that it is...", o:["No longer open source","Not actively maintained","Only for Python","Removed from CRAN"], a:1},
+  {q:"The modern Spark R interfaces that largely replace RHIPE and RHadoop are...", o:["sparklyr and SparkR","dplyr and tidyr","shiny and plumber","caret and mlr"], a:0},
+  {q:"All three R + Hadoop integrations ultimately share which underlying model?", o:["Relational SQL","map, shuffle, reduce","Deep learning","Graph pattern matching"], a:1},
+  {q:"The 'client-side' part of RHadoop refers to...", o:["Code running in your R session that submits jobs","The cluster's web interface","HDFS block replicas","The JVM"], a:0},
+
+  // Machine Learning
+  {q:"In machine learning, a 'feature' is...", o:["A measurable property of one example","The algorithm itself","The correct answer","A library name"], a:0},
+  {q:"In machine learning, a 'label' is...", o:["The algorithm's name","The correct answer attached to a training example","A metric","A plotting style"], a:1},
+  {q:"The 'training set' is...", o:["Held-out data for scoring","The data the model learns from","Metadata only","The test set"], a:1},
+  {q:"The 'test set' should be...", o:["Used during training","Seen only after training to measure generalisation","Larger than the training set","The same as training"], a:1},
+  {q:"Supervised learning requires...", o:["Only inputs","Only outputs","Labeled examples (inputs and outputs)","No data"], a:2},
+
+  // Perceptron
+  {q:"The perceptron is the ancestor of modern...", o:["Random forests","Neural networks","Decision trees","Clustering"], a:1},
+  {q:"A single perceptron can only separate classes that are...", o:["Normally distributed","Linearly separable","Balanced in size","Numeric"], a:1},
+  {q:"The classic failure case for a single-layer perceptron is...", o:["AND gate","OR gate","XOR gate","NAND gate"], a:2},
+  {q:"When does a perceptron update its weights?", o:["Every example","Only after a wrong prediction","Only after a correct prediction","Only at the end of an epoch"], a:1},
+  {q:"In the update w = w + eta * y * x, the symbol eta represents the...", o:["Bias","Learning rate","Label","Input vector"], a:1},
+  {q:"The prediction rule of a perceptron is...", o:["mean of inputs","sign of (w . x + b)","max of inputs","sum of absolute values"], a:1},
+  {q:"If a perceptron scores exactly 0 for a point with true label +1, the convention is to treat it as...", o:["A correct prediction","A mistake","Not a data point","To skip it"], a:1},
+  {q:"Stacking perceptrons in layers gives you...", o:["A support vector machine","A decision tree","A neural network","A kernel method"], a:2},
+
+  // SVM
+  {q:"SVM stands for...", o:["Statistical Vector Model","Support Vector Machine","Shortest Vector Method","Standard Variance Model"], a:1},
+  {q:"An SVM finds the separating line that...", o:["Passes through the mean","Maximises the margin between classes","Is parallel to one axis","Minimises the number of points"], a:1},
+  {q:"The 'margin' in an SVM is...", o:["The error on test data","The gap between the two classes","The number of features","The learning rate"], a:1},
+  {q:"'Support vectors' are...", o:["All training points","The points closest to the decision boundary","The output predictions","The weight vector"], a:1},
+  {q:"The 'kernel trick' allows an SVM to...", o:["Train without data","Learn curved decision boundaries","Compress models","Skip the test set"], a:1},
+  {q:"A commonly used SVM kernel is...", o:["Linear, polynomial, RBF","Sigmoid-only","Tree-based","GPU-only"], a:0},
+  {q:"If you remove a training point that is NOT a support vector, the SVM decision line will...", o:["Change significantly","Not change","Rotate 90 degrees","Become undefined"], a:1},
+  {q:"SVMs often work well in bioinformatics because they handle...", o:["Only tiny datasets","Many features with relatively few samples","Only numeric data","Text data best"], a:1},
+  {q:"The common R package used to fit SVMs is...", o:["e1071","ggplot2","dplyr","MASS"], a:0},
+  {q:"A linear-kernel SVM is conceptually similar to a perceptron, except it also...", o:["Uses random weights","Maximises the margin","Needs no training","Only works in 1D"], a:1},
+  {q:"The widest-margin solution matters because it...", o:["Trains faster","Generalises better to new data","Uses less memory","Needs fewer features"], a:1},
+];
+
+/* ================= utility: shuffle ================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ================= state ================= */
+const QN = 30;              // number of questions picked
+const LIMIT = 25;           // seconds per question
+let picked = [];            // 30 questions, with shuffled options
+let answers = [];           // user answers (index into shuffled options)
+let i = 0;
+let picked_dir = "";
+let user_name = "";
+let tick = null;
+let left = LIMIT;
+const R = 22, CIRC = 2 * Math.PI * R;
+
+const $ = id => document.getElementById(id);
+$("arc").style.strokeDasharray = CIRC;
+
+/* ================= compass ================= */
+const DIRECTIONS = ["N","NE","E","SE","S","SW","W","NW"];
+let spun = false;
+
+// place N/E/S/W marks around compass
+(function placeMarks() {
+  const c = $("compass");
+  const r = 115;  // px from center
+  ["N","E","S","W"].forEach((d, k) => {
+    const angle = k * 90 * Math.PI / 180;   // 0, 90, 180, 270
+    const x =  r * Math.sin(angle);
+    const y = -r * Math.cos(angle);
+    const span = document.createElement("div");
+    span.className = "mark";
+    span.textContent = d;
+    span.style.transform = `translate(${x - 6}px, ${y - 8}px)`;
+    c.appendChild(span);
+  });
+})();
+
+$("spinBtn").addEventListener("click", () => {
+  if (spun) return;
+  spun = true;
+  $("spinBtn").disabled = true;
+  // large random angle (ensures many rotations)
+  const extra = Math.floor(Math.random() * 360);
+  const rot = 1800 + extra;   // 5+ full turns then land
+  $("needleWrap").style.transform = `rotate(${rot}deg)`;
+  // snap-landing resolves to the nearest of 8 directions
+  const final = (extra + Math.round(Math.random() * 10)) % 360;
+  const idx = Math.round(final / 45) % 8;
+  picked_dir = DIRECTIONS[idx];
+  setTimeout(() => {
+    $("direction").innerHTML = `Your direction: <b>${picked_dir}</b>. Your path is ready.`;
+    $("startBtn").disabled = !user_name.trim();
+    if (!user_name.trim()) $("sName").focus();
+  }, 3200);
+});
+
+$("sName").addEventListener("input", e => {
+  user_name = e.target.value;
+  $("startBtn").disabled = !(spun && user_name.trim());
+});
+
+$("startBtn").addEventListener("click", () => {
+  if (!spun || !user_name.trim()) return;
+  startQuiz();
+});
+
+/* ================= quiz engine ================= */
+function startQuiz() {
+  picked = shuffle(BANK).slice(0, QN).map(q => {
+    const idxs = shuffle([0, 1, 2, 3]);
+    return {
+      q: q.q,
+      opts: idxs.map(k => q.o[k]),
+      correct: idxs.indexOf(q.a)
+    };
+  });
+  answers = new Array(QN).fill(null);
+  i = 0;
+  $("landing").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+}
+
+function render() {
+  const q = picked[i];
+  $("count").textContent = `${i + 1} / ${QN}`;
+  $("prog").style.width = (i / QN * 100) + "%";
+  $("qtext").textContent = q.q;
+  $("next").disabled = true;
+  $("next").textContent = i === QN - 1 ? "Finish" : "Next";
+  $("hint").textContent = "Pick one. No feedback until the end.";
+
+  const box = $("opts"); box.innerHTML = "";
+  q.opts.forEach((t, k) => {
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.innerHTML = `<span class="ltr">${"ABCD"[k]}</span><span>${t}</span>`;
+    btn.onclick = () => {
+      answers[i] = k;
+      [...box.children].forEach((c, m) => c.classList.toggle("sel", m === k));
+      $("next").disabled = false;
+      $("hint").textContent = "You can still change it. Or press Next.";
+    };
+    box.appendChild(btn);
+  });
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(tick);
+  left = LIMIT;
+  paint();
+  tick = setInterval(() => {
+    left--;
+    paint();
+    if (left <= 0) {
+      clearInterval(tick);
+      advance();
+    }
+  }, 1000);
+}
+
+function paint() {
+  $("secs").textContent = left;
+  $("arc").style.strokeDashoffset = CIRC * (1 - left / LIMIT);
+  const t = $("timer");
+  t.classList.toggle("low", left <= 10 && left > 5);
+  t.classList.toggle("crit", left <= 5);
+}
+
+function advance() {
+  i++;
+  if (i >= QN) { finish(); return; }
+  render();
+}
+
+$("next").addEventListener("click", () => {
+  clearInterval(tick);
+  advance();
+});
+
+/* ================= results ================= */
+function finish() {
+  clearInterval(tick);
+  $("quiz").classList.add("hidden");
+  $("result").classList.remove("hidden");
+  window.scrollTo({ top: 0 });
+
+  let score = 0;
+  picked.forEach((q, k) => { if (answers[k] === q.correct) score++; });
+  const pct = Math.round(score / QN * 100);
+
+  $("sc").textContent = score;
+  $("pct").textContent = pct + "%";
+  $("verdict").textContent =
+    pct >= 80 ? "Strong grasp of Unit IV. Can explain, not just recall." :
+    pct >= 55 ? "Solid baseline with clear gaps. Review the misses below." :
+    "A useful starting point. The explanations below are your revision list.";
+
+  $("pName").textContent = user_name;
+  $("pDir").textContent = "Direction " + picked_dir;
+
+  const rv = $("review"); rv.innerHTML = "";
+  picked.forEach((q, k) => {
+    const ok = answers[k] === q.correct;
+    const yours = answers[k] === null ? "<span class='cross'>ran out of time</span>" : q.opts[answers[k]];
+    const d = document.createElement("div");
+    d.className = "rev " + (ok ? "ok" : "no");
+    d.innerHTML =
+      `<div class="rq">${k + 1}. ${q.q}</div>` +
+      `<div class="ra"><span class="k">You</span>${ok ? '<span class="tick">&#10003;&nbsp;</span>' : ''}${yours}</div>` +
+      (ok ? "" : `<div class="ra"><span class="k">Answer</span><span class="tick">${q.opts[q.correct]}</span></div>`);
+    rv.appendChild(d);
+  });
+}
+
+$("again").addEventListener("click", () => {
+  // reset for another spin
+  spun = false;
+  picked_dir = "";
+  $("needleWrap").style.transition = "none";
+  $("needleWrap").style.transform = "rotate(0deg)";
+  // force reflow then restore transition
+  void $("needleWrap").offsetHeight;
+  $("needleWrap").style.transition = "transform 3.2s cubic-bezier(.17,.67,.3,1)";
+  $("spinBtn").disabled = false;
+  $("direction").textContent = "Spin to reveal your direction.";
+  $("startBtn").disabled = true;
+  $("result").classList.add("hidden");
+  $("landing").classList.remove("hidden");
+  window.scrollTo({ top: 0 });
+});
+</script>
+</body>
+</html>
