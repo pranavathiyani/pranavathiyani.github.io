@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>INT411 - Big Data Analytics Challenge</title>
+<style>
+  :root {
+    --red: #C1121F;
+    --red-dark: #8E0E17;
+    --black: #111;
+    --grey: #555;
+    --light: #f7f7f7;
+    --border: #ddd;
+    --green: #1e8449;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #fff;
+    color: var(--black);
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  .screen {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    min-height: 100vh;
+  }
+  .hidden { display: none !important; }
+
+  /* ---------- LANDING ---------- */
+  .brand {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .brand h1 {
+    font-size: 2.1em;
+    color: var(--red);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .brand .sub {
+    color: var(--grey);
+    font-size: 0.95em;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: #fff;
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    padding: 24px 22px;
+    margin-top: 20px;
+    box-shadow: 6px 6px 0 var(--red);
+  }
+  .card h2 {
+    font-size: 1.3em;
+    margin-bottom: 14px;
+  }
+  .field {
+    margin-bottom: 16px;
+  }
+  .field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95em;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1.05em;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--red);
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--red);
+    color: #fff;
+    padding: 14px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+
+  .rules {
+    background: var(--light);
+    border-left: 4px solid var(--red);
+    padding: 14px 16px;
+    margin-top: 16px;
+    font-size: 0.92em;
+  }
+  .rules h3 { font-size: 0.95em; margin-bottom: 8px; }
+  .rules ul { margin-left: 20px; }
+  .rules li { margin-bottom: 4px; }
+
+  /* ---------- QUIZ ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--black);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.9em;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .topbar .chip {
+    background: var(--red);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85em;
+  }
+  .topbar .score { font-weight: 600; }
+  .topbar .streak { color: #ffcf33; font-weight: 600; }
+
+  .progress-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .timer-ring {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .timer-circle {
+    width: 68px;
+    height: 68px;
+    position: relative;
+  }
+  .timer-circle svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+  .timer-circle .track {
+    stroke: #eee;
+    stroke-width: 6;
+    fill: none;
+  }
+  .timer-circle .fill {
+    stroke: var(--red);
+    stroke-width: 6;
+    fill: none;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+  }
+  .timer-circle .num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: var(--black);
+  }
+  .timer-circle.warn .fill { stroke: #ff8800; }
+  .timer-circle.danger .fill { stroke: var(--red); }
+  .timer-circle.danger .num { color: var(--red); }
+
+  .q-card {
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    padding: 20px;
+    background: #fff;
+  }
+  .q-type-tag {
+    display: inline-block;
+    background: var(--black);
+    color: #fff;
+    font-size: 0.72em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .q-type-tag.numeric { background: var(--red); }
+  .q-text {
+    font-size: 1.05em;
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .q-text code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.95em;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt {
+    background: #fff;
+    border: 2px solid var(--border);
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 1em;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt:hover { border-color: var(--black); background: #fafafa; }
+  .opt .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--black);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85em;
+    flex-shrink: 0;
+  }
+  .opt.selected {
+    background: #f0f0f0;
+    border-color: var(--black);
+  }
+  .opt.selected .letter { background: var(--red); }
+  .opt:disabled { cursor: default; opacity: 0.9; }
+
+  .numeric-input {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.3em;
+    font-family: 'Consolas', monospace;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .numeric-input:focus {
+    outline: none;
+    border-color: var(--red);
+  }
+  .numeric-input.locked {
+    border-color: var(--black);
+    background: #f0f0f0;
+  }
+  .btn-submit-num {
+    width: 100%;
+    background: var(--black);
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+  }
+
+  .feedback {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 14px;
+    min-height: 28px;
+  }
+  .feedback.correct { color: var(--green); }
+  .feedback.wrong { color: var(--red); }
+
+  /* ---------- RESULT ---------- */
+  .result-hero {
+    text-align: center;
+    padding: 30px 10px 10px;
+  }
+  .result-hero .score-big {
+    font-size: 4em;
+    font-weight: 800;
+    color: var(--red);
+    line-height: 1;
+    margin: 10px 0 4px;
+  }
+  .result-hero .score-of {
+    color: var(--grey);
+    font-size: 1em;
+  }
+  .result-hero .rank {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 20px;
+    background: var(--black);
+    color: #fff;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95em;
+  }
+  .result-card {
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    background: #fff;
+  }
+  .result-card h3 {
+    font-size: 1em;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95em;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .lbl { color: var(--grey); }
+  .result-row .val { font-weight: 600; }
+  .verify-code {
+    text-align: center;
+    font-family: 'Consolas', monospace;
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 4px;
+    padding: 14px;
+    background: #fafafa;
+    border: 2px dashed var(--red);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  .screenshot-note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 14px 16px;
+    margin-top: 20px;
+    font-size: 0.95em;
+    border-radius: 4px;
+  }
+  .screenshot-note strong { color: var(--red); }
+
+  .unit-breakdown {
+    margin-top: 12px;
+  }
+  .unit-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+  }
+  .unit-row .u-label {
+    width: 70px;
+    font-weight: 600;
+  }
+  .unit-row .u-bar {
+    flex: 1;
+    height: 10px;
+    background: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .unit-row .u-fill {
+    height: 100%;
+    background: var(--red);
+  }
+  .unit-row .u-score {
+    font-weight: 600;
+    width: 50px;
+    text-align: right;
+    font-size: 0.9em;
+  }
+
+  /* confetti */
+  /* review */
+  .review-item {
+    border-top: 1px solid #eee;
+    padding: 10px 0;
+    font-size: 0.9em;
+  }
+  .review-item:first-child { border-top: none; }
+  .review-item .r-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .review-item .r-badge {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 22px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8em;
+    flex-shrink: 0;
+  }
+  .review-item .r-badge.ok { background: var(--green); }
+  .review-item .r-badge.no { background: var(--red); }
+  .review-item .r-qtext {
+    color: var(--grey);
+    font-size: 0.88em;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .review-item .r-ans {
+    font-size: 0.85em;
+    margin-top: 2px;
+  }
+  .review-item .r-ans .yours { color: var(--grey); }
+  .review-item .r-ans .theirs { color: var(--green); font-weight: 600; }
+  .review-item .r-ans .wrong-ans { color: var(--red); font-weight: 600; }
+  .btn-toggle {
+    width: 100%;
+    background: var(--black);
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .confetti {
+    position: fixed;
+    top: -10px;
+    width: 10px;
+    height: 14px;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @media (max-width: 600px) {
+    .brand h1 { font-size: 1.7em; }
+    .q-text { font-size: 1em; }
+    .result-hero .score-big { font-size: 3em; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LANDING SCREEN ========== -->
+<div id="landing" class="screen">
+  <div class="brand">
+    <h1>INT411 Challenge</h1>
+    <div class="sub">Big Data Analytics in Bioinformatics &amp; Healthcare</div>
+  </div>
+
+  <div class="card">
+    <h2>Enter the arena</h2>
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="in-name" placeholder="e.g. R. Priya" autocomplete="off" required>
+    </div>
+    <div class="field">
+      <label>Registration Number</label>
+      <input type="text" id="in-regno" placeholder="e.g. 127109023" autocomplete="off" required>
+    </div>
+    <button class="btn-primary" id="btn-start">Start Challenge</button>
+
+    <div class="rules">
+      <h3>Rules</h3>
+      <ul>
+        <li>40 questions across all 4 units (32 MCQ + 8 numeric).</li>
+        <li>35 seconds per MCQ. 60 seconds per numeric question (you may use your phone calculator).</li>
+        <li>Each student gets a unique question order and unique numeric values. Copying from a neighbour will not help.</li>
+        <li>Correct answer = +1 point. Streaks give bonus points (every 5 in a row = +3). You will NOT see your score during the quiz.</li>
+        <li>No correct/wrong feedback is shown per question. All answers are revealed only at the end.</li>
+        <li>At the end, screenshot the score card and upload to Google Classroom.</li>
+        <li>No going back. Choose carefully.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== INTRO / PERSONALISED ========== -->
+<div id="intro" class="screen hidden">
+  <div class="card">
+    <h2 id="intro-greeting">Welcome.</h2>
+    <p id="intro-story" style="margin-top: 12px; line-height: 1.6;"></p>
+    <div style="margin-top: 20px;">
+      <div class="result-row"><span class="lbl">Your spirit tool</span><span class="val" id="intro-tool">-</span></div>
+      <div class="result-row"><span class="lbl">Your pathogen</span><span class="val" id="intro-pathogen">-</span></div>
+      <div class="result-row"><span class="lbl">Questions</span><span class="val">40</span></div>
+      <div class="result-row"><span class="lbl">Time per Q</span><span class="val">35 s</span></div>
+    </div>
+    <button class="btn-primary" id="btn-begin" style="margin-top: 20px;">Begin</button>
+  </div>
+</div>
+
+<!-- ========== QUIZ SCREEN ========== -->
+<div id="quiz" class="screen hidden">
+  <div class="topbar">
+    <span class="chip" id="q-unit">Unit I</span>
+    <span id="q-counter">Q 1 / 40</span>
+    <span id="q-answered">Answered: 0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="q-progress"></div></div>
+
+  <div class="timer-ring">
+    <div class="timer-circle" id="timer">
+      <svg viewBox="0 0 60 60">
+        <circle class="track" cx="30" cy="30" r="26"></circle>
+        <circle class="fill" id="timer-fill" cx="30" cy="30" r="26"
+                stroke-dasharray="163.4" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="num" id="timer-num">35</div>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <span class="q-type-tag" id="q-type">MCQ</span>
+    <div class="q-text" id="q-text">Loading...</div>
+    <div id="q-options" class="options"></div>
+    <div id="q-numeric" class="hidden">
+      <input type="text" class="numeric-input" id="num-input" inputmode="decimal" placeholder="Your answer">
+      <button class="btn-submit-num" id="btn-num-submit">Submit answer</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+</div>
+
+<!-- ========== RESULT SCREEN ========== -->
+<div id="result" class="screen hidden">
+  <div class="result-hero">
+    <div style="font-size: 1em; color: var(--grey);">Final score</div>
+    <div class="score-big" id="res-score">0</div>
+    <div class="score-of">out of 40 (+ streak bonus)</div>
+    <div class="rank" id="res-rank">Explorer</div>
+  </div>
+
+  <div class="result-card">
+    <h3>Student</h3>
+    <div class="result-row"><span class="lbl">Name</span><span class="val" id="res-name">-</span></div>
+    <div class="result-row"><span class="lbl">Reg No</span><span class="val" id="res-regno">-</span></div>
+    <div class="result-row"><span class="lbl">Date</span><span class="val" id="res-date">-</span></div>
+    <div class="result-row"><span class="lbl">Correct answers</span><span class="val" id="res-correct">-</span></div>
+    <div class="result-row"><span class="lbl">Streak bonus</span><span class="val" id="res-bonus">-</span></div>
+    <div class="result-row"><span class="lbl">Time taken</span><span class="val" id="res-time">-</span></div>
+  </div>
+
+  <div class="result-card">
+    <h3>Unit-wise breakdown</h3>
+    <div class="unit-breakdown" id="res-units"></div>
+  </div>
+
+  <div class="result-card">
+    <h3>Verification code</h3>
+    <div class="verify-code" id="res-hash">------</div>
+    <p style="margin-top: 10px; font-size: 0.85em; color: var(--grey); text-align: center;">
+      This code is unique to your reg number and your answers. Fake screenshots will not match.
+    </p>
+  </div>
+
+  <div class="screenshot-note">
+    <strong>Next step:</strong> Take a full screenshot of this page (score + verification code + unit breakdown) and upload it to Google Classroom under the INT411 Challenge assignment.
+  </div>
+
+  <div class="result-card">
+    <h3>Answer review</h3>
+    <button class="btn-toggle" id="btn-toggle-review">Show full answer review</button>
+    <div id="res-review" class="hidden" style="margin-top: 12px;"></div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SEEDED PRNG (mulberry32) + hash
+// =====================================================================
+function strHash(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
+  return h >>> 0;
+}
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = a;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shuffle(arr, rng) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pick(arr, rng) { return arr[Math.floor(rng() * arr.length)]; }
+
+// =====================================================================
+// QUESTION BANK
+// =====================================================================
+// unit: I, II, III, IV
+// type: mcq | numeric
+// For mcq: options[0] is always the correct one; we shuffle at display time.
+// For numeric: fn(seed) returns {text, answer, tolerance}
+const BANK = [
+  // ---------------- UNIT I ----------------
+  { u: 'I', type: 'mcq',
+    q: "Which of the following is NOT one of the 4 Vs of big data?",
+    opts: ["Validity", "Volume", "Velocity", "Variety"] },
+  { u: 'I', type: 'mcq',
+    q: "In Hadoop MapReduce, the Mapper outputs:",
+    opts: ["Key-value pairs", "Raw file chunks", "SQL rows", "Compressed blocks only"] },
+  { u: 'I', type: 'numeric',
+    build: (rng) => {
+      const sizes = [30, 50, 80, 100, 120, 150];
+      const x = sizes[Math.floor(rng()*sizes.length)];
+      return {
+        q: `A genomic dataset of size <code>${x} GB</code> is stored in HDFS with the default replication factor of 3. What is the total storage required (in GB)?`,
+        answer: x * 3,
+        tolerance: 0
+      };
+    }
+  },
+  { u: 'I', type: 'mcq',
+    q: "HDFS default block size in Hadoop 2.x and later is:",
+    opts: ["128 MB", "32 MB", "64 MB", "256 MB"] },
+  { u: 'I', type: 'numeric',
+    build: (rng) => {
+      const sizes = [300, 400, 500, 600, 700, 800, 900, 1000];
+      const x = sizes[Math.floor(rng()*sizes.length)];
+      return {
+        q: `A FASTQ file of size <code>${x} MB</code> is stored in HDFS with the default 128 MB block size. How many blocks are needed?`,
+        answer: Math.ceil(x / 128),
+        tolerance: 0
+      };
+    }
+  },
+  { u: 'I', type: 'mcq',
+    q: "Which Hadoop component manages HDFS metadata (file names, block locations)?",
+    opts: ["NameNode", "DataNode", "JobTracker", "ResourceManager"] },
+  { u: 'I', type: 'mcq',
+    q: "YARN stands for:",
+    opts: ["Yet Another Resource Negotiator", "Yearly Analysis Reduce Network",
+           "Yielded Allocation Request Node", "Yarn Advanced Resource Node"] },
+  { u: 'I', type: 'mcq',
+    q: "Which of the following is NOT a NoSQL database category?",
+    opts: ["Relational store", "Document store", "Key-value store", "Column-family store"] },
+  { u: 'I', type: 'mcq',
+    q: "In MapReduce, the shuffle phase:",
+    opts: ["Groups mapper output by key and routes to reducers",
+           "Writes final output to HDFS",
+           "Deletes intermediate data",
+           "Only compresses data on disk"] },
+  { u: 'I', type: 'mcq',
+    q: "Big data velocity refers to:",
+    opts: ["Speed at which data is generated and must be processed",
+           "Accuracy of the data",
+           "Variety of formats",
+           "Compression ratio achievable"] },
+
+  // ---------------- UNIT II ----------------
+  { u: 'II', type: 'mcq',
+    q: "iRODS is primarily used in genomics for:",
+    opts: ["Data management, versioning, and policy-based storage",
+           "Short-read alignment",
+           "Variant calling",
+           "Phylogenetic tree visualization"] },
+  { u: 'II', type: 'mcq',
+    q: "The Aspera FASP protocol achieves high-speed genomic data transfer by:",
+    opts: ["Running over UDP with its own congestion control",
+           "Using HTTP compression on TCP",
+           "Caching data at CDN edges",
+           "Multiplexing SSH sessions"] },
+  { u: 'II', type: 'numeric',
+    build: (rng) => {
+      const Xs = [30, 50, 60, 80, 100];
+      const Ls = [100, 150];
+      const Gs = [3, 4, 5];
+      const X = Xs[Math.floor(rng()*Xs.length)];
+      const L = Ls[Math.floor(rng()*Ls.length)];
+      const G = Gs[Math.floor(rng()*Gs.length)];
+      const cov = Math.round((X * L) / G * 10) / 10;
+      return {
+        q: `A sequencing run produces <code>${X}</code> million reads of <code>${L} bp</code> each from a <code>${G} Mb</code> genome. Mean coverage = ? (round to 1 decimal)`,
+        answer: cov,
+        tolerance: 0.5
+      };
+    }
+  },
+  { u: 'II', type: 'mcq',
+    q: "The BAM file format is the binary compressed version of:",
+    opts: ["SAM", "FASTA", "FASTQ", "VCF"] },
+  { u: 'II', type: 'numeric',
+    build: (rng) => {
+      // clean power-of-2 ratios so log2 is an integer (2, 3, or 4)
+      const pairs = [
+        [10, 40], [20, 80], [25, 100], [50, 200], [40, 160],  // 4x -> log2 = 2
+        [10, 80], [20, 160], [25, 200], [40, 320], [50, 400], // 8x -> log2 = 3
+        [10, 160], [20, 320], [25, 400], [15, 240]            // 16x -> log2 = 4
+      ];
+      const [C, T] = pairs[Math.floor(rng() * pairs.length)];
+      const lfc = Math.log2(T / C); // integer
+      return {
+        q: `A gene has control expression of <code>${C} TPM</code> and treated expression of <code>${T} TPM</code>. Compute log<sub>2</sub> fold change (treated vs control). Enter as a whole number.`,
+        answer: lfc,
+        tolerance: 0.1
+      };
+    }
+  },
+  { u: 'II', type: 'mcq',
+    q: "Standard tools for differential expression from RNA-seq counts include:",
+    opts: ["DESeq2 and edgeR", "BLAST and BWA", "Clustal and MUSCLE", "VMD and GROMACS"] },
+  { u: 'II', type: 'mcq',
+    q: "Which of these is NOT a core challenge of genomic big data?",
+    opts: ["Processing cost is negligible",
+           "Volume (TB per centre per day)",
+           "Transfer bottlenecks",
+           "Standardization across formats"] },
+  { u: 'II', type: 'mcq',
+    q: "Hadoop is applied to genomic data analysis chiefly because:",
+    opts: ["It parallelises read processing across many nodes",
+           "It replaces the FASTQ format",
+           "It acts as a sequence aligner",
+           "It compresses reads better than gzip"] },
+  { u: 'II', type: 'mcq',
+    q: "Torrent-seeding for genomic data distribution helps mainly because:",
+    opts: ["Peer-to-peer sharing distributes upload bandwidth across many peers",
+           "It encrypts files automatically",
+           "It is centralized at one server",
+           "It compresses better than gzip"] },
+  { u: 'II', type: 'mcq',
+    q: "Which file format is used to store variant calls (SNPs, indels)?",
+    opts: ["VCF", "BAM", "FASTQ", "BED"] },
+
+  // ---------------- UNIT III ----------------
+  { u: 'III', type: 'mcq',
+    q: "In radiation oncology, big data primarily enables:",
+    opts: ["Dose optimization and outcome prediction",
+           "MRI compression only",
+           "Billing automation only",
+           "Patient scheduling only"] },
+  { u: 'III', type: 'mcq',
+    q: "Personalised OMICS phenotyping integrates:",
+    opts: ["Genomics, transcriptomics, proteomics, metabolomics",
+           "Only clinical history",
+           "Only genomics",
+           "Only imaging data"] },
+  { u: 'III', type: 'mcq',
+    q: "SOM in big data healthcare stands for:",
+    opts: ["Self-Organizing Map",
+           "Statistical Omic Model",
+           "System Operations Metric",
+           "Standard Output Monitor"] },
+  { u: 'III', type: 'numeric',
+    build: (rng) => {
+      const dims = [10, 12, 15, 18, 20, 25];
+      const m = dims[Math.floor(rng()*dims.length)];
+      const n = dims[Math.floor(rng()*dims.length)];
+      return {
+        q: `A SOM is set up as an <code>${m} x ${n}</code> grid of neurons. How many neuron units does it contain in total?`,
+        answer: m * n,
+        tolerance: 0
+      };
+    }
+  },
+  { u: 'III', type: 'mcq',
+    q: "In SOM portraying of omics data, each sample is visualised as:",
+    opts: ["A heatmap over the trained SOM grid",
+           "A single scalar score",
+           "A sequence alignment",
+           "A phylogenetic tree"] },
+  { u: 'III', type: 'mcq',
+    q: "Data integration in complex disease analysis typically means:",
+    opts: ["Combining multiple data types (multi-omics + clinical) per patient",
+           "Collecting only genomic data",
+           "Pooling only PubMed abstracts",
+           "Analysing one tissue only"] },
+  { u: 'III', type: 'mcq',
+    q: "Which set are high-throughput molecular medicine techniques?",
+    opts: ["Microarrays, NGS, mass spectrometry",
+           "Only PCR",
+           "Only histopathology staining",
+           "Only basic ELISA"] },
+  { u: 'III', type: 'mcq',
+    q: "Big data analytics in clinical operations most directly improves:",
+    opts: ["Workflow efficiency and resource allocation",
+           "Hospital parking only",
+           "Font choices in records only",
+           "Signage design"] },
+  { u: 'III', type: 'mcq',
+    q: "A major risk of applying ML to EHR data is:",
+    opts: ["Bias from unrepresentative training populations",
+           "Lower disk cost",
+           "Faster compilation",
+           "Lower network bandwidth"] },
+  { u: 'III', type: 'mcq',
+    q: "In personalized medicine, phenotype refers to:",
+    opts: ["Observable traits arising from genotype and environment",
+           "Only the raw DNA sequence",
+           "Only the lab test name",
+           "Only the drug prescribed"] },
+  { u: 'III', type: 'numeric',
+    build: (rng) => {
+      const Ps = [500, 800, 1000, 1500, 2000];
+      const Vs = [10, 15, 20, 24, 30];
+      const Ds = [30, 60, 90];
+      const P = Ps[Math.floor(rng()*Ps.length)];
+      const V = Vs[Math.floor(rng()*Vs.length)];
+      const D = Ds[Math.floor(rng()*Ds.length)];
+      return {
+        q: `A hospital tracks <code>${P}</code> patients, each with <code>${V}</code> vital-sign measurements per day, over <code>${D}</code> days. How many measurement records are stored in total?`,
+        answer: P * V * D,
+        tolerance: 0
+      };
+    }
+  },
+  { u: 'III', type: 'mcq',
+    q: "The main value of big data for pharma R&D is:",
+    opts: ["Hypothesis generation from large patient cohorts",
+           "Replacing clinical trials entirely",
+           "Avoiding regulatory review",
+           "Reducing paperwork only"] },
+
+  // ---------------- UNIT IV ----------------
+  { u: 'IV', type: 'mcq',
+    q: "Which R-Hadoop integration passes data via stdin/stdout to the mapper and reducer?",
+    opts: ["R + Hadoop Streaming", "RHIPE", "RHadoop", "sparklyr"] },
+  { u: 'IV', type: 'numeric',
+    build: (rng) => {
+      const ws = [[-2,1],[1,-1],[2,0],[-1,2],[3,-1],[0,2],[1,1]];
+      const xs = [[1,2],[2,1],[-1,1],[3,-2],[2,2],[-2,1]];
+      const bs = [-1, 0, 1, 2];
+      const w = ws[Math.floor(rng()*ws.length)];
+      const x = xs[Math.floor(rng()*xs.length)];
+      const b = bs[Math.floor(rng()*bs.length)];
+      const score = w[0]*x[0] + w[1]*x[1] + b;
+      return {
+        q: `A perceptron has weights <code>w = (${w[0]}, ${w[1]})</code> and bias <code>b = ${b}</code>. For an input <code>x = (${x[0]}, ${x[1]})</code>, compute the raw score <code>w &middot; x + b</code>.`,
+        answer: score,
+        tolerance: 0
+      };
+    }
+  },
+  { u: 'IV', type: 'mcq',
+    q: "The perceptron weight-update rule is applied when:",
+    opts: ["y &times; (w &middot; x + b) &le; 0 (misclassified or on boundary)",
+           "The learning rate is zero",
+           "All weights are already zero",
+           "The input is normalised"] },
+  { u: 'IV', type: 'mcq',
+    q: "Support vectors in an SVM are:",
+    opts: ["Training points on or inside the margin boundary",
+           "All training points",
+           "Only the misclassified points",
+           "Points farthest from the decision boundary"] },
+  { u: 'IV', type: 'mcq',
+    q: "The kernel trick allows an SVM to:",
+    opts: ["Separate non-linear data in a high-dimensional implicit space without computing the mapping",
+           "Skip training entirely",
+           "Replace cross-validation",
+           "Reduce training set size to one point"] },
+  { u: 'IV', type: 'numeric',
+    build: (rng) => {
+      const etas = [0.5, 1, 2];
+      const eta = etas[Math.floor(rng()*etas.length)];
+      const xs = [1, 2, 3];
+      const x = xs[Math.floor(rng()*xs.length)];
+      return {
+        q: `A perceptron with learning rate <code>&eta; = ${eta}</code> misclassifies a point whose first feature is <code>x<sub>1</sub> = ${x}</code>, with true label <code>y = +1</code>. By how much does the weight <code>w<sub>1</sub></code> change in this update step?`,
+        answer: eta * x,
+        tolerance: 0.001
+      };
+    }
+  },
+  { u: 'IV', type: 'mcq',
+    q: "In R, which function reads a tab-separated values file?",
+    opts: ["read.table() or read.delim()",
+           "read.csv() with no arguments",
+           "read.fasta()",
+           "load.table()"] },
+  { u: 'IV', type: 'mcq',
+    q: "RHIPE differs from basic R + Hadoop Streaming in that RHIPE:",
+    opts: ["Uses binary serialisation of native R objects between mapper and reducer",
+           "Can only run on a single node",
+           "Is restricted to Windows",
+           "Requires no R installation"] },
+];
+
+// =====================================================================
+// FLAVOUR
+// =====================================================================
+const SPIRIT_TOOLS = ["Hadoop", "Apache Spark", "R", "Python / pandas", "Flink"];
+const PATHOGENS = ["E. coli", "K. pneumoniae", "S. aureus", "A. baumannii",
+                   "P. aeruginosa", "Enterococcus faecium", "Enterobacter cloacae"];
+const RANKS = [
+  {min: 36, name: "Platinum - Hadoop Grandmaster"},
+  {min: 30, name: "Gold - Senior Big Data Biologist"},
+  {min: 24, name: "Silver - MapReduce Analyst"},
+  {min: 16, name: "Bronze - Big Data Trainee"},
+  {min: 0,  name: "Explorer - Keep learning!"}
+];
+
+// =====================================================================
+// STATE
+// =====================================================================
+let state = {
+  name: '', regno: '', seed: 0,
+  rng: null,
+  order: [],
+  variants: [],
+  answers: [],
+  idx: 0,
+  score: 0,
+  bonus: 0,
+  streak: 0,
+  start: 0,
+  qStart: 0,
+  timer: null,
+  locked: false,
+};
+
+const UNIT_PERIODS = { 'I': 10, 'II': 12, 'III': 13, 'IV': 10 };
+const UNIT_COLORS  = { 'I': '#C1121F', 'II': '#2E86DE', 'III': '#1e8449', 'IV': '#8E44AD' };
+
+// =====================================================================
+// WIRE UP
+// =====================================================================
+document.getElementById('btn-start').addEventListener('click', onStart);
+document.getElementById('btn-begin').addEventListener('click', onBegin);
+document.getElementById('btn-num-submit').addEventListener('click', onNumSubmit);
+document.getElementById('num-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') onNumSubmit();
+});
+
+function onStart() {
+  const name = document.getElementById('in-name').value.trim();
+  const regno = document.getElementById('in-regno').value.trim();
+  if (!name || name.length < 2) { alert("Enter your full name."); return; }
+  if (!regno || regno.length < 3) { alert("Enter your registration number."); return; }
+
+  state.name = name;
+  state.regno = regno;
+  state.seed = strHash(regno.toLowerCase());
+  state.rng = mulberry32(state.seed);
+
+  // determine order: weighted by unit periods, within each unit a shuffled slice
+  const byUnit = { 'I': [], 'II': [], 'III': [], 'IV': [] };
+  BANK.forEach((q, i) => byUnit[q.u].push(i));
+  // We'll pick: 10 Unit I + 10 Unit II + 12 Unit III + 8 Unit IV = 40
+  // Bank has exactly: 10/10/12/8 so take all, but shuffle within each unit then concat in syllabus order
+  const orderByUnit = ['I','II','III','IV'].map(u =>
+    shuffle(byUnit[u], state.rng)
+  );
+  state.order = [].concat(...orderByUnit);
+
+  // Build variants for numeric and option order for mcq
+  state.variants = state.order.map((bankIdx) => {
+    const q = BANK[bankIdx];
+    if (q.type === 'numeric') {
+      // use a fresh rng derived from seed + bankIdx so variant is stable per student
+      const vrng = mulberry32(state.seed ^ (bankIdx * 2654435761));
+      return q.build(vrng);
+    } else {
+      // mcq: shuffle options; remember which position holds the correct one
+      // options[0] is correct in bank definition
+      const idx = [0,1,2,3];
+      const shuf = shuffle(idx, mulberry32(state.seed ^ (bankIdx * 1597334677)));
+      const shownOpts = shuf.map(i => q.opts[i]);
+      const correctPos = shuf.indexOf(0);
+      return { q: q.q, options: shownOpts, correctPos };
+    }
+  });
+
+  // personalise intro
+  const spirit = SPIRIT_TOOLS[state.seed % SPIRIT_TOOLS.length];
+  const pathogen = PATHOGENS[(state.seed >>> 3) % PATHOGENS.length];
+  const firstName = name.split(/\s+/)[0];
+  document.getElementById('intro-greeting').textContent = `Welcome, ${firstName}.`;
+  document.getElementById('intro-story').innerHTML =
+    `Your lab cluster <code>${regno.toUpperCase()}-NODE</code> just received a 2 TB CRAM file from a <strong>${pathogen}</strong> outbreak. ` +
+    `Your weapon of choice: <strong>${spirit}</strong>. Your task: survive 40 questions on everything we covered.`;
+  document.getElementById('intro-tool').textContent = spirit;
+  document.getElementById('intro-pathogen').innerHTML = `<em>${pathogen}</em>`;
+
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('intro').classList.remove('hidden');
+}
+
+function onBegin() {
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  state.start = Date.now();
+  state.idx = 0;
+  renderQuestion();
+}
+
+// =====================================================================
+// QUESTION RENDER + TIMER
+// =====================================================================
+const TIME_MCQ = 35;      // seconds for MCQ
+const TIME_NUMERIC = 60;  // seconds for numeric calculation
+
+function renderQuestion() {
+  state.locked = false;
+  const bankIdx = state.order[state.idx];
+  const q = BANK[bankIdx];
+  const v = state.variants[state.idx];
+
+  document.getElementById('q-unit').textContent = `Unit ${q.u}`;
+  document.getElementById('q-counter').textContent = `Q ${state.idx + 1} / 40`;
+  document.getElementById('q-answered').textContent = `Answered: ${state.idx}`;
+
+  document.getElementById('q-progress').style.width =
+    `${(state.idx / 40) * 100}%`;
+
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+
+  const typeTag = document.getElementById('q-type');
+  typeTag.className = 'q-type-tag';
+
+  if (q.type === 'mcq') {
+    typeTag.textContent = 'MCQ - 35s';
+    document.getElementById('q-text').innerHTML = v.q;
+    const optBox = document.getElementById('q-options');
+    optBox.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    v.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+      btn.addEventListener('click', () => onMCQAnswer(i));
+      optBox.appendChild(btn);
+    });
+    document.getElementById('q-options').classList.remove('hidden');
+    document.getElementById('q-numeric').classList.add('hidden');
+  } else {
+    typeTag.textContent = 'NUMERIC - use your phone calculator - 60s';
+    typeTag.classList.add('numeric');
+    document.getElementById('q-text').innerHTML = v.q;
+    document.getElementById('q-options').classList.add('hidden');
+    document.getElementById('q-numeric').classList.remove('hidden');
+    const inp = document.getElementById('num-input');
+    inp.value = '';
+    inp.classList.remove('locked');
+    inp.disabled = false;
+    document.getElementById('btn-num-submit').disabled = false;
+    setTimeout(() => inp.focus(), 100);
+  }
+
+  const timeForQ = (q.type === 'numeric') ? TIME_NUMERIC : TIME_MCQ;
+  startTimer(timeForQ);
+}
+
+function startTimer(seconds) {
+  state.qStart = Date.now();
+  state.qDuration = seconds;
+  let elapsed = 0;
+  const DASH = 163.4;
+  const fill = document.getElementById('timer-fill');
+  const num = document.getElementById('timer-num');
+  const ring = document.getElementById('timer');
+  ring.className = 'timer-circle';
+  num.textContent = seconds;
+  fill.style.strokeDashoffset = '0';
+
+  if (state.timer) clearInterval(state.timer);
+  state.timer = setInterval(() => {
+    elapsed++;
+    const left = seconds - elapsed;
+    num.textContent = left;
+    fill.style.strokeDashoffset = (elapsed / seconds) * DASH;
+    if (left <= 10) ring.classList.add('warn');
+    if (left <= 5)  { ring.classList.add('danger'); ring.classList.remove('warn'); }
+    if (elapsed >= seconds) {
+      clearInterval(state.timer);
+      state.timer = null;
+      if (!state.locked) onTimeout();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timer) { clearInterval(state.timer); state.timer = null; }
+}
+
+function onMCQAnswer(chosen) {
+  if (state.locked) return;
+  state.locked = true;
+  stopTimer();
+  const v = state.variants[state.idx];
+  const correct = (chosen === v.correctPos);
+  const buttons = document.querySelectorAll('#q-options .opt');
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === chosen) b.classList.add('selected');
+  });
+  document.getElementById('feedback').textContent = 'Answer locked. Next question in a moment...';
+  recordAnswer(correct, chosen);
+}
+
+function onNumSubmit() {
+  if (state.locked) return;
+  const raw = document.getElementById('num-input').value.trim();
+  if (!raw) { return; }
+  state.locked = true;
+  stopTimer();
+  const v = state.variants[state.idx];
+  const user = parseFloat(raw);
+  const correct = !isNaN(user) && Math.abs(user - v.answer) <= v.tolerance;
+  const inp = document.getElementById('num-input');
+  inp.disabled = true;
+  document.getElementById('btn-num-submit').disabled = true;
+  inp.classList.add('locked');
+  document.getElementById('feedback').textContent = 'Answer locked. Next question in a moment...';
+  recordAnswer(correct, user);
+}
+
+function onTimeout() {
+  state.locked = true;
+  const bankIdx = state.order[state.idx];
+  const q = BANK[bankIdx];
+  if (q.type === 'mcq') {
+    const buttons = document.querySelectorAll('#q-options .opt');
+    buttons.forEach((b) => { b.disabled = true; });
+  } else {
+    const inp = document.getElementById('num-input');
+    inp.disabled = true;
+    inp.classList.add('locked');
+    document.getElementById('btn-num-submit').disabled = true;
+  }
+  document.getElementById('feedback').textContent = 'Time up. Moving on...';
+  recordAnswer(false, null);
+}
+
+function recordAnswer(correct, userAns) {
+  const bankIdx = state.order[state.idx];
+  state.answers.push({
+    bankIdx, u: BANK[bankIdx].u, type: BANK[bankIdx].type,
+    user: userAns, correct
+  });
+
+  // Track streak and bonus silently - revealed at end
+  if (correct) {
+    state.score += 1;
+    state.streak += 1;
+    if (state.streak > 0 && state.streak % 5 === 0) {
+      state.bonus += 3;
+    }
+  } else {
+    state.streak = 0;
+  }
+
+  setTimeout(nextQ, 1500);
+}
+
+function nextQ() {
+  state.idx++;
+  if (state.idx >= state.order.length) {
+    finish();
+  } else {
+    renderQuestion();
+  }
+}
+
+// =====================================================================
+// RESULT
+// =====================================================================
+function finish() {
+  stopTimer();
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('result').classList.remove('hidden');
+
+  const total = state.score + state.bonus;
+  document.getElementById('res-score').textContent = total;
+  document.getElementById('res-name').textContent = state.name;
+  document.getElementById('res-regno').textContent = state.regno.toUpperCase();
+  document.getElementById('res-date').textContent = new Date().toLocaleString('en-IN');
+  document.getElementById('res-correct').textContent = `${state.score} / 40`;
+  document.getElementById('res-bonus').textContent = `+${state.bonus}`;
+  const secs = Math.round((Date.now() - state.start) / 1000);
+  document.getElementById('res-time').textContent = `${Math.floor(secs/60)}m ${secs%60}s`;
+
+  const rank = RANKS.find(r => total >= r.min);
+  document.getElementById('res-rank').textContent = rank.name;
+
+  // unit breakdown
+  const unitBox = document.getElementById('res-units');
+  const unitStats = { 'I': {ok:0, tot:0}, 'II': {ok:0, tot:0},
+                      'III': {ok:0, tot:0}, 'IV': {ok:0, tot:0} };
+  state.answers.forEach(a => {
+    unitStats[a.u].tot += 1;
+    if (a.correct) unitStats[a.u].ok += 1;
+  });
+  unitBox.innerHTML = '';
+  ['I','II','III','IV'].forEach(u => {
+    const s = unitStats[u];
+    const pct = s.tot ? (s.ok / s.tot * 100) : 0;
+    const row = document.createElement('div');
+    row.className = 'unit-row';
+    row.innerHTML = `
+      <span class="u-label">Unit ${u}</span>
+      <span class="u-bar"><span class="u-fill" style="width:${pct}%;background:${UNIT_COLORS[u]}"></span></span>
+      <span class="u-score">${s.ok}/${s.tot}</span>`;
+    unitBox.appendChild(row);
+  });
+
+  // verification hash
+  const payload = state.regno.toLowerCase() + '|' + state.name.toLowerCase() + '|' +
+                  state.answers.map(a => a.correct ? '1' : '0').join('') + '|' + total;
+  const h = strHash(payload);
+  const code = h.toString(36).toUpperCase().padStart(7, '0').slice(0, 6);
+  document.getElementById('res-hash').textContent = code;
+
+  // populate the hidden review
+  const reviewBox = document.getElementById('res-review');
+  reviewBox.innerHTML = '';
+  state.answers.forEach((a, i) => {
+    const q = BANK[a.bankIdx];
+    const v = state.variants[i];
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    let userAnsStr, correctAnsStr;
+    if (q.type === 'mcq') {
+      const letters = ['A','B','C','D'];
+      const userLetter = (a.user !== null && a.user !== undefined) ? letters[a.user] : '-';
+      const userText = (a.user !== null && a.user !== undefined) ? v.options[a.user] : 'No answer';
+      const correctLetter = letters[v.correctPos];
+      const correctText = v.options[v.correctPos];
+      userAnsStr = `${userLetter}. ${userText}`;
+      correctAnsStr = `${correctLetter}. ${correctText}`;
+    } else {
+      userAnsStr = (a.user !== null && a.user !== undefined) ? String(a.user) : 'No answer';
+      correctAnsStr = String(v.answer);
+    }
+    item.innerHTML = `
+      <div class="r-head">
+        <span class="r-badge ${a.correct ? 'ok' : 'no'}">${a.correct ? '✓' : '✗'}</span>
+        <strong>Q${i+1} (Unit ${q.u})</strong>
+      </div>
+      <div class="r-qtext">${v.q}</div>
+      <div class="r-ans">
+        <div class="yours">Your answer: <span class="${a.correct ? 'theirs' : 'wrong-ans'}">${userAnsStr}</span></div>
+        ${a.correct ? '' : `<div>Correct: <span class="theirs">${correctAnsStr}</span></div>`}
+      </div>`;
+    reviewBox.appendChild(item);
+  });
+
+  document.getElementById('btn-toggle-review').addEventListener('click', () => {
+    const box = document.getElementById('res-review');
+    const btn = document.getElementById('btn-toggle-review');
+    if (box.classList.contains('hidden')) {
+      box.classList.remove('hidden');
+      btn.textContent = 'Hide answer review';
+    } else {
+      box.classList.add('hidden');
+      btn.textContent = 'Show full answer review';
+    }
+  });
+
+  if (total >= 28) launchConfetti();
+}
+
+function launchConfetti() {
+  const colors = ['#C1121F', '#111', '#ffcf33', '#2E86DE', '#1e8449'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.style.animation = `fall ${2 + Math.random()*3}s linear ${Math.random()*1.5}s forwards`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 6000);
+  }
+}
+const kf = document.createElement('style');
+kf.textContent = `@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}`;
+document.head.appendChild(kf);
+</script>
+</body>
+</html>
